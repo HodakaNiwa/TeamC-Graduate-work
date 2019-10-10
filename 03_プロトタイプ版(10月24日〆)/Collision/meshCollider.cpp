@@ -6,7 +6,7 @@
 //*****************************************************************************
 #include "collision.h"
 #include "manager.h"
-#include "system.h"
+#include "renderer.h"
 #include "library.h"
 
 //*****************************************************************************
@@ -73,7 +73,7 @@ CMeshCollider *CMeshCollider::Create(float fWidth, float fDepth, int nXBlock, in
 HRESULT CMeshCollider::Init(void)
 {
 	// 描画デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 	if (pDevice == NULL) { return E_FAIL; }
 
 	// 作成に必要な頂点数,インデックス数,ポリゴン数を計算

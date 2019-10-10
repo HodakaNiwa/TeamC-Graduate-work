@@ -66,8 +66,8 @@ HRESULT CColDispSphere::Init(D3DXVECTOR3 pos, D3DXCOLOR col, float fRadius, int 
 	ClearVariable();
 
 	// 各種値の設定
-	GetObject3D()->SetPos(pos);                 // 球の座標
-	GetObject3D()->SetRot(INITIALIZE_VECTOR3);  // 球の向き
+	SetPos(pos);								// 球の座標
+	SetRot(INITIALIZE_VECTOR3);					// 球の向き
 	SetCol(col);                                // 球の色
 	SetRadius(fRadius);                         // 球の半径
 	SetXBlock(nXBlock);                         // 横の分割数
@@ -114,7 +114,7 @@ void CColDispSphere::Disp(void)
 	if (CCollider::GetDrawAll() == false) { return; }
 
 	// 描画デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 	if (pDevice == NULL) { return; }
 
 	// ライティングを無効に

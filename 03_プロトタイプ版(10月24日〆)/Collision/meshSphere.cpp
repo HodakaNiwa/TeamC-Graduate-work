@@ -4,7 +4,7 @@
 //     Auther:Hodaka Niwa
 //
 //*****************************************************************************
-#include "3DMesh.h"
+#include "meshSphere.h"
 #include "manager.h"
 #include "library.h"
 
@@ -71,7 +71,7 @@ CMeshSphere *CMeshSphere::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col
 HRESULT CMeshSphere::Init(void)
 {
 	// 描画デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 	if (pDevice == NULL) { return E_FAIL; }
 
 	// 作成に必要な頂点数,インデックス数,ポリゴン数を計算
@@ -134,7 +134,7 @@ void CMeshSphere::Update(void)
 void CMeshSphere::Draw(void)
 {
 	// 描画デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 	if (pDevice == NULL) { return; }
 
 	// トランスフォーム情報を計算しデバイスに設定

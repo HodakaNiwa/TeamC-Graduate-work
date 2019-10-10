@@ -47,6 +47,7 @@ public:    // 誰でもアクセス可能
 	void SetRadius(const float fRadius);
 	void SetXBlock(const int nXBlock);
 	void SetYBlock(const int nYBlock);
+	void Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) {};
 
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void);
 	LPDIRECT3DINDEXBUFFER9 GetIdxBuff(void);

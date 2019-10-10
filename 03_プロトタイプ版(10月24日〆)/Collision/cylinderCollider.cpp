@@ -6,7 +6,7 @@
 //*****************************************************************************
 #include "collision.h"
 #include "manager.h"
-#include "system.h"
+#include "renderer.h"
 #include "library.h"
 
 //*****************************************************************************
@@ -70,7 +70,7 @@ CCylinderCollider *CCylinderCollider::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale,
 HRESULT CCylinderCollider::Init(void)
 {
 	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 	if (pDevice == NULL) { return E_FAIL; }
 
 	// 頂点バッファの生成
@@ -112,7 +112,7 @@ void CCylinderCollider::Draw(void)
 {
 #ifdef _DEBUG
 	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 	if (pDevice == NULL) { return; }
 
 	DWORD Culling;
@@ -361,7 +361,6 @@ bool CCylinderCollider::LandCollision(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D
 				pPos->z += Move.z;
 				pPos->y = pos.y + m_fHeight;
 				pMove->y = 0.0f;
-				CDebugProc::Print("筒に乗っています\n");
 			}
 			bHit = true;
 			if (pLand != NULL)

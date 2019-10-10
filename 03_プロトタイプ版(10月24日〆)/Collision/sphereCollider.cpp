@@ -6,7 +6,7 @@
 //*****************************************************************************
 #include "collision.h"
 #include "manager.h"
-#include "system.h"
+#include "renderer.h"
 #include "library.h"
 
 //*****************************************************************************
@@ -113,7 +113,7 @@ void CSphereCollider::Draw(void)
 	if (m_pColDispSphere != NULL)
 	{
 		D3DXMATRIX mtxWorld = GetMtxWorld();
-		m_pColDispSphere->GetObject3D()->SetPos(D3DXVECTOR3(mtxWorld._41, mtxWorld._42, mtxWorld._43));
+		m_pColDispSphere->SetPos(D3DXVECTOR3(mtxWorld._41, mtxWorld._42, mtxWorld._43));
 		m_pColDispSphere->Disp();
 	}
 #endif
