@@ -36,7 +36,7 @@ public:
 	static CCharacter* Create();
 
 	//	---<<基盤関数>>---
-	HRESULT Init(char FileName[40]);
+	HRESULT Init(char ModelTxt[40], char MotionTxt[40]);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -51,10 +51,15 @@ public:
 	static char *GetLIneTop(char *pSrc);
 	static int PopString(char *pSrc, char *pDst);
 
+	//	---<<Get関数>>---
+	CModel** GetModel() { return m_ppModel; }
+	//	---<<Set関数>>---
+
+
 private:
 	//	---<<モデル関連変数>>---
 	CModel **m_ppModel;
-	char* m_TextName[40];						//	読み込むテキストファイル名
+	char* m_cModelTxt[40];						//	読み込むテキストファイル名
 	static LPDIRECT3DTEXTURE9 m_pTexture;		
 	static char *m_pUVTexName;					//	UVテクスチャ名
 	static int m_nPartsNum;						//	パーツ数
@@ -65,11 +70,10 @@ private:
 
 	//	---<<モーション関連変数>>---
 	CMotion *m_pMotion;
+	char* m_cMotionTxt[40];						//	読み込むテキストファイル名
 	static CMotion::MOTION_INFO *m_pMotionInfo;
 	int m_nNumMotionMAX;
 	int m_nNumKey;
-
-	D3DXVECTOR3					m_Pos;							//位置
 
 };
 

@@ -77,7 +77,7 @@ void CGame::Init(void)
 	if (m_pPlayer == NULL)
 	{
 		m_pPlayer = new CPlayer;
-		m_pPlayer->Init("data\\TEXT\\PLAYER_LODE.txt");
+		m_pPlayer->Init("data\\TEXT\\PLAYER_LODE.txt", "data\\TEXT\\PLAYER_MOTION.txt");
 	}
 	//	š	š	š	š	š	š	š	š	š	š	š	š	š	š	š	š
 

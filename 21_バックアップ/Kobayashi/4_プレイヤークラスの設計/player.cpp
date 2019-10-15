@@ -24,13 +24,13 @@ CPlayer::~CPlayer()
 //==============================================
 //					¶¬
 //==============================================
-CPlayer* CPlayer::Create(char FileName[40])
+CPlayer* CPlayer::Create(char ModelTxt[40], char MotionTxt[40])
 {
 	CPlayer * pPlayer = NULL;
 	if (pPlayer == NULL)
 	{
 		pPlayer = new CPlayer;
-		pPlayer->Init(FileName);
+		pPlayer->Init(ModelTxt, MotionTxt);
 	}
 
 	return pPlayer;
@@ -39,9 +39,12 @@ CPlayer* CPlayer::Create(char FileName[40])
 //==============================================
 //					‰Šú‰»
 ////==============================================
-HRESULT CPlayer::Init(char FileName[40])
+HRESULT CPlayer::Init(char ModelTxt[40], char MotionTxt[40])
 {
-	CCharacter::Init(FileName);
+	CCharacter::Init(ModelTxt, MotionTxt);
+
+	m_pModel = CCharacter::GetModel();
+	m_pModel[0]->SetFirstPos(D3DXVECTOR3(50.0f, 20.0f, 80.0f));	//	‰Šú’lpos(¦è‘Å‚¿)
 	return S_OK;
 }
 
@@ -59,7 +62,6 @@ void CPlayer::Uninit()
 void CPlayer::Update()
 {
 	CCharacter::Update();
-
 }
 
 //==============================================

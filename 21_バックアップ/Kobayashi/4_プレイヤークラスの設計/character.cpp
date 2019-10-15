@@ -44,7 +44,7 @@ CCharacter* CCharacter::Create()
 	if (pCharacter == NULL)
 	{
 		pCharacter = new CCharacter;
-		pCharacter->Init("data\\TEXT\\PLAYER_LODE.txt");
+		pCharacter->Init("data\\TEXT\\PLAYER_LODE.txt", "data\\TEXT\\PLAYER_MOTION.txt");
 	}
 
 	return pCharacter;
@@ -53,10 +53,10 @@ CCharacter* CCharacter::Create()
 //==============================================
 //					初期化
 ////==============================================
-HRESULT CCharacter::Init(char FileName[40])
+HRESULT CCharacter::Init(char ModelTxt[40], char MotionTxt[40])
 {
-	m_TextName[0] = &FileName[0];
-
+	m_cModelTxt[0] = &ModelTxt[0];
+	m_cMotionTxt[0] = &MotionTxt[0];
 	ModelSetLode();
 
 	m_ppModel = new CModel*[m_nPartsNum];		//	パーツ分確保する
@@ -242,7 +242,7 @@ void CCharacter::ModelSetLode(void)
 	int nDelay;			//	読み込む文字位置をずらす
 	int nCnt = 0;
 	
-	pFile = fopen(m_TextName[0], "r");	//	読み込むテキスト名
+	pFile = fopen(m_cModelTxt[0], "r");	//	読み込むテキスト名
 
 	if (pFile != NULL)
 	{
@@ -411,7 +411,7 @@ void CCharacter::MotionSetLode(void)
 	char aStr[256];//文字列の抜き出し
 	int nWord;
 	int nMotionNum = 0;	//	モーションの種類分カウントする
-	pFile = fopen("DATA\\TEXT\\PLAYER_MOTION.txt", "r");	//	---<<テキスト読み込み>>---
+	pFile = fopen(m_cMotionTxt[0], "r");	//	---<<テキスト読み込み>>---
 
 	if (pFile != NULL)
 	{

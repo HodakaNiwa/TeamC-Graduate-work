@@ -23,15 +23,17 @@ public:
 	CPlayer();
 	~CPlayer();
 
-	static CPlayer* Create(char FileName[40]);
+	static CPlayer* Create(char ModelTxt[40], char MotionTxt[40]);
 
 	//	---<<äÓî’ä÷êî>>---
-	HRESULT Init(char FileName[40]);
+	HRESULT Init(char ModelTxt[40], char MotionTxt[40]);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
 private:
+	//	à íuÅEâÒì]èÓïÒ
+	CModel** m_pModel;
 	
 };
 

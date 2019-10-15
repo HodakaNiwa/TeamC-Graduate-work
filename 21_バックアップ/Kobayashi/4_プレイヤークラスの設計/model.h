@@ -49,6 +49,7 @@ public://誰でも扱える
 	LPD3DXBUFFER GetBuffMat() { return m_pBuffMat; }
 	DWORD GetNumMat() { return m_nNumMat; }
 	CModel* GetParent() { return m_pParent; }
+	//	---<<デバック用変数>>---
 	static int GetCreateNum() {return m_nCreateNum;}
 	//	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★
 

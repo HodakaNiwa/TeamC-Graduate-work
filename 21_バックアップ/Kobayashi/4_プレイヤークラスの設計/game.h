@@ -66,7 +66,6 @@ private:
 	//	---<<¬—Ñ‚ª’Ç‰Á‚µ‚Ü‚µ‚½>>š	š	š	š	š	š	š	š	š	š
 	//static CCharacter* m_pCharacter;	//	ƒ‚ƒfƒ‹
 	static CPlayer* m_pPlayer;	//	ƒ‚ƒfƒ‹
-
 	//	š	š	š	š	š	š	š	š	š	š	š	š	š	š	š	š
 
 };
