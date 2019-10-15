@@ -1,0 +1,27 @@
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -150.0 0.0 0.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 1
+	TEX = 1
+	POS = 71.4 0.0 0.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 0.0 0.0 0.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
