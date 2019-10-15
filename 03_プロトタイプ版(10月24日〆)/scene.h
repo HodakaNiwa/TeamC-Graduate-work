@@ -58,6 +58,8 @@ public:
 		OBJTYPE_2DPOLYGON,
 		OBJTYPE_MESHSPHERE,
 		OBJTYPE_COLDISPSPHERE,
+		OBJTYPE_OBJ,
+		OBJTYPE_TERRITORY,
 	}OBJTYPE;
 
 	CScene(int nPriority = 3, OBJTYPE ObjType = OBJTYPE_NONE);
@@ -84,6 +86,7 @@ public:
 	CScene * GetpNext(void) { return m_pNext; };					//次のオブジェクトポインタの取得
 	static void SetPause(bool bPause) { m_bPause = bPause; };		//ポーズの設定
 	bool GetDraw(void) { return m_bDraw; }							//描画状態の取得
+	bool GetDeth(void) { return m_bDeth; }
 		
 protected:
 	void Release(void);
