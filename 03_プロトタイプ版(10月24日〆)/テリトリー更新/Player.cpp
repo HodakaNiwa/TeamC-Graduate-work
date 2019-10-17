@@ -52,15 +52,14 @@ CPlayer::~CPlayer()
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CPlayer::Init(D3DXVECTOR3 pos, NUMPLAYER nNumPlayer, char ModelTxt[40], char MotionTxt[40])
+HRESULT CPlayer::Init(D3DXVECTOR3 pos, int nNumPlayer, char ModelTxt[40], char MotionTxt[40])
 {
-	m_NumPlayer = nNumPlayer;
+	m_nNumPlayer = nNumPlayer;
 	CCharacter::Init(ModelTxt,MotionTxt);
 	m_pModel = CCharacter::GetModel();
 	CCharacter::SetPos(pos);
 	m_pTerritoryTop = NULL;		//リストの先頭ポインタ
 	m_pTerritoryCur = NULL;		//リストの最後のポインタ
-
 	return S_OK;
 }
 
@@ -102,15 +101,15 @@ void  CPlayer::Draw(void)
 	//位置
 
 	CCharacter::Draw();
-	D3DXMATRIX mtxWorld;
-	D3DXMatrixIdentity(&mtxWorld);
-	CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
+	//D3DXMATRIX mtxWorld;
+	//D3DXMatrixIdentity(&mtxWorld);
+	//CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
 }
 
 //=============================================================================
 //オブジェクトの生成処理
 //=============================================================================
-CPlayer *CPlayer::Create(D3DXVECTOR3 pos, NUMPLAYER nNumPlayer, char ModelTxt[40], char MotionTxt[40], TYPE type)
+CPlayer *CPlayer::Create(D3DXVECTOR3 pos, int nNumPlayer, char ModelTxt[40], char MotionTxt[40],TYPE type)
 {
 	CPlayer *pPlayer = NULL;
 
@@ -125,15 +124,16 @@ CPlayer *CPlayer::Create(D3DXVECTOR3 pos, NUMPLAYER nNumPlayer, char ModelTxt[40
 			//初期化処理
 			pPlayer->Init(pos,nNumPlayer,ModelTxt,MotionTxt);
 			pPlayer->SetType(type);
+
 		}
 		else
 		{
-			MessageBox(0, "territoryがNULLでした", "警告", MB_OK);
+			MessageBox(0, "プレイヤーがNULLでした", "警告", MB_OK);
 		}
 	}
 	else
 	{
-		MessageBox(0, "territoryがNULLじゃないです", "警告", MB_OK);
+		MessageBox(0, "プレイヤーがNULLじゃないです", "警告", MB_OK);
 	}
 	return pPlayer;
 }
@@ -154,16 +154,26 @@ void  CPlayer::PlayerMove(void)
 	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
 	CGamePad * pGamePad = CManager::GetInputGamePad();				//ゲームパッドの取得
 	CInputXPad * pXPad = CManager::GetXPad();
-	float fRot = pXPad->GetStickRot(0, m_NumPlayer);
+	float fRot = pXPad->GetStickRot(0, m_nNumPlayer);
 
 
 	CManager *pManager = NULL;
 	CGame *pGame = pManager->GetGame();
 	CGameCamera *pGameCamera = pGame->GetGameCamera(0);
-	D3DXVECTOR3 rot = pGameCamera->GetRot();
-	
 
+	//向きと位置の取得
+	D3DXVECTOR3 rot = pGameCamera->GetRot();
 	D3DXVECTOR3 pos = CCharacter::GetPos();
+
+	//ステータスの取得
+	int   nAttack      = GetAttack();
+	float fAttackSpeed = GetAttackSpeed();
+	float fRange       = GetRange();
+	float fSpeed       = GetSpeed();
+	float fInertia     = GetInertia();
+	float fLineTime    = GetLineTime();
+
+	//前回の位置を格納
 	m_posOld = pos;
 
 	//プレイヤーの移動処理（キーボード）
@@ -171,20 +181,20 @@ void  CPlayer::PlayerMove(void)
 	{
 		if (pInputKeyboard->GetKeyboardPress(DIK_UP) == true)
 		{//ポリゴンを左上に移動
-			m_move.x -= sinf(rot.y + (-D3DX_PI * 0.25f)) * SPEED;
-			m_move.z -= cosf(rot.y + (-D3DX_PI * 0.25f)) * SPEED;
+			m_move.x -= sinf(rot.y + (-D3DX_PI * 0.25f)) * fSpeed;
+			m_move.z -= cosf(rot.y + (-D3DX_PI * 0.25f)) * fSpeed;
 			m_Angle.y = rot.y - (D3DX_PI * 0.25f);
 		}
 		else if (pInputKeyboard->GetKeyboardPress(DIK_DOWN) == true)
 		{//ポリゴンを左下に移動
-			m_move.x -= sinf(rot.y + (-D3DX_PI * 0.75f)) * SPEED;
-			m_move.z -= cosf(rot.y + (-D3DX_PI * 0.75f)) * SPEED;
+			m_move.x -= sinf(rot.y + (-D3DX_PI * 0.75f)) * fSpeed;
+			m_move.z -= cosf(rot.y + (-D3DX_PI * 0.75f)) * fSpeed;
 			m_Angle.y = rot.y - (D3DX_PI * 0.75f);
 		}
 		else
 		{//ポリゴンを左に移動
-			m_move.x -= sinf(rot.y + (-D3DX_PI * 0.5f)) * SPEED;
-			m_move.z -= cosf(rot.y + (-D3DX_PI * 0.5f)) * SPEED;
+			m_move.x -= sinf(rot.y + (-D3DX_PI * 0.5f)) * fSpeed;
+			m_move.z -= cosf(rot.y + (-D3DX_PI * 0.5f)) * fSpeed;
 			m_Angle.y = rot.y - (D3DX_PI * 0.5f);
 		}
 	}
@@ -192,14 +202,14 @@ void  CPlayer::PlayerMove(void)
 	{
 		if (pInputKeyboard->GetKeyboardPress(DIK_UP) == true)
 		{//ポリゴンを右上に移動
-			m_move.x -= sinf(rot.y + (D3DX_PI * 0.25f)) * SPEED;
-			m_move.z -= cosf(rot.y + (D3DX_PI * 0.25f)) * SPEED;
+			m_move.x -= sinf(rot.y + (D3DX_PI * 0.25f)) * fSpeed;
+			m_move.z -= cosf(rot.y + (D3DX_PI * 0.25f)) * fSpeed;
 			m_Angle.y = rot.y + (D3DX_PI * 0.25f);
 		}
 		else if (pInputKeyboard->GetKeyboardPress(DIK_DOWN) == true)
 		{//ポリゴンを右下に移動
-			m_move.x -= sinf(rot.y + (D3DX_PI * 0.75f)) * SPEED;
-			m_move.z -= cosf(rot.y + (D3DX_PI * 0.75f)) * SPEED;
+			m_move.x -= sinf(rot.y + (D3DX_PI * 0.75f)) * fSpeed;
+			m_move.z -= cosf(rot.y + (D3DX_PI * 0.75f)) * fSpeed;
 			m_Angle.y = rot.y + (D3DX_PI * 0.75f);
 		}
 		else
@@ -217,22 +227,20 @@ void  CPlayer::PlayerMove(void)
 	}
 	else if (pInputKeyboard->GetKeyboardPress(DIK_DOWN) == true)
 	{
-		m_move.x -= sinf(rot.y + D3DX_PI * 1.0f) * SPEED;
-		m_move.z -= cosf(rot.y + D3DX_PI * 1.0f) * SPEED;
+		m_move.x -= sinf(rot.y + D3DX_PI * 1.0f) * fSpeed;
+		m_move.z -= cosf(rot.y + D3DX_PI * 1.0f) * fSpeed;
 		m_Angle.y = D3DX_PI + rot.y;
 	}
 
 		//コントローラー（XInput）
-		if (pXPad->GetStick(0, m_NumPlayer) == true)
+		if (pXPad->GetStick(0, m_nNumPlayer) == true)
 		{
-			m_move.x -= sinf(fRot + rot.y) * SPEED;
-			m_move.z -= cosf(fRot + rot.y) * SPEED;
+			m_move.x -= sinf(fRot + rot.y) * fSpeed;
+			m_move.z -= cosf(fRot + rot.y) * fSpeed;
 			m_Angle.y = rot.y + fRot;
 		}
 	
-
 		D3DXVECTOR3 DiffAngle;
-
 
 		// プレイヤーの角度を修正
 		DiffAngle.y = m_Angle.y - m_rot.y;   //差分を計算
@@ -261,8 +269,8 @@ void  CPlayer::PlayerMove(void)
 		pos += m_move;
 
 		//慣性
-		m_move.x += (0.0f - m_move.x) * 1.0f;
-		m_move.z += (0.0f - m_move.z) * 1.0f;
+		m_move.x += (0.0f - m_move.x) * fInertia;
+		m_move.z += (0.0f - m_move.z) * fInertia;
 	
 		CCharacter::SetPos(pos);
 		CCharacter::SetRot(m_rot);
@@ -329,3 +337,4 @@ bool CPlayer::CollisionBoxCollider(CBoxCollider *pBoxCollider, D3DXVECTOR3 &pos,
 	}
 	return false;
 }
+

@@ -23,7 +23,6 @@
 #define PLAYER_GRAVITY	(0.5f)
 #define PLAYER_MAX_PATTERN		(10)
 #define MAX_PLAY (2)
-
 //==============================================
 //					前方宣言
 //==============================================
@@ -41,7 +40,6 @@ class CCylinderCollider;
 class CEnemyAttackSphereCollider;
 class CModel;
 class CTerritory;
-
 //==============================================
 //			キャラクターの派生 → プレイヤー
 //==============================================
@@ -74,16 +72,17 @@ public:
 	CPlayer();
 	~CPlayer();
 
-	HRESULT Init(D3DXVECTOR3 pos, NUMPLAYER nNumPlayer, char ModelTxt[40], char MotionTxt[40]);
+	HRESULT Init(D3DXVECTOR3 pos, int nNumPlayer, char ModelTxt[40], char MotionTxt[40]);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 	//void CollisionModel(D3DXVECTOR3 *pPos, D3DXVECTOR3 *pPosOld, D3DXVECTOR3 *pMove);
-	static CPlayer *Create(D3DXVECTOR3 pos,NUMPLAYER nNumPlayer, char ModelTxt[40], char MotionTxt[40], TYPE type);
+	static CPlayer *Create(D3DXVECTOR3 pos,int nNumPlayer, char ModelTxt[40], char MotionTxt[40], TYPE type);
 	void  Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);
 	void PlayerMove(void);				//プレイヤーの移動処理
 	void Collision(void);
+
 
 	//テリトリーのリスト用関数
 	CTerritory * GetTop(void) { return m_pTerritoryTop; }
@@ -94,6 +93,12 @@ public:
 	//国のタイプ
 	void SetType(TYPE type) { m_type = type; }
 	TYPE GetType(void) { return m_type; }
+
+protected:
+	//	位置・回転情報
+	CModel** m_pModel;
+	int m_nNumPlayer;
+	NUMPLAYER m_NumPlayer;					//プレイヤーの人数
 
 private:
 	D3DXVECTOR3 m_pos;				//位置
@@ -112,14 +117,9 @@ private:
 
 	static CSceneX *m_apSceneX;
 	D3DXVECTOR3 m_Angle;					//角度
-	NUMPLAYER m_NumPlayer;					//プレイヤーの人数
-	int m_nNumPlayer;
 
 	bool CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 	bool CollisionBoxCollider(CBoxCollider *pBoxCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
-
-	//	位置・回転情報
-	CModel** m_pModel;
 
 	//テリトリーのリスト
 	CTerritory * m_pTerritoryTop;		//先頭テリトリーへのポインタ
@@ -127,5 +127,25 @@ private:
 
 	//国のタイプ
 	TYPE m_type;
+
 };
+
+////==============================================
+////		キャラクターの派生 → プレイヤー
+////==============================================
+//class CSpeedPlayer : public CPlayer
+//{
+//public:
+//	CSpeedPlayer();
+//	~CSpeedPlayer();
+//
+//	HRESULT Init(D3DXVECTOR3 pos, NUMPLAYER nNumPlayer, char ModelTxt[40],char ModelTxt2[40], char MotionTxt[40], char MotionTxt2[40]);
+//	HRESULT Init(void);
+//	void Uninit(void);
+//	void Update(void);
+//	void Draw(void);
+//	static CSpeedPlayer *Create(D3DXVECTOR3 pos, NUMPLAYER nNumPlayer, char ModelTxt[40], char ModelTxt2[40], char MotionTxt[40], char MotionTxt2[40]);
+//private:
+//};
+
 #endif
