@@ -1,0 +1,207 @@
+#==============================================================================
+#
+# パーティクルテクスチャ読み込み [Particle.txt]
+# Author : ASUMI SATO
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 6			#テクスチャの最大数
+
+TEXTURE = data//TEXTURE//effect000.jpg		#[0] 丸
+TEXTURE = data//TEXTURE//star000.jpg		#[1] 星
+TEXTURE = data//TEXTURE//Star.png			#[2] 星
+TEXTURE = data//TEXTURE//GrandSmoke.png		#[3] 土煙
+TEXTURE = data//TEXTURE//smoke_00.jpg		#[4] 煙
+TEXTURE = data//TEXTURE//StarParticle.jpg	#[5] 星
+
+#--------------------------------------
+# エフェクト情報
+#--------------------------------------
+MAX_EFFECT = 5
+
+SETEFFECT
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 20.0 20.0 0.0
+		TEX = 4
+		DRAWTYPE = 1
+		TYPE = 1
+		COLOR = 1.00 0.43 0.13 0.50
+		ZBUFFER = 1
+		LIFE = 2
+		CHANGECOLOR = 0.07
+		USEGRAVITY = 0
+		TIME = 0
+		NUMCREATE = 1
+		SPEED = 0.30
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.04
+	END_PARTICLE
+
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 22.0 28.0 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 1
+		COLOR = 1.00 0.14 0.00 0.80
+		ZBUFFER = 1
+		LIFE = 10
+		CHANGECOLOR = 0.15
+		USEGRAVITY = 0
+		TIME = 2
+		NUMCREATE = 1
+		SPEED = 0.50
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.03
+	END_PARTICLE
+
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 3.0 8.0 0.0
+		TEX = 4
+		DRAWTYPE = 1
+		TYPE = 1
+		COLOR = 1.00 0.16 0.00 0.50
+		ZBUFFER = 1
+		LIFE = 33
+		CHANGECOLOR = 0.15
+		USEGRAVITY = 1
+		TIME = 2
+		NUMCREATE = 1
+		SPEED = 0.60
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.01
+	END_PARTICLE
+END_EFFECT
+
+SETEFFECT
+	SETPARTICLE
+		LOOP = 0
+		SIZE = 10.0 10.0 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 4
+		COLOR = 1.00 0.25 0.00 0.80
+		ZBUFFER = 1
+		LIFE = 10
+		CHANGECOLOR = 0.1
+		USEGRAVITY = 0
+		TIME = 0
+		NUMCREATE = 30
+		SPEED = 0.05
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.04
+	END_PARTICLE
+END_EFFECT
+
+SETEFFECT
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 10.0 10.0 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 1
+		COLOR = 1.00 1.00 1.00 0.80
+		ZBUFFER = 1
+		LIFE = 13
+		CHANGECOLOR = 0.06
+		USEGRAVITY = 1
+		TIME = 0
+		NUMCREATE = 1
+		SPEED = 1.5
+		MINHIGHT = 5
+		MAXHIGHT = 4
+		GRAVITY = 0.3
+	END_PARTICLE
+END_EFFECT
+
+SETEFFECT
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 1.0 1.0 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 4
+		COLOR = 1.00 0.93 0.00 0.50
+		ZBUFFER = 1
+		LIFE = 10
+		CHANGECOLOR = 0.08
+		USEGRAVITY = 0
+		TIME = 3
+		NUMCREATE = 1
+		SPEED = 0.20
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.04
+	END_PARTICLE
+
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 1.5 1.5 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 4
+		COLOR = 0.00 0.71 1.00 0.80
+		ZBUFFER = 1
+		LIFE = 19
+		CHANGECOLOR = 0.15
+		USEGRAVITY = 0
+		TIME = 6
+		NUMCREATE = 1
+		SPEED = 0.10
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.03
+	END_PARTICLE
+
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 1.5 1.5 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 4
+		COLOR = 1.00 0.00 0.86 0.50
+		ZBUFFER = 1
+		LIFE = 19
+		CHANGECOLOR = 0.15
+		USEGRAVITY = 0
+		TIME = 4
+		NUMCREATE = 1
+		SPEED = 0.10
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.01
+	END_PARTICLE
+END_EFFECT
+
+SETEFFECT
+	SETPARTICLE
+		LOOP = 1
+		SIZE = 20.0 10.0 0.0
+		TEX = 5
+		DRAWTYPE = 1
+		TYPE = 2
+		COLOR = 1.00 0.81 0.00 0.40
+		ZBUFFER = 1
+		LIFE = 50
+		CHANGECOLOR = 0.07
+		USEGRAVITY = 0
+		TIME = 10
+		NUMCREATE = 1
+		SPEED = 0.30
+		MINHIGHT = 3
+		MAXHIGHT = 3
+		GRAVITY = 0.04
+	END_PARTICLE
+END_EFFECT
+
+END_SCRIPT		# この行は絶対消さないこと！
