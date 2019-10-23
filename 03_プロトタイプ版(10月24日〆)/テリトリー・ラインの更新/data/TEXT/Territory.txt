@@ -1,0 +1,89 @@
+#--------------------------------------
+#
+# テリトリー情報 [Territory.txt]
+# Author : 佐藤安純 Sato_Asumi
+#
+#--------------------------------------
+SCRIPT
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 1		#テクスチャの最大数
+
+TEXTURE = data/TEXTURE/Model/territory.jpg		#[0] テリトリー
+
+#--------------------------------------
+# モデルの情報
+#--------------------------------------
+MAX_MODEL = 1		#モデルの最大数
+
+MODELNAME = data/MODEL/territory.x		#[0] テスト
+
+#--------------------------------------
+# モデルの配置情報
+#--------------------------------------
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 16.4 0.0 -114.8
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -114.8 0.0 0.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 0
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -16.4 0.0 -213.1
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 0
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 180.3 0.0 -147.5
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 0
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 180.3 0.0 114.8
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 0
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -245.9 0.0 -114.8
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 0
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -114.8 0.0 -344.3
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 0
+END_SET
+
+END_SCRIPT
