@@ -1,0 +1,394 @@
+#--------------------------------------
+#
+# ステージ情報 [Stage.txt]
+# Author : 佐藤安純 Sato_Asumi
+#
+#--------------------------------------
+SCRIPT
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 3			#テクスチャの最大数
+
+TEXTURE = data/TEXTURE/wall.jpg			#[0] 壁
+TEXTURE = data/TEXTURE/water.jpg		#[1] 水
+TEXTURE = data/TEXTURE/monitor_tex1.jpg	#[2] モニター
+
+#--------------------------------------
+# モデルの情報
+#--------------------------------------
+MAX_MODEL = 7		#モデルの最大数
+
+MODELNAME = data/MODEL/test.x			#[0] テスト
+MODELNAME = data/MODEL/test2.x			#[1] テスト
+MODELNAME = data/MODEL/AudienceSeats.x	#[2] 観客席
+MODELNAME = data/MODEL/Bench000.x		#[3] ベンチ
+MODELNAME = data/MODEL/Camera000.x		#[4] カメラ
+MODELNAME = data/MODEL/Monitor000.x		#[5] モニター
+MODELNAME = data/MODEL/Beacon000.x		#[6] ビーコン
+
+#--------------------------------------
+# モデルの配置情報
+#--------------------------------------
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -1241.0 0.0 -2000.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -2000.0 0.0 -1231.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -1996.0 0.0 -210.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -1992.0 0.0 805.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -1988.0 0.0 1820.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -1218.0 0.0 2573.0
+	ROT = 0.0 44.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -190.0 0.0 2555.0
+	ROT = 0.0 44.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 840.0 0.0 2537.0
+	ROT = 0.0 44.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 1870.0 0.0 2519.0
+	ROT = 0.0 44.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 2622.0 0.0 1743.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 2608.0 0.0 720.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 2595.0 0.0 -300.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 2581.0 -0.1 -1270.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 1810.0 0.0 -2027.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = 800.0 0.0 -2018.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 2
+	TEX = 0
+	POS = -215.0 0.0 -2009.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 0.3 0.3 0.3
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -600.0 0.0 2200.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -550.0 0.0 2200.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -500.0 0.0 2200.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 1130.0 0.0 2200.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 1180.0 0.0 2200.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 1230.0 0.0 2200.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 1190.0 0.0 -1680.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 1140.0 0.0 -1680.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 1090.0 0.0 -1680.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -500.0 0.0 -1680.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -550.0 0.0 -1680.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -600.0 0.0 -1680.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -1630.0 0.0 -600.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -1630.0 0.0 -550.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -1630.0 0.0 -500.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -1640.0 0.0 1100.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -1640.0 0.0 1150.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = -1640.0 0.0 1200.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 2260.0 0.0 1120.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 2260.0 0.0 1070.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 2260.0 0.0 1020.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 2260.0 0.0 -550.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 2260.0 0.0 -600.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 3
+	TEX = 0
+	POS = 2260.0 0.0 -650.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 1.0 1.0 1.0
+	TYPE = 0
+END_SET
+
+END_SCRIPT
