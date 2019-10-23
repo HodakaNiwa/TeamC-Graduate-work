@@ -1,0 +1,7 @@
+﻿  enemy.cpp
+c:\users\game114\desktop\後期_卒業制作\編集用ソースコード_まとめ\5_エネミークラス設計\enemy.cpp(176): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\game114\desktop\後期_卒業制作\編集用ソースコード_まとめ\5_エネミークラス設計\enemy.cpp(181): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\game114\desktop\後期_卒業制作\編集用ソースコード_まとめ\5_エネミークラス設計\enemy.cpp(182): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\game114\desktop\後期_卒業制作\編集用ソースコード_まとめ\5_エネミークラス設計\enemy.cpp(387): warning C4244: '=': 'double' から 'float' への変換です。データが失われる可能性があります。
+  5_エネミークラス設計.vcxproj -> C:\Users\game114\Desktop\後期_卒業制作\編集用ソースコード_まとめ\5_エネミークラス設計\Debug\5_エネミークラス設計.exe
+  5_エネミークラス設計.vcxproj -> C:\Users\game114\Desktop\後期_卒業制作\編集用ソースコード_まとめ\5_エネミークラス設計\Debug\5_エネミークラス設計.pdb (Full PDB)
