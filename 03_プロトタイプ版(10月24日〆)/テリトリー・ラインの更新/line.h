@@ -31,6 +31,7 @@ public:
 	void SetNumPlayer(int nNumPlayer) { m_nNumPlayer = nNumPlayer; }
 	void SetTerritoryPos(D3DXVECTOR3 StartPos, D3DXVECTOR3 EndPos) { m_StartPos = StartPos; m_EndPos = EndPos; };
 	void SetID(int nId) { m_nID = nId; }
+	void SetCompleteShape(bool bCompShape) { m_bCompleteShape = bCompShape; }
 
 private:
 	void RequestVecA(void);
@@ -43,5 +44,6 @@ private:
 	D3DXVECTOR3 m_EndPos;
 	D3DXVECTOR3 m_VecA[MAX_POS];
 	D3DXVECTOR3 m_WorldPos[MAX_POS];
+	bool m_bCompleteShape;				//ê}å`Ç™äÆê¨ÇµÇΩÇ©Ç«Ç§Ç©
 };
 #endif

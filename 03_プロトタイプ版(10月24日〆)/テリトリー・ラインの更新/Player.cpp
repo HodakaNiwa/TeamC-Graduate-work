@@ -722,6 +722,7 @@ void CPlayer::CreateEndLine(void)
 		if (m_apLine[nCnt] != NULL)
 		{
 			m_apCopyLine[nCnt] = m_apLine[nCnt];
+			m_apCopyLine[nCnt]->SetCompleteShape(true);
 		}
 	}
 }

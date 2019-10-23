@@ -55,6 +55,9 @@ HRESULT CLine::Init(void)
 {
 	CScene3D::Init();
 
+	//•Ï”‚Ì‰Šú‰»
+	m_bCompleteShape = false;
+
 	//F‚Ìİ’è
 	CPlayer::TYPE PlayerType = CManager::GetGame()->GetPlayer(m_nNumPlayer)->GetType();
 	CScene3D::SetColor(CPlayer::m_CountryColor[(int)PlayerType]);
@@ -93,6 +96,8 @@ void CLine::Uninit(void)
 //=============================================================================
 void CLine::Update(void)
 {
+	if (m_bCompleteShape) { return; }	//}Œ`‚ªŠ®¬‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
+
 	for (int nCntPlayer = 0; nCntPlayer < MAX_NUMPLAYER; nCntPlayer++)
 	{
 		if (nCntPlayer == m_nNumPlayer) { continue; }
