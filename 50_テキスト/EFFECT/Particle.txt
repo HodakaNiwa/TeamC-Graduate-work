@@ -1,0 +1,67 @@
+#==============================================================================
+#
+# パーティクルテクスチャ読み込み [Particle.txt]
+# Author : ASUMI SATO
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 6			#テクスチャの最大数
+
+TEXTURE = data//TEXTURE//effect000.jpg		#[0] 丸
+TEXTURE = data//TEXTURE//star000.jpg		#[1] 星
+TEXTURE = data//TEXTURE//Star.png			#[2] 星
+TEXTURE = data//TEXTURE//GrandSmoke.png		#[3] 土煙
+TEXTURE = data//TEXTURE//smoke_00.jpg		#[4] 煙
+TEXTURE = data//TEXTURE//StarParticle.jpg	#[5] 星
+
+#--------------------------------------
+# エフェクト情報
+#--------------------------------------
+MAX_EFFECT = 1
+
+SETEFFECT
+	SETPARTICLE
+		LOOP = 0
+		SIZE = 10.0 10.0 0.0
+		TEX = 2
+		DRAWTYPE = 1
+		TYPE = 1
+		COLOR = 0.98 0.80 0.03 1.00
+		ZBUFFER = 1
+		LIFE = 1
+		CHANGECOLOR = 0.10
+		USEGRAVITY = 0
+		TIME = 0
+		NUMCREATE = 10
+		SPEED = 2.30
+		MINHIGHT = 1
+		MAXHIGHT = 1
+		GRAVITY = 0.40
+	END_PARTICLE
+
+	SETPARTICLE
+		LOOP = 0
+		SIZE = 10.7 10.7 0.0
+		TEX = 0
+		DRAWTYPE = 1
+		TYPE = 1
+		COLOR = 0.51 1.00 0.32 0.80
+		ZBUFFER = 1
+		LIFE = 1
+		CHANGECOLOR = 0.10
+		USEGRAVITY = 0
+		TIME = 1
+		NUMCREATE = 7
+		SPEED = 2.60
+		MINHIGHT = 1
+		MAXHIGHT = 1
+		GRAVITY = 0.40
+	END_PARTICLE
+
+END_EFFECT
+
+END_SCRIPT		# この行は絶対消さないこと！
