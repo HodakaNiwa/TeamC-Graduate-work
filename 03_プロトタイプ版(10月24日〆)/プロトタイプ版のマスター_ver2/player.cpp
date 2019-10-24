@@ -1,4 +1,3 @@
-
 //=============================================================================
 //
 // モデル処理 [model.cpp]
@@ -385,7 +384,7 @@ bool CPlayer::CollisionBoxCollider(CBoxCollider *pBoxCollider, D3DXVECTOR3 &pos,
 	{
 		if (bLand == true)
 		{
-			
+
 		}
 		return true;
 	}
@@ -555,7 +554,7 @@ void CPlayer::ChackInShape(void)
 	}
 
 	//テリトリーを取得する
-	CScene * pSceneTop = CScene::GetTop(TERRITORY_PRIORITY); //オブジェクトポインタの先頭を取得			
+	CScene * pSceneTop = CScene::GetTop(TERRITORY_PRIORITY); //オブジェクトポインタの先頭を取得
 	CScene * pScene = pSceneTop;							 //トップの位置を保存する
 	CTerritory * m_pTerritory = NULL;
 

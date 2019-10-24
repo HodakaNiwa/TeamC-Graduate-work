@@ -22,7 +22,7 @@
 //=============================================================================
 #define SaveTextName ("data/TEXT/SaveTerritory.txt")		//保存するテキスト名
 #define UPDATE_LENGTH	(80.0f)								//更新状態を有効にする範囲
-#define GET_LENGTH		(40.0f)								//取得範囲		
+#define GET_LENGTH		(40.0f)								//取得範囲
 #define MIN_TERRITORY	(3)									//取得テリトリーの最低数
 
 //=============================================================================
@@ -105,7 +105,7 @@ HRESULT CTerritory::Init(void)
 	m_nOldNumPlayer = -1;							//前回のプレイヤー番号
 	m_fLength = 0.0f;								//長さ
 	m_bGetTerritory = false;						//テリトリーを取得したかどうか
-	
+
 	if (m_pLoadEffect == NULL)
 	{
 		m_pLoadEffect = CLoadEffect::Create(0, m_pos, 8);
@@ -219,7 +219,7 @@ void CTerritory::CreateCollider(void)
 	// コライダーの生成
 	CColliderManager *pColManager = CColliderManager::Create(1);
 	if (pColManager == NULL) { return; }
-	CBoxCollider *pBox = CBoxCollider::Create(m_pos, D3DXVECTOR3(1.0f, 1.0f, 1.0f), 27.0f, 68.0f, 20.0f, true);
+	CBoxCollider *pBox = CBoxCollider::Create(m_pos, D3DXVECTOR3(1.0f, 1.0f, 1.0f), 27.0f, 68.0f, 20.0f, false);
 	pBox->SetParent(this);
 	//pBox->SetParentMtxWorld(&GetMtx());
 	pColManager->SetCollider(pBox, 0);
@@ -419,7 +419,7 @@ void CTerritory::UnloadModel(void)
 CTerritory * CTerritory::RequestPointer(int nCountObj)
 {
 	//敵のオブジェクトポインタの取得
-	CScene * pSceneTop = CScene::GetTop(TERRITORY_PRIORITY);	 //オブジェクトポインタの先頭を取得			
+	CScene * pSceneTop = CScene::GetTop(TERRITORY_PRIORITY);	 //オブジェクトポインタの先頭を取得
 	CScene * pScene = pSceneTop;						 //トップの位置を保存する
 	CTerritory * m_pTerritory = NULL;
 	int nNumObject = 0;
@@ -460,7 +460,7 @@ void CTerritory::Save(HWND hWnd)
 	if (pFile != NULL)
 	{
 		//敵のオブジェクトポインタの取得
-		CScene * pSceneTop = CScene::GetTop(TERRITORY_PRIORITY);	 //オブジェクトポインタの先頭を取得			
+		CScene * pSceneTop = CScene::GetTop(TERRITORY_PRIORITY);	 //オブジェクトポインタの先頭を取得
 		CScene * pScene = pSceneTop;						 //トップの位置を保存する
 
 		while (pScene != NULL)
