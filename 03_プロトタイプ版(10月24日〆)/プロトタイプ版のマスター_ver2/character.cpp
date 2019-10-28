@@ -11,7 +11,7 @@
 #include "renderer.h"
 
 //	---<<静的メンバ変数>>---
-LPDIRECT3DTEXTURE9 CCharacter::m_pTexture = NULL;
+
 
 //==============================================
 //					コンストラクタ
@@ -35,7 +35,7 @@ CCharacter::~CCharacter()
 //=============================================================================
 void CCharacter::Unload(void)
 {
-	
+
 }
 
 
@@ -57,7 +57,7 @@ HRESULT CCharacter::Init(char ModelTxt[40], char MotionTxt[40])
 		//	モデルパーツを決める
 		m_ppModel[nCnt]->BindModel(m_ppModel[nCnt]->GetMesh(), m_ppModel[nCnt]->GetBuffMat(), m_ppModel[nCnt]->GetNumMat());
 		//	モデルUVテクスチャを決める
-		m_ppModel[nCnt]->BindTexture(m_pTexture);
+		m_ppModel[nCnt]->BindTexture(m_ppTexture[m_nTexIdx[nCnt]]);
 		//	各モデルパーツの親を決める
 		if (nCnt == 0)
 		{
@@ -122,32 +122,33 @@ void CCharacter::Uninit()
 
 	//!+ ---<<モデル情報の解放>>---
 	//	オフセット
-	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
+	if (m_aOffset != NULL)
 	{
-		if (m_aOffset != NULL)
-		{
-			delete m_aOffset;
-			m_aOffset = NULL;
-		}
+		delete[] m_aOffset;
+		m_aOffset = NULL;
 	}
+
 	//	ペアレント情報
-	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
+	if (m_nParent != NULL)
 	{
-		if (m_nParent != NULL)
-		{
-			delete m_nParent;
-			m_nParent = NULL;
-		}
+		delete[] m_nParent;
+		m_nParent = NULL;
 	}
+
 	//	インデックス情報
-	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
+	if (m_aIndex != NULL)
 	{
-		if (m_aIndex != NULL)
-		{
-			delete m_aIndex;
-			m_aIndex = NULL;
-		}
+		delete[] m_aIndex;
+		m_aIndex = NULL;
 	}
+
+	// 使用するテクスチャの番号
+	if (m_nTexIdx != NULL)
+	{
+		delete[] m_nTexIdx;
+		m_nTexIdx = NULL;
+	}
+
 	//	ファイル名情報(ダブルポインタを扱っているので)
 	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
 	{
@@ -163,10 +164,19 @@ void CCharacter::Uninit()
 		m_aPartsName = NULL;
 	}
 
-	if (m_pUVTexName != NULL)
+	// テクスチャのファイル名情報
+	for (int nCnt = 0; nCnt < m_nTexNum; nCnt++)
 	{
-		delete[] m_pUVTexName;
-		m_pUVTexName = NULL;
+		if (m_ppUVTexName[nCnt] != NULL)
+		{
+			delete[] m_ppUVTexName[nCnt];
+			m_ppUVTexName[nCnt] = NULL;
+		}
+	}
+	if (m_ppUVTexName != NULL)
+	{
+		delete[] m_ppUVTexName;
+		m_ppUVTexName = NULL;
 	}
 
 	//	モデルパーツ情報(ダブルポインタを扱っているので)
@@ -183,6 +193,21 @@ void CCharacter::Uninit()
 	{
 		delete[] m_ppModel;
 		m_ppModel = NULL;
+	}
+
+	// テクスチャの開放
+	if (m_ppTexture != NULL)
+	{
+		for (int nCntTex = 0; nCntTex < m_nTexNum; nCntTex++)
+		{
+			if (m_ppTexture[nCntTex] != NULL)
+			{
+				m_ppTexture[nCntTex]->Release();
+				m_ppTexture[nCntTex] = NULL;
+			}
+		}
+		delete[] m_ppTexture;
+		m_ppTexture = NULL;
 	}
 
 	//死亡フラグを立てる
@@ -212,7 +237,7 @@ void CCharacter::Draw()
 	D3DXMATRIX mtxRot, mtxTrans, mtxParent, mtxScale;	//計算
 
 
-														// ワールドマトリックスの初期化
+	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
 	// 回転を反映
@@ -248,7 +273,8 @@ void CCharacter::ModelSetLode(void)
 	char aStr[256];		//	文字列の抜き出し
 	int nDelay;			//	読み込む文字位置をずらす
 	int nCnt = 0;
-	
+	int nCntLoadTex = 0;
+
 	pFile = fopen(m_cModelTxt[0], "r");	//	読み込むテキスト名
 
 	if (pFile != NULL)
@@ -264,7 +290,21 @@ void CCharacter::ModelSetLode(void)
 				{
 					fgets(&aLine[0], 256, pFile);
 					pStrCur = CCharacter::GetLIneTop(&aLine[0]);
-					
+					if (memcmp(pStrCur, "NUM_UV = ", strlen("NUM_UV = ")) == 0)	// ---<<使用するUVテクスチャの数の読み込み>>---
+					{
+						// 文字列を進める
+						pStrCur += strlen("NUM_UV = ");
+						strcpy(aStr, pStrCur);
+
+						// 使用するUVテクスチャの数を読み込む
+						m_nTexNum = atoi(aStr);
+
+						// 読み込むUVテクスチャの数だけ動的確保
+						m_nTexIdx = new int[m_nTexNum];
+						m_ppUVTexName = new char*[m_nTexNum];
+						m_ppTexture = new LPDIRECT3DTEXTURE9[m_nTexNum];
+					}
+
 					if (memcmp(pStrCur, "UV_NAME ", strlen("UV_NAME ")) == 0)	// ---<<UVテクスチャの読み込み>>---
 					{
 						pStrCur += strlen("UV_NAME ");
@@ -279,14 +319,15 @@ void CCharacter::ModelSetLode(void)
 							{
 								break;
 							}
-							m_pUVTexName = new char[256];	//	文字列の確保
-							strcpy(&m_pUVTexName[0], pStrCur);
+							m_ppUVTexName[nCntLoadTex] = new char[256];	//	文字列の確保
+							strcpy(m_ppUVTexName[nCntLoadTex], pStrCur);
 						}
 
 						//デバイス情報の取得
 						LPDIRECT3DDEVICE9 pDevice;
 						pDevice = CManager::GetRenderer()->GetDevice();
-						D3DXCreateTextureFromFile(pDevice, m_pUVTexName, &m_pTexture);
+						D3DXCreateTextureFromFile(pDevice, m_ppUVTexName[nCntLoadTex], &m_ppTexture[nCntLoadTex]);
+						nCntLoadTex++;
 					}
 
 					if (memcmp(pStrCur, "NUM_MODEL = ", strlen("NUM_MODEL = ")) == 0)	// ---<<パーツ数の読み込み>>---
@@ -301,6 +342,7 @@ void CCharacter::ModelSetLode(void)
 						}
 						m_aIndex = new int[m_nPartsNum];
 						m_nParent = new int[m_nPartsNum];
+						m_nTexIdx = new int[m_nPartsNum];
 						m_aOffset = new MODEL_OFFSET[m_nPartsNum];
 					}
 
@@ -433,6 +475,12 @@ void CCharacter::ModelSetLode(void)
 								strcpy(aStr, pStrCur);
 								m_aIndex[nCnt] = atoi(aStr);
 							}
+							if (memcmp(pStrCur, "TEX_INDEX = ", strlen("TEX_INDEX = ")) == 0)
+							{
+								pStrCur += strlen("TEX_INDEX = ");
+								strcpy(aStr, pStrCur);
+								m_nTexIdx[nCnt] = atoi(aStr);
+							}
 							//	---<<各パーツの親を決める>>---
 							if (memcmp(pStrCur, "PARENT = ", strlen("PARENT = ")) == 0)
 							{
@@ -523,7 +571,7 @@ void CCharacter::MotionSetLode(void)
 			}
 		}
 
-		
+
 		while (1)
 		{
 			fgets(&aLine[0], 256, pFile);
@@ -581,7 +629,7 @@ void CCharacter::MotionSetLode(void)
 								strcpy(aStr, pStrCur);
 								m_pMotionInfo[nMotionNum].m_pKeyInfo[nKeyNum].nFrame = atoi(aStr);	//	モーションの数分回す
 							}
-							
+
 
 							if (memcmp(pStrCur, "KEY", strlen("KEY")) == 0)
 							{

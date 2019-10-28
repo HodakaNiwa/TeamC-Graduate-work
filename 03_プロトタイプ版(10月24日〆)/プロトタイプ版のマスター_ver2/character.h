@@ -41,10 +41,10 @@ public:
 	void Update(void);
 	void Draw(void);
 	void Unload(void);
-	
+
 
 	//	---<<モデル情報の読み込み>>---
-	void ModelSetLode(void);	
+	void ModelSetLode(void);
 	//	---<<モーション情報の読み込み>>---
 	void MotionSetLode(void);
 
@@ -83,12 +83,14 @@ private:
 	//	---<<モデル関連変数>>---
 	CModel **m_ppModel;
 	char* m_cModelTxt[40];					//	読み込むテキストファイル名
-	static LPDIRECT3DTEXTURE9 m_pTexture;		
-	 char *m_pUVTexName;					//	UVテクスチャ名
+	LPDIRECT3DTEXTURE9 *m_ppTexture;		//	テクスチャへのポインタ(ダブルポインタ)
+	 char **m_ppUVTexName;					//	UVテクスチャ名
+	 int m_nTexNum;							//	使用するテクスチャの数
 	 int m_nPartsNum;						//	パーツ数
 	 char **m_aPartsName;					//	各パーツ名
 	 int *m_aIndex;							//	インデックス
 	 int *m_nParent;						//	親番号
+	 int *m_nTexIdx;						//	使用するテクスチャの番号
 	 MODEL_OFFSET *m_aOffset;				//	各パーツの位置等情報
 
 	//	---<<モーション関連変数>>---

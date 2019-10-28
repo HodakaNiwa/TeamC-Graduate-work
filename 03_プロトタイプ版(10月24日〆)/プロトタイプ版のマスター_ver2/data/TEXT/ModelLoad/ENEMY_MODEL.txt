@@ -2,6 +2,9 @@
 #モデルの読み込み
 MODEL_LOAD
 
+#読み込むUVテクスチャの数
+NUM_UV = 1
+
 #読み込むUVテクスチャ
 UV_NAME data/TEXTURE/MODEL_UV/enemy01.png
 
@@ -26,6 +29,7 @@ CHARACTERSET
 
 	PARTSSET #体
 		INDEX = 0
+		TEX_INDEX = 0
 		PARENT = -1	#親なし
 		POS = 0.0 15.0 0.0
 		ROT = 0.0 0.0 0.0
@@ -33,6 +37,7 @@ CHARACTERSET
 	
 	PARTSSET #頭
 		INDEX = 1
+		TEX_INDEX = 0
 		PARENT = 0	#体
 		POS = 0.0 6.0 0.0
 		ROT = 0.0 0.0 0.0
@@ -40,6 +45,7 @@ CHARACTERSET
 	
 	PARTSSET #腰
 		INDEX = 2
+		TEX_INDEX = 0
 		PARENT = 0	#体
 		POS = 5.0 4.0 0.0
 		ROT = 0.0 0.0 0.0
@@ -47,6 +53,7 @@ CHARACTERSET
 	
 	PARTSSET #左腕
 		INDEX = 3
+		TEX_INDEX = 0
 		PARENT = 0	#腰
 		POS = -5.0 4.0 0.0
 		ROT = 0.0 0.0 0.0
@@ -54,6 +61,7 @@ CHARACTERSET
 	
 	PARTSSET #左手
 		INDEX = 4
+		TEX_INDEX = 0
 		PARENT = 0	#左もも
 		POS = 2.0 -3.0 0.0
 		ROT = 0.0 0.0 0.0
@@ -61,6 +69,7 @@ CHARACTERSET
 	
 	PARTSSET #右腕
 		INDEX = 5
+		TEX_INDEX = 0
 		PARENT = 0	#腰
 		POS = -2.0 -3.0 0.0
 		ROT = 0.0 0.0 0.0
