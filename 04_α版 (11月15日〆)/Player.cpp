@@ -46,7 +46,7 @@
 #define COLOR_PAPULE (D3DXCOLOR(0.5f, 0.0f, 1.0f, 1.0f))	//紫
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//静的メンバ変数宣言
+// 静的メンバ変数宣言
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //国の色の設定
@@ -195,10 +195,7 @@ CPlayer *CPlayer::Create(D3DXVECTOR3 pos, int nNumPlayer, char ModelTxt[40], cha
 //=============================================================================
 //
 //=============================================================================
-void  CPlayer::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
-{
-
-}
+void  CPlayer::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size){}
 
 //=============================================================================
 //　プレイヤーの移動処理
@@ -209,7 +206,6 @@ void  CPlayer::PlayerMove(void)
 	CGamePad * pGamePad = CManager::GetInputGamePad();				//ゲームパッドの取得
 	CInputXPad * pXPad = CManager::GetXPad();
 	float fRot = pXPad->GetStickRot(0, m_nNumPlayer);
-
 
 	CManager *pManager = NULL;
 	CGame *pGame = pManager->GetGame();
@@ -460,7 +456,8 @@ void CPlayer::AddTerritoryList(CTerritory * pTerritory)
 			if (m_bBlockStartTerritory)
 			{//取得後、同じ起点を取らないようにする
 				D3DXVECTOR3 Pos = pTerritory->GetPos();
-				D3DXVECTOR3 OldStartPos = m_pOldStartTerritory->GetPos();
+				D3DXVECTOR3 OldStartPos = INITIALIZE_VECTOR3;
+				if(m_pOldStartTerritory != NULL){ OldStartPos = m_pOldStartTerritory->GetPos(); }
 
 				if ((nCnt != TERRITORY_TOP) && (Pos != OldStartPos))
 				{
@@ -481,7 +478,10 @@ void CPlayer::AddTerritoryList(CTerritory * pTerritory)
 			{
 				if (m_apLine[nCnt - 1] == NULL)
 				{
-					m_apLine[nCnt - 1] = CLine::Create(m_apTerritory[nCnt - 1]->GetPos(), m_apTerritory[nCnt]->GetPos(), m_nNumPlayer, nCnt - 1);
+					if ((m_apTerritory[nCnt - 1] != NULL) && (m_apTerritory[nCnt] != NULL))
+					{
+						m_apLine[nCnt - 1] = CLine::Create(m_apTerritory[nCnt - 1]->GetPos(), m_apTerritory[nCnt]->GetPos(), m_nNumPlayer, nCnt - 1);
+					}
 				}
 			}
 			break;
@@ -706,7 +706,7 @@ void CPlayer::GetTerritory(CTerritory * pTerritory)
 	pTerritory->SetColor(m_CountryColor[(int)m_type]);	//色の変更
 	pTerritory->SetPlayerNumber(m_nNumPlayer);			//プレイヤー番号の保存
 
-														//前回のプレイヤーの減点処理
+	//前回のプレイヤーの減点処理
 	if (nOldNumPlayer != -1)
 	{
 
@@ -807,8 +807,12 @@ void CPlayer::CreateEndLine(void)
 	{
 		if (m_apLine[nCnt] == NULL)
 		{
-			m_apLine[nCnt] = CLine::Create(m_apTerritory[nCountTerritory]->GetPos(), m_apTerritory[TERRITORY_TOP]->GetPos(), m_nNumPlayer, nCnt);
+			if ((m_apTerritory[nCountTerritory] != NULL) && (m_apTerritory[TERRITORY_TOP] != NULL))
+			{
+				m_apLine[nCnt] = CLine::Create(m_apTerritory[nCountTerritory]->GetPos(), m_apTerritory[TERRITORY_TOP]->GetPos(), m_nNumPlayer, nCnt);
+			}
 			break;
+
 		}
 	}
 
@@ -872,6 +876,7 @@ void CPlayer::CutLine(int nID)
 	for (int nCnt = nID; nCnt >= 0; nCnt--)
 	{
 		m_apTerritory[nCnt] = NULL;
+		m_nCountTerritory--;
 	}
 
 	//テリトリーの始点を移動させる
