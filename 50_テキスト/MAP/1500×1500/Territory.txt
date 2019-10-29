@@ -1,0 +1,935 @@
+#--------------------------------------
+#
+# テリトリー情報 [Territory.txt]
+# Author : 佐藤安純 Sato_Asumi
+#
+#--------------------------------------
+SCRIPT
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 1		#テクスチャの最大数
+
+TEXTURE = data/TEXTURE/territory.jpg	#[0] テリトリー
+
+#--------------------------------------
+# モデルの情報
+#--------------------------------------
+MAX_MODEL = 1		#モデルの最大数
+
+MODELNAME = data/MODEL/territory.x		#[0] テスト
+
+#--------------------------------------
+# モデルの配置情報
+#--------------------------------------
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 140.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -260.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 300.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 -100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -160.0 0.0 -0.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 40.0 0.0 0.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 40.0 0.0 200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -160.0 0.0 200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -220.0 0.0 270.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -220.0 0.0 -70.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 90.0 0.0 -70.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 90.0 0.0 270.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -460.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 340.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 500.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 -300.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -310.0 0.0 -200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 190.0 0.0 -200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 190.0 0.0 400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -310.0 0.0 400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -260.0 0.0 600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -460.0 0.0 600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 140.0 0.0 600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 340.0 0.0 600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 340.0 0.0 -400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 140.0 0.0 -400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 -400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -260.0 0.0 -400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -460.0 0.0 -400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 300.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 500.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 -100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 -300.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 -300.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 -100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 300.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 500.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -860.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 740.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -160.0 0.0 -600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -160.0 0.0 700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 40.0 0.0 700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 40.0 0.0 -600.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -760.0 0.0 200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -760.0 0.0 0.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 640.0 0.0 0.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 640.0 0.0 200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -960.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -960.0 0.0 400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -960.0 0.0 700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -960.0 0.0 -200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -960.0 0.0 -500.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 840.0 0.0 -500.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 840.0 0.0 -200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 840.0 0.0 100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 840.0 0.0 400.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 840.0 0.0 700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -360.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 240.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 240.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -60.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -360.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -260.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -460.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -860.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 140.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 340.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 740.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 740.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 540.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 340.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 140.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -260.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -460.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -660.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -860.0 0.0 800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -1160.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -1160.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -1060.0 0.0 -800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 860.0 0.0 -800.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 960.0 0.0 -700.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 1000.0 0.0 -900.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 1000.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 1000.0 0.0 1200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = 900.0 0.0 1100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -900.0 0.0 1100.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -1100.0 0.0 1200.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+SET
+	MODELTYPE = 0
+	TEX = 0
+	POS = -1100.0 0.0 1000.0
+	ROT = 0.0 1.7 0.0
+	SCALE = 1.0 1.0 1.0
+	POINT = 1
+END_SET
+
+END_SCRIPT
