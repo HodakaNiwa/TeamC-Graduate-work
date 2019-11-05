@@ -136,10 +136,10 @@ HRESULT CEnemy::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 	}
 
 	//	距離を短い順にソート
-	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)//	エリアごとのテリトリー数分回す
+	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
 		//	ここからソート処理
-		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	
+		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//	エリアごとのテリトリー数分回す
 		{
 			for (int nTerrCnt02 = 0; nTerrCnt02 < m_nAreaTerrNum[nAreaCnt]; nTerrCnt02++)
 			{
@@ -152,16 +152,18 @@ HRESULT CEnemy::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 			}
 		}
 	}
+
 	//	ゲーム開始の際に、どこのエリアが一番近いかを決める(ソート処理)
+	float fSort = 0.0f;
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
 		for (int nAreaCnt02 = 0; nAreaCnt02 < AREA_MAX; nAreaCnt02++)
 		{
 			if (m_AreaInfo[nAreaCnt][0].fDisSort < m_AreaInfo[nAreaCnt02][0].fDisSort)
 			{
-				float c = m_AreaInfo[nAreaCnt][0].fDisSort;
+				fSort = m_AreaInfo[nAreaCnt][0].fDisSort;
 				m_AreaInfo[nAreaCnt][0].fDisSort = m_AreaInfo[nAreaCnt02][0].fDisSort;
-				m_AreaInfo[nAreaCnt02][0].fDisSort = c;
+				m_AreaInfo[nAreaCnt02][0].fDisSort = fSort;
 			}
 		}
 	}
@@ -175,8 +177,8 @@ HRESULT CEnemy::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 			if (m_AreaInfo[0][0].fDisSort == m_AreaInfo[nAreaCnt][nInitTarget].fDistance)
 			{
 				m_nTargetNum = nInitTarget;
-				m_nAreaNow = nAreaCnt;//	一番最初に所属するエリアが決まる
-				m_bBreak = true;
+				m_nAreaNow = nAreaCnt;	//	一番最初に所属するエリアが決まる
+				m_bBreak = true;		//	決まった瞬間ループを抜ける
 				break;
 			}
 		}
