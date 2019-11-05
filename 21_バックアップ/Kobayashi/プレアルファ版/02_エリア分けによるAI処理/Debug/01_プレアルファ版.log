@@ -1,4 +1,3 @@
-﻿  camera.cpp
-c:\users\game114\desktop\後期_卒業制作\編集用ソースコード_まとめ\02_プレアルファ版\01_プレアルファ版02\camera.cpp(415): warning C4060: switch ステートメントに 'case' または 'default' ラベルがありません。
-  01_プレアルファ版.vcxproj -> C:\Users\game114\Desktop\後期_卒業制作\編集用ソースコード_まとめ\02_プレアルファ版\01_プレアルファ版02\Debug\01_プレアルファ版.exe
-  01_プレアルファ版.vcxproj -> C:\Users\game114\Desktop\後期_卒業制作\編集用ソースコード_まとめ\02_プレアルファ版\01_プレアルファ版02\Debug\01_プレアルファ版.pdb (Full PDB)
+﻿  enemy.cpp
+  01_プレアルファ版.vcxproj -> C:\Users\game114\Desktop\後期_卒業制作\編集用ソースコード_まとめ\02_プレアルファ版\02_エリア分けによるAI処理\Debug\01_プレアルファ版.exe
+  01_プレアルファ版.vcxproj -> C:\Users\game114\Desktop\後期_卒業制作\編集用ソースコード_まとめ\02_プレアルファ版\02_エリア分けによるAI処理\Debug\01_プレアルファ版.pdb (Full PDB)

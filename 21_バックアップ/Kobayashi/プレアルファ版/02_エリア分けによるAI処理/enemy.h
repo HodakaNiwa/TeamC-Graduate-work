@@ -16,9 +16,7 @@
 //==============================================
 //					マクロ定義
 //==============================================
-#define BASE_MAX	(5)
-#define MAX_TERRITORY	(10)
-
+#define AREA_MAX	(4)	//	エリアの分割数
 //==============================================
 //					前方宣言
 //==============================================
@@ -43,24 +41,15 @@ class CTerritory;
 class CEnemy : public CCharacter
 {
 public:
-	//	(仮)テリトリー情報
-	typedef struct
-	{
-		D3DXVECTOR3 pos;
-		float fDistance;	//	エネミーとの距離
-		float fChange;		//	近い順に変更した値を変える
-		float fRadian;		//	〃の角度
-		bool bFlag;
-	}INFO_TARGET;
-
 	//	テリトリー情報
 	typedef struct
 	{
 		D3DXVECTOR3 pos;
-		float fDistance;
-		float fChange;
-		float fRadian;
-		bool bFlag;
+		int nAreaNum;		//	エリア番号
+		float fDistance;	//	距離
+		float fDisSort;		//	ソート後の距離(短い順)
+		float fRadian;		//	角度
+		bool bFlag;			//	一度通ったか
 	}TERRITORY_INFO;
 
 	//	---<<コンストラクタ・デストラクタ>>---
@@ -117,16 +106,19 @@ private:
 
 	//!	---<<AI関連>---
 	D3DXVECTOR3 m_beforePos;					//	ワンフレーム前の位置情報
-	INFO_TARGET m_InfoTarget[BASE_MAX];			//	(仮)拠点情報
 	int m_nTargetNum;							//	(仮)拠点番号の確保
 	int m_nTargetCnt;							//	拠点の通過回数を記憶
 	bool m_bBreak;								//	ループ解除用
 
 	//!	---<<テリトリー関連>>---
-	CTerritory* m_pTerritory;			//	クラスポインタ
-	TERRITORY_INFO* m_TerritoryInfo;	//	構造体ポインタ
-	int m_nMax;							//	生成数
+	CTerritory* m_pTerritory;				//	クラスポインタ
+	TERRITORY_INFO* m_TerritoryInfo;		//	構造体ポインタ
+	TERRITORY_INFO* m_AreaInfo[AREA_MAX];	//	構造体ポインタ
+	int m_nMax;								//	生成数
+	int m_nAreaTerrNum[AREA_MAX];			//	各エリアのテリトリー数
 
-	int m_nAreaNum;						//	現在いるエリア番号
+	int m_nAreaNow;							//	現在いるエリア番号
+
+	int m_nAreaNum;							//	デバック用
 };
 #endif

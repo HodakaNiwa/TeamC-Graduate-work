@@ -218,10 +218,10 @@ void CGame::Init(void)
 	LoadUI(LOAD_UI);
 
 	//	---<<è¨ó—Ç™í«â¡ÇµÇ‹ÇµÇΩ>>Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö
-	m_pEnemy[0] = CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
-	//m_pEnemy[1] = CEnemy::Create(D3DXVECTOR3(50.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
-	//m_pEnemy[2] = CEnemy::Create(D3DXVECTOR3(50.0f, 0.0f, 50.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
-	//m_pEnemy[3] = CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 50.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
+	m_pEnemy[0] = CEnemy::Create(D3DXVECTOR3(-300.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
+	m_pEnemy[1] = CEnemy::Create(D3DXVECTOR3(150.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
+	m_pEnemy[2] = CEnemy::Create(D3DXVECTOR3(-150.0f, 0.0f, 50.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
+	m_pEnemy[3] = CEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, -450.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
 
 	//	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö	Åö
 
