@@ -9,9 +9,11 @@ SCRIPT
 #--------------------------------------
 # テクスチャの情報
 #--------------------------------------
-MAX_TEX = 1			#テクスチャの最大数
+MAX_TEX = 3			#テクスチャの最大数
 
 TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[0] モニター
+TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[1] モニター
+TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[2] モニター
 
 #--------------------------------------
 # モデルの情報
@@ -472,7 +474,7 @@ END_SET
 
 SET
 	MODELTYPE = 5
-	TEX = 2
+	TEX = 0
 	POS = -1480.0 300.0 1590.0
 	ROT = 0.0 11.8 0.0
 	SCALE = 0.2 0.2 0.2
@@ -481,7 +483,7 @@ END_SET
 
 SET
 	MODELTYPE = 5
-	TEX = 2
+	TEX = 0
 	POS = -1510.0 300.0 -1250.0
 	ROT = 0.0 3.8 0.0
 	SCALE = 0.2 0.2 0.2
@@ -490,7 +492,7 @@ END_SET
 
 SET
 	MODELTYPE = 5
-	TEX = 2
+	TEX = 0
 	POS = 1300.0 300.0 -1230.0
 	ROT = 0.0 2.3 0.0
 	SCALE = 0.2 0.2 0.2
