@@ -9,11 +9,9 @@ SCRIPT
 #--------------------------------------
 # テクスチャの情報
 #--------------------------------------
-MAX_TEX = 3			#テクスチャの最大数
+MAX_TEX = 1			#テクスチャの最大数
 
-TEXTURE = data/TEXTURE/wall.jpg			#[0] 壁
-TEXTURE = data/TEXTURE/water.jpg		#[1] 水
-TEXTURE = data/TEXTURE/monitor_tex1.jpg	#[2] モニター
+TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[0] モニター
 
 #--------------------------------------
 # モデルの情報
