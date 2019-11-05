@@ -11,7 +11,7 @@ SCRIPT
 #--------------------------------------
 MAX_TEX = 1		#テクスチャの最大数
 
-TEXTURE = data/TEXTURE/territory.jpg	#[0] テリトリー
+TEXTURE = data/TEXTURE/Model/territory.jpg	#[0] テリトリー
 
 #--------------------------------------
 # モデルの情報
