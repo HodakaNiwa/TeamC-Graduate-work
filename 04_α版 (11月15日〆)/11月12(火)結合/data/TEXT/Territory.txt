@@ -11,14 +11,15 @@ SCRIPT
 #--------------------------------------
 MAX_TEX = 1		#テクスチャの最大数
 
-TEXTURE = data/TEXTURE/Model/territory.jpg	#[0] テリトリー
+TEXTURE = data/TEXTURE/MODEL_UV/cyber2.jpg	#[0] テリトリー
 
 #--------------------------------------
 # モデルの情報
 #--------------------------------------
-MAX_MODEL = 1		#モデルの最大数
+MAX_MODEL = 2		#モデルの最大数
 
-MODELNAME = data/MODEL/territory.x		#[0] テスト
+MODELNAME = data/MODEL/territory.x		#[0] テリトリー
+MODELNAME = data/MODEL/territory_ring.x		#[1] 周りのリング
 
 #--------------------------------------
 # モデルの配置情報

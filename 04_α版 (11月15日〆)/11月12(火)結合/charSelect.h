@@ -17,6 +17,7 @@
 //==============================================
 #define MAX_TYPE	(3)
 #define MAX_CUNTRY	(8)
+#define SELECTCHAR_TEX	(2)
 
 //==============================================
 //					ëOï˚êÈåæ
@@ -59,11 +60,12 @@ private:
 	void LoadMultRendering(void);
 	void UpdateInput(void);
 
-	static LPDIRECT3DTEXTURE9 m_pTexture;
+	static LPDIRECT3DTEXTURE9 m_pTexture[SELECTCHAR_TEX];
 	LPDIRECT3DTEXTURE9 m_pStatusTex;
 	CMoveUI * m_pMoveUI;
 	CMoveUI * m_pTypeName;
 	CMoveUI * m_pStatus;
+	CMoveUI * m_pEnter;
 	CCharMultRender * m_pCharMultRender[MAX_TYPE];
 	int m_nCuntry;
 	int m_nType;

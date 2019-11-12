@@ -25,6 +25,7 @@
 //=============================================================================
 class CPlayer;
 class CLoadEffect;
+class CRing;
 
 //=============================================================================
 // Xファイルクラス
@@ -81,10 +82,13 @@ protected:
 	bool m_bGetTerritory;	//テリトリーの取得状態
 	D3DXCOLOR m_Color;		//色
 	D3DXCOLOR m_OldColor;	//前回の色
-	
+	CRing **m_ppRing;		//周りのリング
+
 private:
 	//関数宣言
 	void CreateCollider(void);
+	void CreateRing(void);
+	void ReleaseRing(void);
 
 	//変数宣言
 	static LPDIRECT3DTEXTURE9 *  m_ppTexture;			// テクスチャへのポインタ

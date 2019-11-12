@@ -16,11 +16,12 @@
 // マクロ定義
 //=============================================================================
 #define TEX_TYPENAME	("data/TEXTURE/Select/TypeName.png")
+#define TEX_ENTER		("data/TEXTURE/Select/CharEnter.png")
 
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
-LPDIRECT3DTEXTURE9 CSelectCharacter::m_pTexture = NULL;
+LPDIRECT3DTEXTURE9 CSelectCharacter::m_pTexture[SELECTCHAR_TEX] = {};
 
 //=============================================================================
 // 生成処理
@@ -53,6 +54,7 @@ HRESULT CSelectCharacter::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, int nCuntry, i
 	m_pTypeName = NULL;
 	m_pStatus = NULL;
 	m_pStatusTex = NULL;		//ステータスのテクスチャ
+	m_pEnter = NULL;			//エンターキーを押したかどうか
 	m_nCuntry = nCuntry;		//国番号
 	m_nType = 0;				//タイプ番号
 	m_nNumPlayer = nNumPlayer;	//プレイヤー番号
@@ -70,7 +72,7 @@ HRESULT CSelectCharacter::Init(D3DXVECTOR3 pos, D3DXVECTOR3 size, int nCuntry, i
 	//タイプ名の表示
 	if (m_pTypeName == NULL)
 	{
-		m_pTypeName = CMoveUI::Create(D3DXVECTOR3(170.0f + (nNumPlayer * 315.0f), 530.0f, 0.0f), D3DXVECTOR3(10.0f, 1.0f, 0.0f), m_pTexture);
+		m_pTypeName = CMoveUI::Create(D3DXVECTOR3(170.0f + (nNumPlayer * 315.0f), 530.0f, 0.0f), D3DXVECTOR3(10.0f, 1.0f, 0.0f), m_pTexture[0]);
 		m_pTypeName->SetTexUV(0.0f, 1.0f, 0.0f, 0.25f);
 	}
 
@@ -92,15 +94,13 @@ void  CSelectCharacter::Uninit(void)
 	//メモリの初期化
 	for (int nCnt = 0; nCnt < MAX_TYPE; nCnt++)
 	{
-		if (m_pCharMultRender[nCnt] != NULL)
-		{
-			m_pCharMultRender[nCnt] = NULL;
-		}
+		m_pCharMultRender[nCnt] = NULL;
 	}
 
 	m_pMoveUI = NULL;
 	m_pTypeName = NULL;
 	m_pStatus = NULL;
+	m_pEnter = NULL;
 
 	//ステータステクスチャの破棄
 	if (m_pStatusTex != NULL)
@@ -120,6 +120,22 @@ void  CSelectCharacter::Update(void)
 
 	//入力処理
 	UpdateInput();
+
+	//エンターキーの生成 / 破棄
+	if (m_bEnter)
+	{// 生成
+		D3DXVECTOR3 Size = m_pMoveUI->GetSize();
+		Size.y += 5.0f;
+		if (m_pEnter == NULL) { m_pEnter = CMoveUI::Create(m_pMoveUI->GetPos(), Size, m_pTexture[1]); }
+	}
+	else
+	{//	破棄
+		if (m_pEnter != NULL)
+		{
+			m_pEnter->Uninit();
+			m_pEnter = NULL;
+		}
+	}
 
 	switch (m_state)
 	{
@@ -213,7 +229,7 @@ void CSelectCharacter::UpdateInput(void)
 		}
 		else 
 		{
-			m_bEnter = true;
+			m_bEnter = true;	//決定状態にする
 		}
 	}
 }
@@ -272,6 +288,13 @@ void CSelectCharacter::UninitUI(void)
 	{
 		m_pStatus->Uninit();
 		m_pStatus = NULL;
+	}
+
+	//決定テクスチャの破棄
+	if (m_pEnter != NULL)
+	{
+		m_pEnter->Uninit();
+		m_pEnter = NULL;
 	}
 }
 
@@ -348,7 +371,8 @@ void CSelectCharacter::LoadTex(void)
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 
 	//国旗のテクスチャ読み込み
-	D3DXCreateTextureFromFile(pDevice, TEX_TYPENAME, &m_pTexture);	//タイプ名
+	D3DXCreateTextureFromFile(pDevice, TEX_TYPENAME, &m_pTexture[0]);	//タイプ名
+	D3DXCreateTextureFromFile(pDevice, TEX_ENTER, &m_pTexture[1]);	//キャラ決定
 }
 
 //=============================================================================
@@ -357,9 +381,12 @@ void CSelectCharacter::LoadTex(void)
 void CSelectCharacter::UnloadTex(void)
 {
 	//テクスチャの破棄
-	if (m_pTexture != NULL)
+	for (int nCntTex = 0; nCntTex < SELECTCHAR_TEX; nCntTex++)
 	{
-		m_pTexture->Release();
-		m_pTexture = NULL;
+		if (m_pTexture[nCntTex] != NULL)
+		{
+			m_pTexture[nCntTex]->Release();
+			m_pTexture[nCntTex] = NULL;
+		}
 	}
 }

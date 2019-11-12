@@ -17,6 +17,8 @@
 #include "sound.h"
 #include "UI.h"
 #include "score.h"
+#include "sceneTriangle3D.h"
+#include "game.h"
 
 //	---<<マクロ定義>>---
 #define CHARACTER_COLLISION_POS    (D3DXVECTOR3(0.0f,0.0f,0.0f))
@@ -890,11 +892,7 @@ void CCharacter::UpdateShapeComplete(void)
 	//時間の可算
 	m_nCntTimeCopyLine++;
 
-	if ((m_nCntTimeCopyLine % LINE_TIME) == 0)
-	{
-		m_bMakeShape = false;
-		UninitCopyLine();
-	}
+	if (m_nCntTimeCopyLine > LINE_TIME) { UninitCopyLine(); }
 }
 
 //=============================================================================
@@ -1349,8 +1347,15 @@ void CCharacter::UninitCopyLine(void)
 	{
 		if (m_apCopyLine[nCnt] != NULL)
 		{
-			m_apCopyLine[nCnt]->Uninit();
-			m_apCopyLine[nCnt] = NULL;
+			bool bDeth = m_apCopyLine[nCnt]->ColChange();
+
+			if (bDeth)
+			{//死亡フラグが有効だったら
+				m_apCopyLine[nCnt]->Uninit();
+				m_apCopyLine[nCnt] = NULL;
+				m_nCntTimeCopyLine = 0;
+				m_bMakeShape = false;
+			}
 		}
 	}
 }
@@ -1510,9 +1515,26 @@ void CCharacter::MakeTraiangle(int nCnt, int * nCountTraiangle, int * pnFarNumTe
 			pnFarNumTerritory[nCntPos] = pnFarNumTerritory[0];
 		}
 
+		//三角形ポリゴンを生成する
+		MakePolygon(pTraiangle[*nCountTraiangle]);
+
 		//ポインタ内の数値を加算
 		*nCountTraiangle += 1;
 	}
+}
+
+//=============================================================================
+// 三角形のポリゴン生成
+//=============================================================================
+void CCharacter::MakePolygon(TRAIANGLE pTraiangle)
+{
+	CSceneTriangle3D * pSceneTriangle = CSceneTriangle3D::Create(pTraiangle.pos[0], pTraiangle.pos[1], pTraiangle.pos[2]);
+
+	CGame * pGame = CManager::GetGame();
+
+	if (pGame == NULL) { return; }
+	int nNumPlayer = m_nNumPlayerNo;
+	pSceneTriangle->SetColor(m_CountryColor[nNumPlayer]);
 }
 
 //=============================================================================
@@ -1547,22 +1569,22 @@ void CCharacter::CutTerritoryPoint(CTerritory * pTerritory, int nOldPlayer)
 //=============================================================================
 void CCharacter::AddTerritoryPoint(CTerritory * pTerritory)
 {
-	//// 得点を取得
-	//if (pTerritory == NULL) { return; }
-	//int nPoint = pTerritory->GetPoint();
+	// 得点を取得
+	if (pTerritory == NULL) { return; }
+	int nPoint = pTerritory->GetPoint();
 
-	//// ゲームクラスを取得
-	//CGame *pGame = CManager::GetGame();
-	//if (pGame == NULL || CManager::GetMode() != CManager::MODE_GAME) { return; }
+	// ゲームクラスを取得
+	CGame *pGame = CManager::GetGame();
+	if (pGame == NULL || CManager::GetMode() != CManager::MODE_GAME) { return; }
 
-	//// UIクラスを取得
-	//CUI *pUI = pGame->GetUI();
-	//if (pUI == NULL) { return; }
+	// UIクラスを取得
+	CUI *pUI = pGame->GetUI();
+	if (pUI == NULL) { return; }
 
-	//// ゲームスコアクラスを取得
-	//CScoreGame *pScoreGame = pUI->GetScoreGame(m_nNumPlayer);
-	//if (pScoreGame == NULL) { return; }
+	// ゲームスコアクラスを取得
+	CScoreGame *pScoreGame = pUI->GetScoreGame(m_nNumPlayerNo);
+	if (pScoreGame == NULL) { return; }
 
-	//// スコアを加算
-	//pScoreGame->AddScore(nPoint);
+	// スコアを加算
+	pScoreGame->AddScore(nPoint);
 }

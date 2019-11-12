@@ -17,6 +17,7 @@
 #include "Player.h"
 #include "loadEffect.h"
 #include "camera.h"
+#include "ring.h"
 
 //=============================================================================
 // マクロ定義
@@ -26,6 +27,15 @@
 #define GET_LENGTH		(40.0f)								//取得範囲		
 #define MIN_TERRITORY	(3)									//取得テリトリーの最低数
 #define FIELD_SIZE		(D3DXVECTOR2(4000.0f, 4000.0f))		//フィールドのサイズ
+
+// リング用
+#define RING_MODELIDX   (1)
+#define RING_DIFFERENCE (D3DX_PI * 0.8f)
+#define RING_OFFSET     (D3DXVECTOR3(0.0f,18.0f,0.0f))
+#define RING_SCALE      (D3DXVECTOR3(1.6f, 1.6f,1.6f))
+#define RING_SCALEDOWN  (0.25f)
+#define RING_ADDPOSY    (15.0f)
+#define RING_ADDANGLE   (D3DX_PI * 0.005f)
 
 //=============================================================================
 // 前方宣言
@@ -40,7 +50,7 @@ int CTerritory::m_nMaxTex = 0;
 int CTerritory::m_nMaxModel = 0;
 int CTerritory::m_nCountObj = 0;
 int CTerritory::m_nMaxObj = 0;
-D3DXCOLOR CTerritory::m_DefaultColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+D3DXCOLOR CTerritory::m_DefaultColor = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
 D3DXVECTOR2 CTerritory::m_pEreaPos[MAX_EREAPOS] = {};
 
 //=============================================================================
@@ -65,6 +75,9 @@ CTerritory * CTerritory::Create(const D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECT
 
 	//モデル・テクスチャの割り当て
 	pTerritory->BindModel(m_pMesh[ModelNum], m_pBuffMat[ModelNum], m_pNumMat[ModelNum], m_ppTexture[nTexNum]);
+
+	// リングを作成する処理
+	pTerritory->CreateRing();
 
 	return pTerritory;
 }
@@ -102,13 +115,14 @@ HRESULT CTerritory::Init(void)
 	m_nTex = 0;
 	m_nModelType = 0;
 	m_nPoint = 1;
-	m_Color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	//色
-	m_OldColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	//色
+	m_Color = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);	//色
+	m_OldColor = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);	//色
 	m_nNumPlayer = -1;								//プレイヤー番号
 	m_nOldNumPlayer = -1;							//前回のプレイヤー番号
 	m_fLength = 0.0f;								//長さ
 	m_bGetTerritory = false;						//テリトリーを取得したかどうか
 	m_nErea = 0;									//エリア番号
+	m_ppRing = NULL;
 
 	if (m_pLoadEffect == NULL)
 	{
@@ -133,6 +147,9 @@ void CTerritory::Uninit(void)
 		delete m_pLoadEffect;
 		m_pLoadEffect = NULL;
 	}
+
+	// リングの開放
+	ReleaseRing();
 
 	m_nMaxObj--;
 }
@@ -343,6 +360,59 @@ void CTerritory::CreateCollider(void)
 	//pBox->SetParentMtxWorld(&GetMtx());
 	pColManager->SetCollider(pBox, 0);
 	SetCOlliderManager(pColManager);
+}
+
+//=============================================================================
+// リングを作成する処理
+//=============================================================================
+void CTerritory::CreateRing(void)
+{
+	if (m_ppRing != NULL) { return; }
+
+	// メモリを確保する
+	m_ppRing = new CRing*[m_nPoint];
+	if (m_ppRing == NULL) { return; }
+
+	// インスタンスのアドレスを生成
+	float fAngle = 0.0f;
+	for (int nCntPoint = 0; nCntPoint < m_nPoint; nCntPoint++)
+	{// 自身のポイントの回数分繰りかえし
+	 // リングの角度をずらしておく
+		fAngle = RING_DIFFERENCE * nCntPoint;
+
+		// リングの位置をずらしておく
+		D3DXVECTOR3 Offset = RING_OFFSET;
+		Offset.y += RING_ADDPOSY * nCntPoint;
+
+		// 大きさを変更
+		D3DXVECTOR3 Scale = RING_SCALE;
+		Scale.x -= RING_SCALEDOWN * nCntPoint;
+		Scale.y -= RING_SCALEDOWN * nCntPoint;
+		Scale.z -= RING_SCALEDOWN * nCntPoint;
+
+		// メモリを確保
+		m_ppRing[nCntPoint] = NULL;
+		m_ppRing[nCntPoint] = CRing::Create(GetPos() + Offset, Scale, m_pMesh[RING_MODELIDX], m_pBuffMat[RING_MODELIDX], m_pNumMat[RING_MODELIDX], NULL);
+		if (m_ppRing[nCntPoint] == NULL) { continue; }
+	}
+}
+
+//=============================================================================
+// リングを開放する処理
+//=============================================================================
+void CTerritory::ReleaseRing(void)
+{
+	if (m_ppRing == NULL) { return; }
+	for (int nCntPoint = 0; nCntPoint < m_nPoint; nCntPoint++)
+	{// 自身のポイントの回数分繰りかえし
+		if (m_ppRing[nCntPoint] != NULL)
+		{// メモリが確保されている
+			m_ppRing[nCntPoint]->Uninit();
+			m_ppRing[nCntPoint] = NULL;
+		}
+	}
+	delete[] m_ppRing;
+	m_ppRing = NULL;
 }
 
 //=============================================================================

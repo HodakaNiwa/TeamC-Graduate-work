@@ -121,7 +121,7 @@ protected:
 	void UpdateShapeComplete(void);										//完成後の更新処理
 	void InitTraiangle(TRAIANGLE * pTraiangle, int nMaxTraiangle);		//三角形の構造体の初期化
 	void MakeTraiangle(int nCnt, int * nCountTraiangle, int * pnFarNumTerritory, D3DXVECTOR3 * pListPos, TRAIANGLE * pTraiangle);				//三角形を作る処理
-
+	void MakePolygon(TRAIANGLE pTraiangle);								//ポリゴンの生成
 																																				//テリトリー
 	CTerritory * m_apTerritory[MAX_TERRITORY];	//テリトリーのリスト
 	CTerritory * m_pOldStartTerritory;			//初期位置のテリトリー

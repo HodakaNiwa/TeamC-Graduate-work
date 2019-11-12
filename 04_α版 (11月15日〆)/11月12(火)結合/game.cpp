@@ -111,8 +111,8 @@ CGame::CGame()
 	}
 
 	//	---<<小林が追加しました>>★	★	★	★	★	★	★	★	★	★
-	m_nEnemyNum = 3;//手打ち
-	//m_nEnemyNum = 8 - m_nNumPlay // 最大参加数からプレイヤーを引いた数がエネミーの数
+	//m_nEnemyNum = 3;//手打ち
+	m_nEnemyNum = ENEMY_MAX - m_nNumPlay; // 最大参加数からプレイヤーを引いた数がエネミーの数
 	//	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★
 
 	for (int nCnt = 0; nCnt < ENEMY_MAX; nCnt++)
@@ -442,9 +442,11 @@ void CGame::CreateInitCamera(void)
 //=============================================================================
 void CGame::CreateUI(void)
 {
+	int nAllCharacter = m_nNumPlay + m_nEnemyNum;
+
 	// メモリを確保
 	if (m_pUI != NULL) { return; }
-	m_pUI = CUI::Create(m_nNumPlay);
+	m_pUI = CUI::Create(m_nNumPlay, nAllCharacter);
 
 	// ミニマップクラスを取得
 	CMiniMap *pMiniMap = m_pUI->GetMiniMap();
@@ -455,7 +457,6 @@ void CGame::CreateUI(void)
 	{
 		pMiniMap->SettingBGPos();
 	}
-	int nAllCharacter = m_nNumPlay + m_nEnemyNum;
 	// ミニマップ用にプレイヤーのポインタを設定
 	for (int nCnt = 0; nCnt < nAllCharacter; nCnt++)
 	{

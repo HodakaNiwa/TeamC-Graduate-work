@@ -61,10 +61,11 @@ HRESULT CLine::Init(void)
 
 	CGame *pGame = CManager::GetGame();
 
-	int nType = pGame->GetChara(m_nNumPlayer)->GetType();
+	int nNumPlayer = m_nNumPlayer;
+	m_col = CPlayer::m_CountryColor[nNumPlayer];
 
 	//色の設定
-	CScene3D::SetColor(CPlayer::m_CountryColor[nType]);
+	CScene3D::SetColor(m_col);
 
 	//中心点を求める
 	D3DXVECTOR3 Pos = (m_StartPos + m_EndPos) / 2.0f;
@@ -193,6 +194,28 @@ bool CLine::CollsionLine(D3DXVECTOR3 PlayerPos)
 
 	return bIn;
 }
+
+//=============================================================================
+// 色の変更処理
+//=============================================================================
+bool CLine::ColChange(void)
+{
+	//変数宣言
+	bool bDeth = false;	//死亡フラグ
+
+	m_col.a -= 0.05f;
+
+	if (m_col.a < 0.0f)
+	{
+		m_col.a = 0.0f;
+		bDeth = true;	//死亡フラグを有効にする
+	}
+
+	//色を設定
+	SetColor(m_col);
+	return bDeth;
+}
+
 
 //=============================================================================
 // VecAを求める

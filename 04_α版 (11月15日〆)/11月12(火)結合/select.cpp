@@ -903,7 +903,7 @@ void CSelect::UpdateDicision(void)
 				if (pXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true)
 				{
 					SetPlayerInfo();	//プレイヤー情報の保存
-					if (CFade::GetFadeMode() != CFade::FADE_OUT) { CFade::SetFade(CManager::MODE_TUTORIAL); }
+					if (CFade::GetFadeMode() != CFade::FADE_OUT) { CFade::SetFade(CManager::MODE_GAME); }
 				}
 			}
 
@@ -912,7 +912,7 @@ void CSelect::UpdateDicision(void)
 				if (CFade::GetFadeMode() != CFade::FADE_OUT)
 				{
 					SetPlayerInfo();	//プレイヤー情報の保存
-					CFade::SetFade(CManager::MODE_TUTORIAL); 
+					CFade::SetFade(CManager::MODE_GAME); 
 				}
 			}
 		}

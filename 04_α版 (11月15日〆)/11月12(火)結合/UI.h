@@ -32,9 +32,9 @@ public:    // 誰でもアクセス可能
 	CUI();
 	~CUI();
 
-	static CUI *Create(int nNumPlayer);
+	static CUI *Create(int nNumPlayer, int nAllCharacter);
 
-	HRESULT Init(int nNumPlayer);
+	HRESULT Init(int nNumPlayer, int nAllCharacter);
 	void Uninit(void);
 	void Update(void);
 
@@ -42,9 +42,11 @@ public:    // 誰でもアクセス可能
 	//	Set & Get
 	//--------------------
 	void SetNumPlayer(const int nNumPlayer) { m_nNumPlayer = nNumPlayer; }
+	void SetNumAllCharacter(const int nNumAllCharacter) { m_nNumAllCharacter = nNumAllCharacter; }
 	void SetScoreGame(CScoreGame *pScoreGame, const int nIdx) { m_pScoreGame[nIdx] = pScoreGame; }
 	void SetMiniMap(CMiniMap *pMiniMap) { m_pMiniMap = pMiniMap; }
 	int GetNumPlayer(void) { return m_nNumPlayer; }
+	int GetNumAllCharacter(void) { return m_nNumAllCharacter; }
 	CScoreGame *GetScoreGame(const int nIdx) { return m_pScoreGame[nIdx]; }
 	CMiniMap *GetMiniMap(void) { return m_pMiniMap; }
 
@@ -63,9 +65,10 @@ private:   // このクラスだけがアクセス可能
 	//--------------------
 	//	メンバ変数
 	//--------------------
-	int m_nNumPlayer;							// ゲームに参加している人数(保存用)
-	CScoreGame *m_pScoreGame[MAX_PLAYERNUM];	// ゲームスコアクラスへのポインタ
-	CMiniMap *m_pMiniMap;						// ミニマップクラスへのポインタ
+	int m_nNumPlayer;								// ゲームに参加しているプレイヤーの人数(保存用)
+	int m_nNumAllCharacter;							// ゲームに参加している人数(保存用)
+	CScoreGame *m_pScoreGame[MAX_PLAYERNUM * 2];	// ゲームスコアクラスへのポインタ
+	CMiniMap *m_pMiniMap;							// ミニマップクラスへのポインタ
 };
 
 #endif
