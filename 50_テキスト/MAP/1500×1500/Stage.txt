@@ -11,22 +11,23 @@ SCRIPT
 #--------------------------------------
 MAX_TEX = 3			#テクスチャの最大数
 
-TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[0] モニター
-TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[1] モニター
-TEXTURE = data/TEXTURE/Model/monitor_tex1.jpg	#[2] モニター
+TEXTURE = data/TEXTURE/wall.jpg			#[0] 壁
+TEXTURE = data/TEXTURE/water.jpg		#[1] 水
+TEXTURE = data/TEXTURE/monitor_tex1.jpg	#[2] モニター
 
 #--------------------------------------
 # モデルの情報
 #--------------------------------------
-MAX_MODEL = 7		#モデルの最大数
+MAX_MODEL = 8		#モデルの最大数
 
-MODELNAME = data/MODEL/test.x			#[0] テスト
-MODELNAME = data/MODEL/test2.x			#[1] テスト
-MODELNAME = data/MODEL/AudienceSeats.x	#[2] 観客席
-MODELNAME = data/MODEL/Bench000.x		#[3] ベンチ
-MODELNAME = data/MODEL/Camera000.x		#[4] カメラ
-MODELNAME = data/MODEL/Monitor000.x		#[5] モニター
-MODELNAME = data/MODEL/Beacon000.x		#[6] ビーコン
+MODELNAME = data/MODEL/test.x					#[0] テスト
+MODELNAME = data/MODEL/test2.x					#[1] テスト
+MODELNAME = data/MODEL/AudienceSeats.x			#[2] 観客席
+MODELNAME = data/MODEL/Bench000.x				#[3] ベンチ
+MODELNAME = data/MODEL/Camera000.x				#[4] カメラ
+MODELNAME = data/MODEL/Monitor000.x				#[5] モニター
+MODELNAME = data/MODEL/Beacon000.x				#[6] ビーコン
+MODELNAME = data/MODEL/AudienceSeatsCorner.x	#[7] 観客席の四隅
 
 #--------------------------------------
 # モデルの配置情報
@@ -474,7 +475,7 @@ END_SET
 
 SET
 	MODELTYPE = 5
-	TEX = 0
+	TEX = 2
 	POS = -1480.0 300.0 1590.0
 	ROT = 0.0 11.8 0.0
 	SCALE = 0.2 0.2 0.2
@@ -483,7 +484,7 @@ END_SET
 
 SET
 	MODELTYPE = 5
-	TEX = 0
+	TEX = 2
 	POS = -1510.0 300.0 -1250.0
 	ROT = 0.0 3.8 0.0
 	SCALE = 0.2 0.2 0.2
@@ -492,10 +493,46 @@ END_SET
 
 SET
 	MODELTYPE = 5
-	TEX = 0
+	TEX = 2
 	POS = 1300.0 300.0 -1230.0
 	ROT = 0.0 2.3 0.0
 	SCALE = 0.2 0.2 0.2
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 7
+	TEX = 0
+	POS = 1366.8 0.000 1619.0
+	ROT = 0.0 0.0 0.0
+	SCALE = 2.0 2.0 2.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 7
+	TEX = 0
+	POS = 1375.7 0.000 -1273.0
+	ROT = 0.0 33.0 0.0
+	SCALE = 2.0 2.0 2.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 7
+	TEX = 0
+	POS = -1514.0 0.000 -1291.0
+	ROT = 0.0 22.0 0.0
+	SCALE = 2.0 2.0 2.0
+	TYPE = 0
+END_SET
+
+SET
+	MODELTYPE = 7
+	TEX = 0
+	POS = -1545.0 0.000 1620.0
+	ROT = 0.0 11.0 0.0
+	SCALE = 2.0 2.0 2.0
 	TYPE = 0
 END_SET
 

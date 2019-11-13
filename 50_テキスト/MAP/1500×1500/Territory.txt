@@ -11,7 +11,7 @@ SCRIPT
 #--------------------------------------
 MAX_TEX = 1		#テクスチャの最大数
 
-TEXTURE = data/TEXTURE/Model/territory.jpg	#[0] テリトリー
+TEXTURE = data/TEXTURE/territory.jpg	#[0] テリトリー
 
 #--------------------------------------
 # モデルの情報
@@ -29,7 +29,7 @@ SET
 	POS = -60.0 0.0 50.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -38,7 +38,7 @@ SET
 	POS = 140.0 0.0 150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -47,7 +47,7 @@ SET
 	POS = -260.0 0.0 150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -56,7 +56,7 @@ SET
 	POS = -60.0 0.0 250.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -146,7 +146,7 @@ SET
 	POS = -460.0 0.0 150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -155,7 +155,7 @@ SET
 	POS = 340.0 0.0 150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -164,7 +164,7 @@ SET
 	POS = -60.0 0.0 550.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -173,7 +173,7 @@ SET
 	POS = -60.0 0.0 -250.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -182,7 +182,7 @@ SET
 	POS = -310.0 0.0 -150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -191,7 +191,7 @@ SET
 	POS = 190.0 0.0 -150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -200,7 +200,7 @@ SET
 	POS = 190.0 0.0 450.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -209,7 +209,7 @@ SET
 	POS = -310.0 0.0 450.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -398,7 +398,7 @@ SET
 	POS = -60.0 0.0 -650.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -407,7 +407,7 @@ SET
 	POS = -60.0 0.0 950.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -416,7 +416,7 @@ SET
 	POS = -860.0 0.0 150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -425,7 +425,7 @@ SET
 	POS = 740.0 0.0 150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -434,7 +434,7 @@ SET
 	POS = -160.0 0.0 -550.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -443,7 +443,7 @@ SET
 	POS = -160.0 0.0 750.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -452,7 +452,7 @@ SET
 	POS = 40.0 0.0 750.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -461,7 +461,7 @@ SET
 	POS = 40.0 0.0 -550.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
@@ -470,7 +470,7 @@ SET
 	POS = -760.0 0.0 250.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -479,7 +479,7 @@ SET
 	POS = -760.0 0.0 50.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -488,7 +488,7 @@ SET
 	POS = 640.0 0.0 50.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -497,7 +497,7 @@ SET
 	POS = 640.0 0.0 250.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -596,43 +596,43 @@ SET
 	POS = -60.0 0.0 -850.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -360.0 0.0 -850.0
+	POS = -360.0 0.0 -851.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -660.0 0.0 -850.0
+	POS = -660.0 0.0 -849.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = 240.0 0.0 -850.0
+	POS = 240.0 0.0 -849.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = 540.0 0.0 -850.0
+	POS = 540.0 0.0 -852.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -641,43 +641,43 @@ SET
 	POS = 540.0 0.0 1050.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = 240.0 0.0 1050.0
+	POS = 240.0 0.0 1051.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -60.0 0.0 1050.0
+	POS = -60.0 0.0 1052.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -360.0 0.0 1050.0
+	POS = -360.0 0.0 1049.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -660.0 0.0 1050.0
+	POS = -660.0 0.0 1048.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -791,7 +791,7 @@ END_SET
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -260.0 0.0 850.0
+	POS = -260.0 0.0 850.1
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
 	POINT = 1
@@ -800,7 +800,7 @@ END_SET
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -460.0 0.0 850.0
+	POS = -460.0 0.0 850.2
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
 	POINT = 1
@@ -809,7 +809,7 @@ END_SET
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -660.0 0.0 850.0
+	POS = -660.0 0.0 850.1
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
 	POINT = 1
@@ -827,37 +827,37 @@ END_SET
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -1160.0 0.0 -850.0
+	POS = -1160.0 0.0 -850.2
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -1160.0 0.0 -650.0
+	POS = -1160.0 0.0 -650.2
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = -1060.0 0.0 -750.0
+	POS = -1060.0 0.0 -750.1
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
 	MODELTYPE = 0
 	TEX = 0
-	POS = 860.0 0.0 -750.0
+	POS = 860.0 0.0 -750.3
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -866,7 +866,7 @@ SET
 	POS = 960.0 0.0 -650.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -875,7 +875,7 @@ SET
 	POS = 1000.0 0.0 -850.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -884,7 +884,7 @@ SET
 	POS = 1000.0 0.0 1050.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -893,7 +893,7 @@ SET
 	POS = 1000.0 0.0 1250.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -902,7 +902,7 @@ SET
 	POS = 900.0 0.0 1150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -911,7 +911,7 @@ SET
 	POS = -900.0 0.0 1150.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -920,7 +920,7 @@ SET
 	POS = -1100.0 0.0 1250.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -929,7 +929,7 @@ SET
 	POS = -1100.0 0.0 1050.0
 	ROT = 0.0 1.7 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 2
 END_SET
 
 SET
@@ -938,7 +938,7 @@ SET
 	POS = -60.0 0.0 150.0
 	ROT = 0.0 0.0 0.0
 	SCALE = 1.0 1.0 1.0
-	POINT = 1
+	POINT = 3
 END_SET
 
 SET
