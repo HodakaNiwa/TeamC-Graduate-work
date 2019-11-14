@@ -80,7 +80,7 @@ CGame::CGame()
 		m_pGameCamera[nCntPlayer] = NULL;
 	}
 	//	---<<小林が追加しました>>★	★	★	★	★	★	★	★	★	★
-	m_nEnemyNum = 2;//手打ち
+	m_nEnemyNum = 1;//手打ち
 	//m_nEnemyNum = 8 - m_nNumPlay // 最大参加数からプレイヤーを引いた数がエネミーの数
 	//	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★
 
@@ -124,7 +124,7 @@ void CGame::Init(void)
 		CEffectTool::LoadEffect();
 	}
 	//カウントダウン状態
-	CManager::SetGameState(CManager::GAMESTATE_FIRSTCOUNTDOWN);
+	CManager::SetGameState(CManager::GAMESTATE_GAME);
 
 	//地面の生成
 	//if (m_pMeshFiled == NULL) { m_pMeshFiled = CSceneMeshFiled::Create(VECTOR_ZERO); }
@@ -171,14 +171,14 @@ void CGame::Init(void)
 	//CMiniMap::Create();
 
 	//カウントダウンタイマーの生成
-	CTimer::Create(CTimer::TYPE_COUNTER, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+	//CTimer::Create(CTimer::TYPE_COUNTER, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 
 	//ゲームタイマーの生成（ラスト5秒で描画される）
-	CTimer::Create(CTimer::TYPE_GAME, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
+	//CTimer::Create(CTimer::TYPE_GAME, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 
 	////	---<<小林が追加しました>>★	★	★	★	★	★	★	★	★	★
 	m_pCharacter[PLAYER_MAX] = CEnemy::Create(PLAYER_MAX, CEnemy::TYPE_BRAZIL, D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
-	m_pCharacter[PLAYER_MAX + 1] = CEnemy::Create(PLAYER_MAX+1, CEnemy::TYPE_RUSSIA, D3DXVECTOR3(100.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
+	//m_pCharacter[PLAYER_MAX + 1] = CEnemy::Create(PLAYER_MAX+1, CEnemy::TYPE_RUSSIA, D3DXVECTOR3(100.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
 	//m_pCharacter[PLAYER_MAX + 2] = CEnemy::Create(PLAYER_MAX + 2, D3DXVECTOR3(-100.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
 	//m_pEnemy[3] = CEnemy::Create(3, D3DXVECTOR3(200.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\ENEMY_MODEL.txt", "data\\TEXT\\MotionLoad\\ENEMY_MOTION.txt");
 	//	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★

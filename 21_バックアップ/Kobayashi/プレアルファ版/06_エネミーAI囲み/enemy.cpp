@@ -69,6 +69,7 @@ HRESULT CEnemy::Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTx
 	m_pModel = CCharacter::GetModel();
 	CCharacter::SetPos(pos);
 
+	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせる)
 	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
 
 	//ライン変数の初期化
@@ -276,8 +277,9 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 	//	ループ解除用
 	m_bBreak = false;
 
-	//	テリトリー通過数記録
+	//	テリトリー通過数記録 / 現在のライン数
 	m_nTargetCnt = 0;
+	m_bFinish = false;
 
 	//	エネミーとテリトリー間の距離を計算
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
@@ -333,6 +335,7 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 			{
 				m_nTargetNum = nInitTarget;
 				m_nAreaNow = nAreaCnt;	//	一番最初に所属するエリアが決まる
+				//m_nTerrStart.pos = m_AreaInfo[nAreaCnt][nInitTarget].pos;	//	ラインを繋ぐ際の始点・終点となる
 				m_bBreak = true;		//	決まった瞬間ループを抜ける
 				break;
 			}
@@ -347,109 +350,213 @@ void  CEnemy::Move(void)
 {
 	D3DXVECTOR3 pos = CCharacter::GetPos();
 	m_posOld = pos;
-
 	
 	//!	---<<AI関連>---
-	//	★角度計算
-	for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+	
+
+	if (m_bFinish == true)
 	{
-		m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
-	}
+		//?	★終点となる拠点
+		m_nTerrStart.fRadian = (float)atan2(m_nTerrStart.pos.z - pos.z, m_nTerrStart.pos.x - pos.x);
 
-	//	★次の座標の予測値を計算する
-	D3DXVECTOR3 nextPos;
-	nextPos.x = (float)cos(m_AreaInfo[m_nAreaNow][m_nTargetNum].fRadian) * SPEED + pos.x;
-	nextPos.z = (float)sin(m_AreaInfo[m_nAreaNow][m_nTargetNum].fRadian) * SPEED + pos.z;
-
-	//	★目的地範囲内に入った
-	if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
-		pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
-	{
-		//	[[フラグを立てる]]
-		m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
-		//	[[通過記録カウントアップ]]
-		m_nTargetCnt += 1;
-		// [[現地点から近い距離を探す]]
-		m_bBreak = false;
-		int nNextNum = 0;//	次の近いターゲット拠点番号(0は現在自分がいる場所)
-
-		if (m_nTargetCnt == m_nAreaTerrNum[m_nAreaNow])	//	通過回数もフラグもリセット
+		//?	★次の座標の予測値を計算する
+		if (pos.x <= m_nTerrStart.pos.x + 25.0f && pos.x >= m_nTerrStart.pos.x - 25.0f &&
+			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
 		{
-			m_nTargetCnt = 0;
+			// [[現地点から近い距離を探す]]
+			m_bBreak = false;
+			int nNextNum = 0;//	次の近いターゲット拠点番号(0は現在自分がいる場所)
 
-
+			//	[[再度距離を計算]]
 			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 			{
-				m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+				m_AreaInfo[m_nAreaNow][nCnt].fDistance = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
+				m_AreaInfo[m_nAreaNow][nCnt].fDisSort = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
 
 			}
-			m_nAreaNow += 1;
-			if (m_nAreaNow == AREA_MAX)
-			{
-				m_nAreaNow = 0;
-			}
-		}
-		//	[[再度距離を計算]]
-		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-		{
-			m_AreaInfo[m_nAreaNow][nCnt].fDistance = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
-			m_AreaInfo[m_nAreaNow][nCnt].fDisSort = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
 
-		}
-
-		//	[[短い距離順に変える]]
-		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-		{
-			for (int nCnt2 = 0; nCnt2 < m_nAreaTerrNum[m_nAreaNow]; nCnt2++)
-			{
-				if (m_AreaInfo[m_nAreaNow][nCnt].fDisSort < m_AreaInfo[m_nAreaNow][nCnt2].fDisSort)
-				{
-					float fDisSort = m_AreaInfo[m_nAreaNow][nCnt].fDisSort;
-					m_AreaInfo[m_nAreaNow][nCnt].fDisSort = m_AreaInfo[m_nAreaNow][nCnt2].fDisSort;
-					m_AreaInfo[m_nAreaNow][nCnt2].fDisSort = fDisSort;
-				}
-			}
-		}
-
-		while (m_bBreak != true)
-		{
+			//	[[短い距離順に変える]]
 			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 			{
-				if (m_AreaInfo[m_nAreaNow][nCnt].bFlag == false)
+				for (int nCnt2 = 0; nCnt2 < m_nAreaTerrNum[m_nAreaNow]; nCnt2++)
 				{
-					if (m_AreaInfo[m_nAreaNow][nCnt].fDistance == m_AreaInfo[m_nAreaNow][nNextNum].fDisSort)
+					if (m_AreaInfo[m_nAreaNow][nCnt].fDisSort < m_AreaInfo[m_nAreaNow][nCnt2].fDisSort)
 					{
-						m_nTargetNum = nCnt;
-						m_bBreak = true;
-						break;
+						float fDisSort = m_AreaInfo[m_nAreaNow][nCnt].fDisSort;
+						m_AreaInfo[m_nAreaNow][nCnt].fDisSort = m_AreaInfo[m_nAreaNow][nCnt2].fDisSort;
+						m_AreaInfo[m_nAreaNow][nCnt2].fDisSort = fDisSort;
 					}
 				}
 			}
-			nNextNum += 1;	//	すでにフラグが立っている場合は次の近場へ
+
+			while (m_bBreak != true)
+			{
+				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+				{
+					if (m_AreaInfo[m_nAreaNow][nCnt].bFlag == false)
+					{
+						if (m_AreaInfo[m_nAreaNow][nCnt].fDistance == m_AreaInfo[m_nAreaNow][nNextNum].fDisSort)
+						{
+							m_nTargetNum = nCnt;
+							m_bBreak = true;
+							break;
+						}
+					}
+				}
+				nNextNum += 1;	//	すでにフラグが立っている場合は次の近場へ
+			}
+
+			//	ライン数の初期化 / 新たな始点・終点を決める
+			m_bFinish = false;
+			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
 		}
+		//	移動加算処理
+		pos.x += (float)cos(m_nTerrStart.fRadian) * SPEED;
+		pos.z += (float)sin(m_nTerrStart.fRadian) * SPEED;
+
+		// ★拠点までの角度 / 自身の軸調整
+		float fDestAngle = atan2f(pos.x - m_nTerrStart.pos.x, pos.z - m_nTerrStart.pos.z);
+		float fAngle = fDestAngle - m_rot.y;
+
+		if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
+		if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
+
+		//	移動方向に角度調整
+		m_rot.y += fAngle * 0.1f;
+
+		if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
+		if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
+
+		//	位置・回転情報の反映
+		CCharacter::SetPos(pos);
+		CCharacter::SetRot(m_rot);
+	}
+	// ------------------------------------------------------------------------------------------------------------------
+	else
+	{
+		//	★角度計算
+		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+		{
+			m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
+		}
+
+		//	★目的地範囲内に入った
+		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
+			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
+		{
+			//	[[最新の始点・終点に更新]]
+			if (m_apTerritory[0] != NULL)
+			{
+				m_nTerrStart.pos = m_apTerritory[0]->GetPos();
+			}
+			
+			//	[[ラインを?本引いたら始点に戻る]]
+			if (m_apTerritory[m_nLineNum] != NULL)
+			{
+				if (m_nLineTime <= 800)	// 制限時間(8秒)が迫ってきたら
+				{
+					m_nLineNum = 2;
+					m_bFinish = true;	//	始点に戻す
+				}
+				else//	ラインを伸ばす時間に余裕があれば
+				{
+					m_nLineNum += 1;
+				}
+				
+			}
+			//	[[フラグを立てる]]
+			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
+			//	[[通過記録カウントアップ]]
+			m_nTargetCnt += 1;
+			// [[現地点から近い距離を探す]]
+			m_bBreak = false;
+			int nNextNum = 0;//	次の近いターゲット拠点番号(0は現在自分がいる場所)
+
+			if (m_nTargetCnt == (m_nAreaTerrNum[m_nAreaNow] / 2)-5)	//	通過回数もフラグもリセット
+			{
+				m_nTargetCnt = 0;
+
+				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+				{
+					m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+				}
+				//	このif文を何回か通ったら次のエリアに移動させよう
+				//int 〇 = 0;
+				//〇++;
+				//if (〇 == 3)
+				//{
+
+				//}
+				/*m_nAreaNow += 1;
+				if (m_nAreaNow == AREA_MAX)
+				{
+					m_nAreaNow = 0;
+				}*/
+			}
+
+			//	[[再度距離を計算]]
+			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+			{
+				m_AreaInfo[m_nAreaNow][nCnt].fDistance = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
+				m_AreaInfo[m_nAreaNow][nCnt].fDisSort = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
+
+			}
+
+			//	[[短い距離順に変える]]
+			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+			{
+				for (int nCnt2 = 0; nCnt2 < m_nAreaTerrNum[m_nAreaNow]; nCnt2++)
+				{
+					if (m_AreaInfo[m_nAreaNow][nCnt].fDisSort < m_AreaInfo[m_nAreaNow][nCnt2].fDisSort)
+					{
+						float fDisSort = m_AreaInfo[m_nAreaNow][nCnt].fDisSort;
+						m_AreaInfo[m_nAreaNow][nCnt].fDisSort = m_AreaInfo[m_nAreaNow][nCnt2].fDisSort;
+						m_AreaInfo[m_nAreaNow][nCnt2].fDisSort = fDisSort;
+					}
+				}
+			}
+
+			while (m_bBreak != true)
+			{
+				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+				{
+					if (m_AreaInfo[m_nAreaNow][nCnt].bFlag == false)
+					{
+						if (m_AreaInfo[m_nAreaNow][nCnt].fDistance == m_AreaInfo[m_nAreaNow][nNextNum].fDisSort)
+						{
+							m_nTargetNum = nCnt;
+							m_bBreak = true;
+							break;
+						}
+					}
+				}
+				nNextNum += 1;	//	すでにフラグが立っている場合は次の近場へ
+			}
+		}
+
+		//	移動加算処理
+		pos.x += (float)cos(m_AreaInfo[m_nAreaNow][m_nTargetNum].fRadian) * SPEED;
+		pos.z += (float)sin(m_AreaInfo[m_nAreaNow][m_nTargetNum].fRadian) * SPEED;
+
+		// ★拠点までの角度 / 自身の軸調整
+		float fDestAngle = atan2f(pos.x - m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x, pos.z - m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z);
+		float fAngle = fDestAngle - m_rot.y;
+
+		if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
+		if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
+
+		//	移動方向に角度調整
+		m_rot.y += fAngle * 0.1f;
+
+		if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
+		if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
+
+		//	位置・回転情報の反映
+		CCharacter::SetPos(pos);
+		CCharacter::SetRot(m_rot);
 	}
 
-	if (pos.x > nextPos.x) { pos.x -= SPEED; }
-	else if (pos.x < nextPos.x) { pos.x += SPEED; }
-	if (pos.z > nextPos.z) { pos.z -= SPEED; }
-	else if (pos.z < nextPos.z) { pos.z += SPEED; }
-
-	// ★拠点までの角度 / 自身の軸調整
-	float fDestAngle = atan2f(pos.x - m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x, pos.z - m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z);
-	float fAngle = fDestAngle - m_rot.y;
-
-	if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
-	if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
-
-	//	移動方向に角度調整
-	m_rot.y += fAngle * 0.1f;
-
-	if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
-	if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
-
-	//	位置・回転情報の反映
-	CCharacter::SetPos(pos);
-	CCharacter::SetRot(m_rot);
 
 }
 

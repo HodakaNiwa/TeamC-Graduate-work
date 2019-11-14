@@ -601,7 +601,6 @@ void CCharacter::MotionSetLode(void)
 			}
 		}
 
-
 		while (1)
 		{
 			fgets(&aLine[0], 256, pFile);

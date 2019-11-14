@@ -141,6 +141,9 @@ private:
 	void CreateOrbitLine(void);				//	軌跡の線の生成
 	void UninitOrtbitLine(void);			//	ラインの破棄
 
-
+	//!	---<<ラインを繋ぐ変数>>---
+	TERRITORY_INFO m_nTerrStart;			//	図形となるラインを繋ぐ際の始点・終点を記憶(始点・終点は同じ位置)
+	int m_nLineNum;							//	現在のライン数
+	bool m_bFinish;							//	図形を完成させるかどうか						
 };
 #endif
