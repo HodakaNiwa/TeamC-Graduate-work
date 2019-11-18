@@ -132,6 +132,8 @@ void  CEnemy::Uninit(void)
 		m_TerritoryInfo = NULL;
 	}
 
+
+
 	CCharacter::Uninit();
 }
 

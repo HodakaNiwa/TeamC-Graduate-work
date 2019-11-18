@@ -138,6 +138,13 @@ HRESULT CTypeSpeed::Init(void)
 //=============================================================================
 void  CTypeSpeed::Uninit(void)
 {
+	if (m_pLoadEffect != NULL)
+	{//エフェクトの破棄
+		m_pLoadEffect->Uninit();
+		delete m_pLoadEffect;
+		m_pLoadEffect = NULL;
+	}
+
 	//プレイヤーの終了処理
 	CEnemy::Uninit();
 }
