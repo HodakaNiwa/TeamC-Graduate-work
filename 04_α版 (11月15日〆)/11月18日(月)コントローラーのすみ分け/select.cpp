@@ -136,6 +136,7 @@ void CSelect::Init(void)
 		m_pFram[nCnt] = NULL;					//フレーム
 		m_pCharBack[nCnt] = NULL;				//キャラ背景
 		m_nCntPressTime[nCnt] = 0;				//ボタンを押した時間
+		m_nCntPressTime2[nCnt] = 0;				//ボタンを押した時間
 		m_anPlayeCuntry[nCnt] = -1;				//国
 		m_anPlayerType[nCnt] = -1;				//タイプ
 		m_pSelectChar[nCnt] = NULL;				//キャラ選択UI
@@ -520,6 +521,7 @@ void CSelect::UpdateCharacterSelect(void)
 	CGamePad * pGamePad = CManager::GetInputGamePad();	
 	CInputXPad * pXPad = CManager::GetXPad();
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
+	CRawMouse * pMouse = CManager::GetRawMouse();
 	
 	for (int nCnt = 0; nCnt < NUMPLAYER; nCnt++)
 	{	
@@ -536,6 +538,21 @@ void CSelect::UpdateCharacterSelect(void)
 		else
 		{
 			m_nCntPressTime[nCnt] = 0;
+		}
+
+		//マウスの入力処理
+		if (pMouse->GetPress(nCnt, CRawMouse::RIMS_BUTTON_RIGHT) == true)
+		{
+			m_nCntPressTime2[nCnt]++;
+
+			if ((m_nCntPressTime2[nCnt] % TIME_BACKBOTTUN) == 0)
+			{
+				SetState(STATE_BACKCHANGE);	//前回の画面に戻る
+			}
+		}
+		else
+		{
+			m_nCntPressTime2[nCnt] = 0;
 		}
 	}
 
@@ -850,7 +867,12 @@ void CSelect::BackCuntryInit(void)
 		m_pNumPlayer[nCnt]->SetDraw(false);
 
 		//描画状態にする
-		if (m_bPlayerEnter[nCnt] == true) { m_pNumPlayer[nCnt]->SetDraw(true); }
+		if (m_bPlayerEnter[nCnt] == true)
+		{
+			m_pNumPlayer[nCnt]->SetNumInput(m_anControler[nCnt]);
+			m_pNumPlayer[nCnt]->SetInputType(m_anInputType[nCnt]);
+			m_pNumPlayer[nCnt]->SetDraw(true); 
+		}
 	}
 
 	//国旗の表示

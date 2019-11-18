@@ -115,6 +115,7 @@ private:
 	STATE m_state;										//状態設定
 	int m_nCountTime;									//カウンター
 	int m_nCntPressTime[NUMPLAYER];						//ボタンを押した時間
+	int m_nCntPressTime2[NUMPLAYER];						//ボタンを押した時間
 	bool m_bPlayerEnter[NUMPLAYER];						//エントリーしているかどうか
 	bool m_bEntryGamePad[NUMPLAYER];					//何番目のコントローラーがエントリーしたのか
 	bool m_bEntryMouse[NUMPLAYER];					//何番目のコントローラーがエントリーしたのか
