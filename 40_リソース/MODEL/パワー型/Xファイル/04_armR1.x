@@ -1809,7 +1809,7 @@ Mesh {
    0.100000;0.100000;0.100000;;
    0.480000;0.480000;0.480000;;
    TextureFilename {
-    "data\\TEXTURE\\UV\\player_power\\101_skin_UV.jpg";
+    "data\\TEXTURE\\UV\\player_power\\ÉçÉVÉA\\101_skin_UV.jpg";
    }
   }
  }

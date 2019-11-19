@@ -2026,7 +2026,7 @@ Mesh {
    0.100000;0.100000;0.100000;;
    0.600000;0.600000;0.600000;;
    TextureFilename {
-    "C:\\Users\\game102\\Desktop\\プレイヤー(スピード型)\\胴体\\01_body_UV.jpg";
+    "data\\TEXTURE\\UV\\player_speed\\ロシア\\01_body_UV.jpg";
    }
   }
  }

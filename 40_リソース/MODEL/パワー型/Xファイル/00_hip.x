@@ -505,7 +505,7 @@ Mesh {
    0.100000;0.100000;0.100000;;
    0.480000;0.480000;0.480000;;
    TextureFilename {
-    "C:\\Users\\game102\\Desktop\\プレイヤー(重量型)_UV\\00_hip_UV.jpg";
+    "data\\TEXTURE\\UV\\player_power\\ロシア\\00_hip_UV.jpg";
    }
   }
  }

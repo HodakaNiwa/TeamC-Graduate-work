@@ -1840,7 +1840,7 @@ Mesh {
    0.100000;0.100000;0.100000;;
    0.480000;0.480000;0.480000;;
    TextureFilename {
-    "data\\TEXTURE\\UV\\player_power\\11_InstepR_UV.jpg";
+    "data\\TEXTURE\\UV\\player_power\\ÉçÉVÉA\\11_InstepR_UV.jpg";
    }
   }
  }

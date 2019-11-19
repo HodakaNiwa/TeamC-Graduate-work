@@ -3570,7 +3570,7 @@ Mesh {
    0.100000;0.100000;0.100000;;
    0.600000;0.600000;0.600000;;
    TextureFilename {
-    "C:\\Users\\game102\\Desktop\\プレイヤー(スピード型)\\右足\\10_calfR_UV.jpg";
+    "data\\TEXTURE\\UV\\player_speed\\ロシア\\10_calfR_UV.jpg";
    }
   }
  }

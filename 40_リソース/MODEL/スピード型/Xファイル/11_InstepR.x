@@ -1844,7 +1844,7 @@ Mesh {
    0.100000;0.100000;0.100000;;
    0.600000;0.600000;0.600000;;
    TextureFilename {
-    "C:\\Users\\game102\\Desktop\\プレイヤー(スピード型)\\右足\\11_InstepR_UV.jpg";
+    "data\\TEXTURE\\UV\\player_speed\\ロシア\\11_InstepR_UV.jpg";
    }
   }
  }
