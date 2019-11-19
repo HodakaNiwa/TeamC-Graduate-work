@@ -100,6 +100,7 @@ CGame::CGame()
 	m_pLoadTerritory = NULL;
 	m_pUI = NULL;
 	m_pRotCamera = NULL;
+	m_nEnemyNum = 0;
 
 	m_nNumPlay = CSelect::GetEntryPlayer();
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
@@ -117,6 +118,16 @@ CGame::CGame()
 	for (int nCnt = 0; nCnt < ENEMY_MAX; nCnt++)
 	{
 		m_pEnemy[nCnt] = NULL;
+	}
+
+	for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
+	{
+		m_pCharacter[nCnt] = NULL;
+	}
+
+	for (int nCnt = 0; nCnt < MAX_GAMECAMERA; nCnt++)
+	{
+		m_pGameCamera[nCnt] = NULL;
 	}
 }
 
@@ -228,9 +239,6 @@ void CGame::Init(void)
 		m_nEnemyNumResult++;*/
 	}
 	//	š	š	š	š	š	š	š	š	š	š	š	š	š	š	š	š
-
-	// UI‚ð“Ç‚Ýž‚Þˆ—
-	LoadUI(LOAD_UI);
 
 	// UI‚ð¶¬‚·‚éˆ—
 	CreateUI();
@@ -741,7 +749,7 @@ void CGame::Update(void)
 
 	CInputMouse *pInputMouse = CManager::GetInputMouse();
 
-	m_pFieldManager->Update();
+	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 
 	//if (pInputMouse->GetPress(pInputMouse->BUTTON_LEFT) == true)
 	//{

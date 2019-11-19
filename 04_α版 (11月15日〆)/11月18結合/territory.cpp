@@ -123,6 +123,7 @@ HRESULT CTerritory::Init(void)
 	m_bGetTerritory = false;						//テリトリーを取得したかどうか
 	m_nErea = 0;									//エリア番号
 	m_ppRing = NULL;
+	m_pLoadEffect = NULL;
 
 	if (m_pLoadEffect == NULL)
 	{

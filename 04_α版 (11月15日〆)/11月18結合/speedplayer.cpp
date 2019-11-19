@@ -66,6 +66,7 @@ HRESULT CSpeedPlayer::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40
 	m_pOrbitLine = NULL;
 	m_bMakeShape = false;
 	m_nCntTimeCopyLine = 0;
+	m_pLoadEffect = NULL;
 
 
 	//コピーラインの初期化

@@ -57,10 +57,13 @@
 //*****************************************************************************
 CPlayer::CPlayer(int nPriority, OBJTYPE objType) : CCharacter(nPriority,objType)
 {
+	m_move = INITIALIZE_VECTOR3;
 	m_Angle = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	m_nDamageCount = 0;
 	m_fBlowAngle = 0.0f;
 	m_fBlowLength = 0.0f;
+	m_rot = INITIALIZE_VECTOR3;
+	m_posOld = INITIALIZE_VECTOR3;
 }
 
 //*****************************************************************************
@@ -367,7 +370,7 @@ void  CPlayer::PlayerMove(void)
 		PlayerMoveMouse(rot, pos);
 
 	}
-	D3DXVECTOR3 DiffAngle;
+	D3DXVECTOR3 DiffAngle = INITIALIZE_VECTOR3;
 
 	// プレイヤーの角度を修正
 	DiffAngle.y = m_Angle.y - m_rot.y;   //差分を計算

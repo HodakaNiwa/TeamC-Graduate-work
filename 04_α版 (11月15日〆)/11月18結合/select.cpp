@@ -591,7 +591,7 @@ void CSelect::UninitCharacterSelect(void)
 		{
 			m_pSelectChar[nCnt]->UninitUI();	//UI‚ðÁ‚·
 			m_pSelectChar[nCnt]->Uninit();
-			//delete m_pSelectChar[nCnt];
+			delete m_pSelectChar[nCnt];
 			m_pSelectChar[nCnt] = NULL;
 		}
 

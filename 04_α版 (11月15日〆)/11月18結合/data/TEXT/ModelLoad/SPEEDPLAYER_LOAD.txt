@@ -14,7 +14,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Speed/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Speed/10_calfR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Speed/11_InstepR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Speed/99_clothes_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Speed/101_skin_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Speed/101_skin_UV.jpg			#9
 
 
 #日本
@@ -26,7 +26,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/日本/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/日本/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/日本/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/日本/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/日本/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/日本/11_InstepR_UV.jpg	#9
 
 
 
@@ -39,7 +39,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/ロシア/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ロシア/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ロシア/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ロシア/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/ロシア/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/ロシア/11_InstepR_UV.jpg #9
 
 
 #アメリカ
@@ -51,7 +51,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/アメリカ/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/アメリカ/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/アメリカ/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/アメリカ/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/アメリカ/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/アメリカ/11_InstepR_UV.jpg #9
 
 
 #ブラジル
@@ -63,7 +63,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/ブラジル/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ブラジル/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ブラジル/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ブラジル/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/ブラジル/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/ブラジル/11_InstepR_UV.jpg #9
 
 
 #イギリス
@@ -75,7 +75,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/イギリス/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/イギリス/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/イギリス/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/イギリス/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/イギリス/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/イギリス/11_InstepR_UV.jpg #9
 
 
 #イタリア
@@ -87,7 +87,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/イタリア/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/イタリア/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/イタリア/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/イタリア/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/イタリア/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/イタリア/11_InstepR_UV.jpg #9
 
 
 #ニュージーランド
@@ -99,7 +99,7 @@ UV_NAME data/TEXTURE/MODEL_UV/Teq/ニュージーランド/04_armR1_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ニュージーランド/05_handR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ニュージーランド/09_thighR_UV.jpg
 UV_NAME data/TEXTURE/MODEL_UV/Teq/ニュージーランド/10_calfR_UV.jpg
-UV_NAME data/TEXTURE/MODEL_UV/Teq/ニュージーランド/11_InstepR_UV.jpg
+UV_NAME data/TEXTURE/MODEL_UV/Teq/ニュージーランド/11_InstepR_UV.jpg #9
 
 
 #南アフリカ

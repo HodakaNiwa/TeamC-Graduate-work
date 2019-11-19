@@ -65,7 +65,6 @@ CCharacter::CCharacter(int nPriority, OBJTYPE objType) : CScene(nPriority,objTyp
 
 }
 
-
 //==============================================
 //					デストラクタ
 //==============================================
@@ -88,12 +87,28 @@ void CCharacter::Unload(void)
 ////==============================================
 HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],int nType)
 {
+	//初期化処理
+	m_Pos = INITIALIZE_VECTOR3;
+	m_Rot = INITIALIZE_VECTOR3;
+	m_nCountTerritory = 0;
+
 	m_cModelTxt[0] = &ModelTxt[0];
 	m_cMotionTxt[0] = &MotionTxt[0];
 	ModelSetLode();
 	int nData = 0;
+	
+	m_ppModel = NULL;
+	m_pMotion = NULL;
 
-	m_ppModel = new CModel*[m_nPartsNum];		//	パーツ分確保する
+	if (m_ppModel == NULL)
+	{
+		m_ppModel = new CModel*[m_nPartsNum];		//	パーツ分確保する
+	}
+	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
+	{
+		m_ppModel[nCnt] = NULL;
+	}
+
 	CSelect *pSelect = CManager::GetSelect();
 	int nPlayer[4] = {};
 	int nData2 = 0;
@@ -101,6 +116,13 @@ HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],in
 	for (int nCntCountry = 0; nCntCountry < 4; nCntCountry++)
 	{
 		m_nCuntry[nCntCountry] = pSelect->GetPlayerCuntry(nCntCountry);
+	}
+
+	for (int nCntTerritory = 0; nCntTerritory < MAX_TERRITORY; nCntTerritory++)
+	{//テリトリー・ラインの初期化
+		m_apTerritory[nCntTerritory] = NULL;
+		m_apLine[nCntTerritory] = NULL;
+		m_apCopyLine[nCntTerritory] = NULL;
 	}
 
 	if (nType == 0)
@@ -118,22 +140,29 @@ HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],in
 	
 	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
 	{
-		//	モデルパーツの初期値を決める
-		m_ppModel[nCnt] = CModel::Create(D3DXVECTOR3(m_aOffset[nCnt].pos.x, m_aOffset[nCnt].pos.y, m_aOffset[nCnt].pos.z), m_aPartsName[nCnt], D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-		//	モデルパーツを決める
-		m_ppModel[nCnt]->BindModel(m_ppModel[nCnt]->GetMesh(), m_ppModel[nCnt]->GetBuffMat(), m_ppModel[nCnt]->GetNumMat());
+		if (m_ppModel[nCnt] == NULL)
+		{
+			//	モデルパーツの初期値を決める
+			D3DXVECTOR3 Pos = D3DXVECTOR3(m_aOffset[nCnt].pos.x, m_aOffset[nCnt].pos.y, m_aOffset[nCnt].pos.z);
+			char * Name = m_aPartsName[nCnt];
 
-		//	モデルUVテクスチャを決める
-		m_ppModel[nCnt]->BindTexture(m_ppTexture[m_nTexIdx[nCnt] + (m_nCuntry[nCharaNum] * nData2)]);
-		
-		//	各モデルパーツの親を決める
-		if (nCnt == 0)
-		{
-			m_ppModel[nCnt]->SetParent(NULL);
-		}
-		else
-		{
-			m_ppModel[nCnt]->SetParent(m_ppModel[m_nParent[nCnt]]);
+			m_ppModel[nCnt] = CModel::Create(D3DXVECTOR3(m_aOffset[nCnt].pos.x, m_aOffset[nCnt].pos.y, m_aOffset[nCnt].pos.z), m_aPartsName[nCnt], D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+			//	モデルパーツを決める
+			//m_ppModel[nCnt]->BindModel(m_ppModel[nCnt]->GetMesh(), m_ppModel[nCnt]->GetBuffMat(), m_ppModel[nCnt]->GetNumMat());
+
+			//	モデルUVテクスチャを決める
+			m_ppModel[nCnt]->BindTexture(m_ppTexture[m_nTexIdx[nCnt] + (m_nCuntry[nCharaNum] * nData2)]);
+
+			//	各モデルパーツの親を決める
+			if (nCnt == 0)
+			{
+				m_ppModel[nCnt]->SetParent(NULL);
+			}
+			else
+			{
+				int nParent = m_nParent[nCnt];
+				m_ppModel[nCnt]->SetParent(m_ppModel[m_nParent[nCnt]]);
+			}
 		}
 	}
 	MotionSetLode();
@@ -182,7 +211,7 @@ void CCharacter::CreateCylinderCollider(void)
 void CCharacter::Uninit()
 {
 	//!+ ---<<モーション情報の解放>>---
-	//	キーフレームの位置・回転情報の解放(モーションの種類分 / キー分)
+		//キーフレームの位置・回転情報の解放(モーションの種類分 / キー分)
 	for (int nCnt = 0; nCnt < m_nNumMotionMAX; nCnt++)
 	{
 		for (int nCnt02 = 0; nCnt02 < m_pMotionInfo[nCnt].nNumKey; nCnt02++)
@@ -341,10 +370,6 @@ void CCharacter::Draw()
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	//拡大縮小行列の作成
-	//D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
-	//D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
-
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
@@ -354,7 +379,10 @@ void CCharacter::Draw()
 
 	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
 	{
-		m_ppModel[nCnt]->Draw(1.0f);
+		if (m_ppModel[nCnt] != NULL)
+		{
+			m_ppModel[nCnt]->Draw(1.0f);
+		}
 	}
 }
 
@@ -371,6 +399,13 @@ void CCharacter::ModelSetLode(void)
 	int nDelay;			//	読み込む文字位置をずらす
 	int nCnt = 0;
 	int nCntLoadTex = 0;
+	m_ppUVTexName = NULL;
+	m_ppTexture = NULL;
+	m_aPartsName = NULL;
+	m_aIndex = NULL;
+	m_nParent = NULL;
+	m_nTexIdx = NULL;
+	m_aOffset = NULL;
 
 	pFile = fopen(m_cModelTxt[0], "r");	//	読み込むテキスト名
 
@@ -399,6 +434,11 @@ void CCharacter::ModelSetLode(void)
 						// 読み込むUVテクスチャの数だけ動的確保
 						m_ppUVTexName = new char*[m_nTexNum];
 						m_ppTexture = new LPDIRECT3DTEXTURE9[m_nTexNum];
+
+						for (int nCnt = 0; nCnt < m_nTexNum; nCnt++)
+						{//メモリの初期化
+							m_ppTexture[nCnt] = NULL;
+						}
 					}
 
 					if (memcmp(pStrCur, "UV_NAME ", strlen("UV_NAME ")) == 0)	// ---<<UVテクスチャの読み込み>>---
@@ -440,6 +480,15 @@ void CCharacter::ModelSetLode(void)
 						m_nParent = new int[m_nPartsNum];
 						m_nTexIdx = new int[m_nPartsNum];
 						m_aOffset = new MODEL_OFFSET[m_nPartsNum];
+
+						for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
+						{
+							m_aIndex[nCnt] = 0;
+							m_nParent[nCnt] = 0;
+							m_nTexIdx[nCnt] = 0;
+							m_aOffset[nCnt].pos = INITIALIZE_VECTOR3;
+							m_aOffset[nCnt].rot = INITIALIZE_VECTOR3;
+						}
 					}
 
 					if (memcmp(pStrCur, "MODEL_NAME ", strlen("MODEL_NAME ")) == 0)	// ---<<各パーツの名前を取得>>---
@@ -668,7 +717,6 @@ void CCharacter::MotionSetLode(void)
 			}
 		}
 
-
 		while (1)
 		{
 			fgets(&aLine[0], 256, pFile);
@@ -713,8 +761,11 @@ void CCharacter::MotionSetLode(void)
 
 					if (memcmp(pStrCur, "KEYSET", strlen("KEYSET")) == 0)
 					{
-						m_pMotionInfo[nMotionNum].m_pKeyInfo[nKeyNum].aKey = new CMotion::KEY[m_nPartsNum];	//	モデルのパーツ分確保
-						ClearMotionInfo_KeyInfo_Key(nMotionNum, nKeyNum);
+						if (m_pMotionInfo[nMotionNum].m_pKeyInfo[nKeyNum].aKey == NULL)
+						{
+							m_pMotionInfo[nMotionNum].m_pKeyInfo[nKeyNum].aKey = new CMotion::KEY[m_nPartsNum];	//	モデルのパーツ分確保
+							ClearMotionInfo_KeyInfo_Key(nMotionNum, nKeyNum);
+						}
 
 						while (1)
 						{
@@ -1031,10 +1082,15 @@ void CCharacter::ShapeComplete(CTerritory * pTerritory)
 void CCharacter::ChackInShape(void)
 {
 	//変数宣言
-	D3DXVECTOR3 * pListPos = new D3DXVECTOR3[m_nCountTerritory];
-	TRAIANGLE * pTraiangle = new TRAIANGLE[m_nCountTerritory - 2];	//三角形の数分メモリを確保する
-	int * pnFarNumTerritory = new int[m_nCountTerritory - 1];		//遠い順
-	float * pfLength = new float[m_nCountTerritory - 1];			//距離
+	D3DXVECTOR3 * pListPos = NULL;
+	TRAIANGLE * pTraiangle = NULL;
+	int * pnFarNumTerritory = NULL;
+	float * pfLength = NULL;
+
+	pListPos = new D3DXVECTOR3[m_nCountTerritory];
+	pTraiangle = new TRAIANGLE[m_nCountTerritory - 2];	//三角形の数分メモリを確保する
+	pnFarNumTerritory = new int[m_nCountTerritory - 1];		//遠い順
+	pfLength = new float[m_nCountTerritory - 1];			//距離
 	bool bEnter = false;
 
 	InitTraiangle(pTraiangle, m_nCountTerritory - 2);	//三角形の構造体の初期化

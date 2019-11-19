@@ -147,7 +147,7 @@ void  CSelectCharacter::Update(void)
 
 		if ((m_pMoveUI != NULL) && (m_pTypeName != NULL) && (m_pStatus != NULL))
 		{//テクスチャとUVの設定
-			m_pMoveUI->BindTexture(m_pCharMultRender[m_nType]->GetTexture()); 
+			m_pMoveUI->BindTexture(m_pCharMultRender[m_nType]->GetTexture());
 			m_pTypeName->SetTexUV(0.0f, 1.0f, 0.0f, 0.25f);
 			m_pStatus->SetTexUV(0.0f, 1.0f, 0.0f, 0.25f);
 		}
@@ -362,6 +362,7 @@ void CSelectCharacter::LoadMultRendering(void)
 		m_pCharMultRender[nCnt] = NULL;
 	}
 
+#if 1
 	switch (m_nCuntry)
 	{
 	case CPlayer::TYPE_JAPAN:	//日本
@@ -412,6 +413,7 @@ void CSelectCharacter::LoadMultRendering(void)
 		m_pCharMultRender[2] = CCharMultRender::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\TEQPLAYER_LOAD.txt", "data\\TEXT\\MotionLoad\\TEQPLAYER_MOTION.txt", CCharacter::CHARCTERTYPE_TECHNIQUE);
 		break;
 	}
+#endif
 }
 
 

@@ -60,6 +60,8 @@ HRESULT CCharMultRender::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt
 	//プレイヤーのナンバーを取得
 	m_nNumPlayer = nNumPlayer;
 	m_PlayerState = PLAYERSTATE_NONE;
+	m_pModel = NULL;
+	m_pMotion = NULL;
 
 	//キャラクターの初期化
 	CCharacter::Init(nNumPlayer,ModelTxt, MotionTxt, m_CharcterType);
@@ -250,8 +252,11 @@ void CCharMultRender::InitMultTexture(void)
 {
 	//変数宣言
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
-	LPDIRECT3DSURFACE9 pRenderOrg;
-	LPDIRECT3DSURFACE9 pBuffOrg;
+	LPDIRECT3DSURFACE9 pRenderOrg = NULL;
+	LPDIRECT3DSURFACE9 pBuffOrg = NULL;
+	m_pTextureMT = NULL;
+	m_pBuffMT = NULL;
+	m_pRenderMT = NULL;
 
 	// Textureの作成
 	pDevice->CreateTexture(SCREEN_WIDTH, SCREEN_HEIGHT, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pTextureMT, NULL);

@@ -57,6 +57,9 @@ CModel::CModel()
 	m_FirstPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	//初期位置
 	m_Scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	//拡大縮小率
 	m_pTextures = NULL;
+	m_pParent = NULL;
+	D3DXMatrixIdentity(&m_mtxWorld);			// ワールドマトリックスの初期化
+	m_Move = INITIALIZE_VECTOR3;				// 移動量
 }
 //===============================================================================
 //　デストラクタ
@@ -187,13 +190,13 @@ void CModel::Draw(float fAlpha)
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	// 回転を反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
 	//拡大縮小行列の作成
 	D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
+	// 回転を反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
