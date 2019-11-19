@@ -1,0 +1,143 @@
+
+#モデルの読み込み
+MODEL_LOAD
+
+#読み込むUVテクスチャの数
+NUM_UV = 1
+
+#読み込むUVテクスチャ
+UV_NAME data/TEXTURE/MODEL_UV/nejiko.png
+
+#読み込むモデルの数
+NUM_MODEL = 11
+ 
+#読み込むモデル
+MODEL_NAME data/MODEL/PLAYER/player_body.x
+MODEL_NAME data/MODEL/PLAYER/player_head.x
+MODEL_NAME data/MODEL/PLAYER/player_hip.x
+MODEL_NAME data/MODEL/PLAYER/player_armL01.x
+MODEL_NAME data/MODEL/PLAYER/player_armL02.x
+MODEL_NAME data/MODEL/PLAYER/player_armR01.x
+MODEL_NAME data/MODEL/PLAYER/player_armR02.x
+MODEL_NAME data/MODEL/PLAYER/player_legL01.x
+MODEL_NAME data/MODEL/PLAYER/player_legL02.x
+MODEL_NAME data/MODEL/PLAYER/player_legR01.x
+MODEL_NAME data/MODEL/PLAYER/player_legR02.x
+
+#モデルの読み込み終了
+END_MODEL_LOAD
+
+#########################################################
+
+
+#キャラクターのパラメーター設定
+
+PARAMETERSET
+		STATUSSET
+			ATTACK = 100			#攻撃力
+			ATTACKSPEED = 10.0		#攻撃速度
+			RANGE = 10.0			#射程
+			SPEED = 4.0				#移動量
+			INERTIA = 0.85			#慣性
+			LINETIME = 5.0			#線を描ける時間
+		END_STATUSSET
+END_PARAMETERSET
+
+#########################################################
+
+
+#各パーツの設定
+CHARACTERSET
+
+PARTSSET #体
+		INDEX = 0
+		TEX_INDEX = 0
+		PARENT = -1	#親なし
+		POS = 0.0 15.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #頭
+		INDEX = 1
+		TEX_INDEX = 0
+		PARENT = 0	#体
+		POS = 0.0 2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #腰
+		INDEX = 2
+		TEX_INDEX = 0
+		PARENT = 0	#体
+		POS = 0.0 -2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #左腕
+		INDEX = 3
+		TEX_INDEX = 0
+		PARENT = 0	#腰
+		POS = 0.0 1.0 -1.5
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #左手
+		INDEX = 4
+		TEX_INDEX = 0
+		PARENT = 3	#左もも
+		POS = -6.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #右腕
+		INDEX = 5
+		TEX_INDEX = 0
+		PARENT = 0	#腰
+		POS = 0.0 1.0 -1.5
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #右手
+		INDEX = 6
+		TEX_INDEX = 0
+		PARENT = 5	#左もも
+		POS = 6.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET #左もも
+		INDEX = 7
+		TEX_INDEX = 0
+		PARENT = 2	#腰
+		POS = 1.5 -2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #左足
+		INDEX = 8
+		TEX_INDEX = 0
+		PARENT = 7	#左もも
+		POS = 0.0 -3.0 -1.5
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #右もも
+		INDEX = 9
+		TEX_INDEX = 0
+		PARENT = 2	#腰
+		POS = -1.5 -2.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+	PARTSSET #右足
+		INDEX = 10
+		TEX_INDEX = 0
+		PARENT = 9	#左もも
+		POS = 0.0 -3.0 -1.5
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+	
+END_CHARACTERSET
+
+#########################################################
+
