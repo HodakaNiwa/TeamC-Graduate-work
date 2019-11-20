@@ -56,7 +56,13 @@ CSceneX *CEnemy::m_apSceneX = NULL;
 //*****************************************************************************
 CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 {
+		m_move = INITIALIZE_VECTOR3;
 	m_Angle = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_nDamageCount = 0;
+	m_fBlowAngle = 0.0f;
+	m_fBlowLength = 0.0f;
+	m_rot = INITIALIZE_VECTOR3;
+	m_posOld = INITIALIZE_VECTOR3;
 }
 
 //*****************************************************************************
