@@ -1,0 +1,87 @@
+#==============================================================================
+#
+# 観客データファイル [audienceData.txt]
+# Author : Hodaka Niwa
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# 観客データ
+#------------------------------------------------------------------------------
+AUDIENCESET
+	POS = 0.0 0.0 0.0
+	COL = 0.0 1.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = -100.0 0.0 0.0
+	COL = 1.0 1.0 0.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 100.0 0.0 0.0
+	COL = 1.0 1.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 0.0 0.0 100.0
+	COL = 0.0 0.0 0.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 100.0 0.0 100.0
+	COL = 1.0 0.0 0.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = -100.0 0.0 100.0
+	COL = 0.0 1.0 0.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 0.0 0.0 -100.0
+	COL = 0.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = -100.0 0.0 -100.0
+	COL = 1.0 0.5 0.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 100.0 0.0 -100.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 500.0 0.0 -400.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = -300.0 0.0 -100.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 200.0 0.0 -400.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 300.0 0.0 -400.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 500.0 0.0 -600.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+AUDIENCESET
+	POS = 500.0 0.0 0.0
+	COL = 1.0 0.0 1.0 1.0
+END_AUDIENCESET
+
+END_SCRIPT		# この行は絶対消さないこと！
