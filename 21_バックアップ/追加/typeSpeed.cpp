@@ -22,7 +22,7 @@
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
-CTypeSpeed::CTypeSpeed()
+CTypeSpeed::CTypeSpeed(int nPriority, OBJTYPE objType) : CEnemy(nPriority, objType)
 {
 
 }
@@ -68,24 +68,19 @@ CTypeSpeed *CTypeSpeed::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 //=============================================================================
 HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 {
-	//プレイヤーのナンバーを格納
-	m_nEnemyNo = nChara;
-
-	//初期化
 	m_bWalk = true;
-	m_bSprintMotion = false;
-	//キャラクターの初期化
-	CCharacter::Init(nChara,ModelTxt, MotionTxt);
-	CCharacter::SetPos(pos);
 
-	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせる)
+	m_nEnemyNo = nChara;	//	キャラ番号の記憶(生成順)
+
+	CCharacter::Init(nChara, ModelTxt, MotionTxt,m_CharcterType);	//	初期化
+	CCharacter::SetPos(pos);						//	位置反映
+	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせ
 	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
 
+	m_pModel = CCharacter::GetModel();	//	モデル情報の取得
+	m_pMotion = CCharacter::GetMotion();//	モーション情報の取得
 
-	//モデルの取得
-	m_pModel = CCharacter::GetModel();
-	
-	//ライン変数の初期化
+										//	---ライン変数の初期化---
 	m_nMaxLineTime = FIRST_LINETIME;
 	m_nLineTime = m_nMaxLineTime;
 	m_bBlockStartTerritory = false;
@@ -94,34 +89,35 @@ HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 	m_pOrbitLine = NULL;
 	m_bMakeShape = false;
 	m_nCntTimeCopyLine = 0;
+	m_pLoadEffect = NULL;
 
-
-	//コピーラインの初期化
+	//	コピーラインの初期化
 	for (int nCnt = 0; nCnt < MAX_TERRITORY; nCnt++)
 	{
 		m_apCopyLine[nCnt] = NULL;
 	}
 
-	//エフェクトの初期化
+	//	エフェクトの初期化
 	if (m_pLoadEffect == NULL)
 	{
 		m_pLoadEffect = CLoadEffect::Create(1, D3DXVECTOR3(pos.x, pos.y + 60.0f, pos.z), 8);
 	}
 
-	//モーションの情報を取得
-	m_pMotion = CCharacter::GetMotion();
-	ResetLine();	//ラインの初期化
 
-	//スピードプレイヤー用の変数を初期化
-	m_fSpeed = 1.0f;
+	ResetLine();	//	ラインの初期化
+
+
+	m_fSpeed = 1.0f;				//	初期速度
 	m_nSprintCounter = 0;
 	m_nSprintTimer = 0;
 	m_nRecastCounter = 0;
 	m_nRecastTimer = 0;
-	m_nButtonCounter = 0;
 	m_bRecast = false;
 	m_bSprint = false;
+	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
+	m_nLineNum = 2;
 
+	m_bCheckS = false;
 	return S_OK;
 }
 
@@ -154,11 +150,15 @@ void  CTypeSpeed::Uninit(void)
 //=============================================================================
 void  CTypeSpeed::Update(void)
 {
-	//スピード型のスキル処理
-	SprintUpdate();
+	//ゲームの状態を取得
+	int nGameState = CGame::GetGameState();
 
-	//プレイヤーの更新
-	CEnemy::Update();
+	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
+	{
+
+		SprintUpdate();		//	スキル処理
+		CEnemy::Update();
+	}
 }
 
 //=============================================================================
@@ -166,12 +166,14 @@ void  CTypeSpeed::Update(void)
 //=============================================================================
 void  CTypeSpeed::SprintUpdate(void)
 {
-	
-			//m_fSpeed = 1.5f;		//スピード型の速さを1.5倍にする
-			//m_nButtonCounter = 1;	//ボタンを押せないようにする
-			//m_bSprint = true;		//スプリント中にする
-			//m_bSprintMotion = true;	//スプリントモーション中かどうか
-			//pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();
+
+	if (m_bRecast == false && m_bCheckS == false)
+	{
+		m_bCheckS = true;
+		m_state = STATE_ACTION;	//スプリント状態
+		m_fSpeed = 1.5f;		//スピード型の速さを1.5倍にする
+		m_bSprint = true;		//スプリント中にする
+	}
 
 	//スプリント中
 	if (m_bSprint == true)
@@ -182,27 +184,13 @@ void  CTypeSpeed::SprintUpdate(void)
 		{
 			m_nSprintTimer++;
 
-			if (m_nSprintTimer <= MAX_SPRINTTIMER)
-			{//8秒間速さを上げる
-				m_state = STATE_ACTION;	//スプリント状態
-
-				if (m_bSprintMotion == false)
-				{
-					//m_bSprintMotion = true;
-				}
-				//if (m_PlayerState == PLAYERSTATE_BLOWAWAY && m_PlayerState == PLAYERSTATE_NONE && m_PlayerState == PLAYERSTATE_WALK)
-				//{//スプリント中にぶつかったらスプリント状態に戻す
-				//	m_PlayerState = PLAYERSTATE_ACTION;
-				//}
-			}
-			else
-			{//8秒超えたら普通の速さに戻す
+			if (m_nSprintTimer >= MAX_SPRINTTIMER)	//	一定時間で元の速度に
+			{
 				m_fSpeed = 1.0f;					//スピードをもとに戻す
 				m_nSprintTimer = 0;					//スプリントタイマーを初期化
 				m_bRecast = true;					//リキャスト中にする
 				m_bWalk = true;						//移動モーションができる状態にする
-				m_state = STATE_NONE;	//移動状態
-				m_bSprintMotion = false;
+				m_state = STATE_NONE;				//移動状態
 				m_bSprint = false;
 			}
 		}
@@ -221,10 +209,9 @@ void  CTypeSpeed::SprintUpdate(void)
 			}
 			else
 			{//10秒たったらスプリントを使用できるようにする
-
+				m_bCheckS = false;
 				m_bRecast = false;		//リキャスト中じゃない
 				m_nRecastTimer = 0;		//リキャストタイマーの初期化
-				m_nButtonCounter = 0;	//スキルボタンを押せるようにする
 				m_bSprint = false;
 
 			}
