@@ -23,6 +23,7 @@
 #include "score.h"
 #include "number2D.h"
 #include "select.h"
+#include "audience.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -197,7 +198,7 @@ void CResult::Init(void)
 	}
 
 	if (m_pLoadTextObj == NULL) { m_pLoadTextObj = CLoadTextObject::Create(LOAD_OBJ); }					//オブジェクトの生成
-	if (m_pLoadTerritory == NULL) { m_pLoadTerritory = CLoadTextTerritory::Create(LOAD_TERRITORY); }	//テリトリーの読み込み
+	//if (m_pLoadTerritory == NULL) { m_pLoadTerritory = CLoadTextTerritory::Create(LOAD_TERRITORY); }	//テリトリーの読み込み
 
 	//スコア順にソートする
 	SortScore();
@@ -235,6 +236,9 @@ void CResult::Init(void)
 
 	//キャラ表示の初期化
 	InitCharUI();
+
+	// デバッグ用
+	CAudience::Create();
 }
 
 //=============================================================================

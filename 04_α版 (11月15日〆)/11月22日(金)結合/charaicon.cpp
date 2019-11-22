@@ -137,7 +137,6 @@ void CCharaicon::CheckDraw(void)
 
 	// 位置をスクリーンに投影
 	D3DXVec3TransformCoord(&pos, &pos, &mtxWorld);
-	CDebugProc::Print("%.1f %.1f\n", pos.x, pos.y);
 
 	// スクリーン内に収まっているか判定
 	if (pos.x <= Viewport.X || pos.x >= Viewport.X + Viewport.Width

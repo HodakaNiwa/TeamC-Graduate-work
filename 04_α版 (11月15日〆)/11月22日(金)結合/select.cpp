@@ -189,9 +189,6 @@ void CSelect::Init(void)
 	//国選択モードのUI生成処理
 	InitCuntrySelect();
 
-
-
-
 	// デバッグ用
 	CAudience::Create();
 }

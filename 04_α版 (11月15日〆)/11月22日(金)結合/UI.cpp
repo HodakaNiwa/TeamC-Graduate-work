@@ -213,17 +213,6 @@ void CUI::Update(void)
 
 	// 王冠アイコンの更新処理
 	UpdateCrownicon(pGame);
-
-
-	for (int nCntRank = 0; nCntRank < m_nNumAllCharacter; nCntRank++)
-	{
-		CDebugProc::Print("スコア : %d\n", m_pScoreGame[nCntRank]->GetScore());
-	}
-	CDebugProc::Print("\n");
-	for (int nCntRank = 0; nCntRank < m_nNumAllCharacter; nCntRank++)
-	{
-		CDebugProc::Print("順位 : %d\n", m_nRank[nCntRank]);
-	}
 }
 
 //=============================================================================
