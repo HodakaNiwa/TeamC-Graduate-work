@@ -113,16 +113,15 @@ HRESULT CTypePower::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 
 
 	m_fSpeed = 1.0f;				//	初期速度
-	m_nColliderCnt = 0;
-	m_nColliderTimer = 0;
 	m_nRecastCounter = 0;
-	m_fScale = 0.0f;
 	m_bBreakTime = false;
 	m_bRecast = false;
 	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
 	m_nLineNum = 2;
 	m_bStop = false;
 	m_bTrigger = false;
+	m_bBreakTime = false;
+
 	return S_OK;
 }
 
@@ -182,10 +181,9 @@ void  CTypePower::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) { }
 void  CTypePower::ActionUpdate(void)
 {
 	// ブレイクタイムではない && スキルの発動フラグを立てた && 処理を一回しか通さない
-	if (m_bBreakTime == false && m_bTrigger == true && m_bStop == false)
+	if (m_bBreakTime == false && m_bTrigger == true && m_bStop == false && m_state != STATE_DAMAGE)
 	{
 		m_bStop = true;				//	更新を一時的に止める
-		CreateStartUpCollider();	//　ハンマーの当たり判定
 		m_pMotion->SetNumMotion(2);	//　攻撃モーション
 		m_fSpeed = 0.0f;			//	アクション中は動きを止める
 		m_bTarget = true;			//	ターゲットを変更
@@ -197,16 +195,19 @@ void  CTypePower::ActionUpdate(void)
 		m_nRecastCounter++;
 	}
 
-	switch(m_nRecastCounter)
+	switch (m_nRecastCounter)
 	{
 	case 60:
-		CreateColliderSphere();	//	衝撃波の当たり判定を付与
+		CreateColliderSphere();	//衝撃波の当たり判定を付与
+
 		break;
 
 	case 80:
 		m_fSpeed = 1.0f;		//	アクション終了時、動けるように
 		m_bBreakTime = true;	//	ブレイクタイムの発生
 		m_bTarget = false;		//	ターゲットを拠点に戻す
+		m_state = STATE_NONE;	//	モーションの初期化
+		m_bSuperArmor = false;
 		break;
 
 	case 60 * RECAST:
@@ -218,25 +219,6 @@ void  CTypePower::ActionUpdate(void)
 	}
 }
 
-
-//=============================================================================
-//    ハンマーの当たり判定を生成する処理
-//=============================================================================
-void CTypePower::CreateStartUpCollider(void)
-{
-	//	円筒を生成
-	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(0.0f, 0.0f, -60.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-		30.0f, 100, 1);
-
-	if (pSphere == NULL) { return; }
-
-	//	親を設定
-	pSphere->SetParent(this);
-
-	//	武器の場所に判定を付ける
-	pSphere->SetParentMtxWorld(&m_pModel[15]->GetMtxWorld());
-}
-
 //=============================================================================
 //    衝撃波の判定を生成する処理
 //=============================================================================
@@ -246,8 +228,8 @@ void CTypePower::CreateColliderSphere(void)
 	D3DXVec3TransformCoord(&pos, &m_pModel[15]->GetPos(), &m_pModel[15]->GetMtxWorld());
 
 	//	スフィアを生成
-	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(pos.x, pos.y, pos.z + 35.0f),
-		D3DXVECTOR3(1.0f, 1.0f, 1.0f), 100.0f, 100, 1);
+	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(pos.x, pos.y, pos.z),
+		D3DXVECTOR3(1.0f, 1.0f, 1.0f), 140.0f, 110, 1);
 
 	if (pSphere == NULL) { return; }
 
@@ -256,27 +238,45 @@ void CTypePower::CreateColliderSphere(void)
 
 }
 
-//=============================================================================
-// ラインの生成処理
-//=============================================================================
-void CTypePower::CreateOrbitLine(void)
-{
-	if (m_pOrbitLine == NULL)
-	{
-		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());
-		m_pOrbitLine->SetMtxParent(&m_pModel[10]->GetMtxWorld());
-		m_pOrbitLine->SetMtxParentEnd(&m_pModel[1]->GetMtxWorld());
-	}
-}
 
 //=============================================================================
-// ラインの破棄
+//	スキルを使用する範囲
 //=============================================================================
-void CTypePower::UninitOrtbitLine(void)
+bool CTypePower::CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange)
 {
-	if (m_pOrbitLine != NULL)
+	bool bLand = false;
+
+	// [[★スキル発動範囲]]
+	if (pCylinderCollider->Collision(&pos, &posOld, &Move, 150.0f, 50.0f, this, &bLand) == true)
 	{
-		m_pOrbitLine->Uninit();
-		m_pOrbitLine = NULL;
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
+		{
+			D3DXVECTOR3 thisPos = CCharacter::GetPos(); // 自身の位置情報
+			CScene *pParent = pCylinderCollider->GetParent(); // 他キャラの情報を取得
+
+			if (m_bBreakTime == false) // ブレイクタイムでなければ...
+			{
+				m_bTrigger = true;	//	使用フラグを立てる
+				m_bSuperArmor = true;
+				CCharacter *pCharacter = (CCharacter*)pParent;
+				if (pCharacter == NULL) { return true; }
+				D3DXVECTOR3 targetPos = pCharacter->GetPos(); // 対象の位置情報を取得
+
+				// [[★角度調整の処理]]^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				float fDestAngle = atan2f(thisPos.x - targetPos.x, thisPos.z - targetPos.z);
+				float fAngle = fDestAngle - m_rot.y;
+				if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
+				if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
+				m_rot.y += fAngle * 0.1f;
+				if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
+				if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
+				CCharacter::SetPos(targetPos);
+				CCharacter::SetRot(m_rot);
+				// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+			}
+			return true;
+		}
 	}
+
+	return false;
 }

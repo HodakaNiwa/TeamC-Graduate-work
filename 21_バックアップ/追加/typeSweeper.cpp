@@ -128,7 +128,6 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	m_nRecastTimer = 0;
 	m_nButtonCounter = 0;
 	m_bRecast = false;
-	m_bCollision = false;
 	m_nReCounter = 0;
 	m_nReTimer = 0;
 	m_nMinePoint = MAX_MINE_POINT;
@@ -137,7 +136,6 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	m_nLineNum = 2;
 	m_nTiming = 0;
 	m_bStop = false;
-	m_bBreakTime = false;
 
 	return S_OK;
 }
@@ -254,30 +252,6 @@ void CTypeSweeper::Process()
 				m_nMinePoint = 0;
 			}
 		}
-	}
-}
-//=============================================================================
-// ƒ‰ƒCƒ“‚Ì¶¬ˆ—
-//=============================================================================
-void CTypeSweeper::CreateOrbitLine(void)
-{
-	if (m_pOrbitLine == NULL)
-	{
-		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());
-		m_pOrbitLine->SetMtxParent(&m_pModel[10]->GetMtxWorld());
-		m_pOrbitLine->SetMtxParentEnd(&m_pModel[1]->GetMtxWorld());
-	}
-}
-
-//=============================================================================
-// ƒ‰ƒCƒ“‚Ì”jŠü
-//=============================================================================
-void CTypeSweeper::UninitOrtbitLine(void)
-{
-	if (m_pOrbitLine != NULL)
-	{
-		m_pOrbitLine->Uninit();
-		m_pOrbitLine = NULL;
 	}
 }
 
