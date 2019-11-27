@@ -7,18 +7,22 @@
 #include "model.h"
 #include "manager.h"
 #include "renderer.h"
+#include "shader.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define MODEL_OUTLINESHADER_FILENAME "data/outline.hlsl"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 
+
 //*****************************************************************************
 // 静的メンバ変数
 //*****************************************************************************
+COutlineShader *CModel::m_pOutlineShader = NULL;		// アウトラインシェーダークラスへのポインタ
 #ifdef _DEBUG
 int CModel::m_nCreateNum = 0;
 #endif
@@ -49,6 +53,30 @@ CModel * CModel::Create(const D3DXVECTOR3 pos, char FileName[40], D3DXVECTOR3 Sc
 	}
 
 	return pModel;
+}
+
+//=============================================================================
+// シェーダーを読み込む処理
+//=============================================================================
+HRESULT CModel::ShaderLoad(void)
+{
+	if (m_pOutlineShader != NULL) { return E_FAIL; }
+	m_pOutlineShader = COutlineShader::Create(MODEL_OUTLINESHADER_FILENAME);
+
+	return S_OK;
+}
+
+//=============================================================================
+// シェーダーを開放する処理
+//=============================================================================
+void CModel::ShaderUnLoad(void)
+{
+	if (m_pOutlineShader != NULL)
+	{
+		m_pOutlineShader->Uninit();
+		delete m_pOutlineShader;
+		m_pOutlineShader = NULL;
+	}
 }
 
 //===============================================================================
@@ -155,7 +183,7 @@ void CModel::Uninit(void)
 #ifdef _DEBUG
 	m_nCreateNum--;
 #endif
-	
+
 	// メッシュの開放
 	if (m_pMesh != NULL)
 	{
@@ -176,7 +204,7 @@ void CModel::Uninit(void)
 		//m_pTextures->Release();
 		m_pTextures = NULL;
 	}
-	
+
 }
 
 //=============================================================================
@@ -247,6 +275,84 @@ void CModel::Draw(float fAlpha)
 	// マテリアルをデフォルトに戻す
 	pDevice->SetMaterial(&matDef);
 
+}
+
+//=============================================================================
+//　モデルのアウトラインを描画する処理
+//=============================================================================
+void CModel::DrawOutline(void)
+{
+	if (m_pOutlineShader == NULL) { return; }
+
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
+
+	D3DXMATRIX mtxRot, mtxTrans, mtxParent, mtxScale;	//計算
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	//拡大縮小行列の作成
+	D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
+
+	// 回転を反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	if (m_pParent != NULL)
+	{//親の場合
+		mtxParent = m_pParent->GetMtxWorld();
+	}
+	else
+	{//親ではない場合
+		pDevice->GetTransform(D3DTS_WORLD, &mtxParent);
+	}
+
+	//親のマトリックスと掛け合わせる
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxParent);
+
+	// ワールドマトリックスの設定
+	m_pOutlineShader->SetMtxWorld(m_mtxWorld);
+
+	// プロジェクションマトリックスとビューマトリックスの設定
+	D3DXMATRIX mtxView, mtxProj;
+	pDevice->GetTransform(D3DTS_PROJECTION, &mtxProj);
+	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+	m_pOutlineShader->SetMtxProjection(mtxProj);
+	m_pOutlineShader->SetMtxView(mtxView);
+
+	// シェーダーに値をセット
+	m_pOutlineShader->SetParamToEffect();
+
+	// 表面カリングに設定
+	DWORD CullMode;
+	pDevice->GetRenderState(D3DRS_CULLMODE, &CullMode);
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+
+	// 描画開始
+	m_pOutlineShader->Begin();
+
+	for (int nCntMat = 0; nCntMat < (int)m_nNumMat; nCntMat++)
+	{
+		// レンダリングパス開始
+		m_pOutlineShader->BeginPass(0);
+
+		// オブジェクト(パーツ)の描画
+		m_pMesh->DrawSubset(nCntMat);
+
+		// レンダリングパス終了
+		m_pOutlineShader->EndPass();
+	}
+
+	// 描画終了
+	m_pOutlineShader->End();
+
+	// カリングの設定を戻す
+	pDevice->SetRenderState(D3DRS_CULLMODE, CullMode);
 }
 
 //=============================================================================

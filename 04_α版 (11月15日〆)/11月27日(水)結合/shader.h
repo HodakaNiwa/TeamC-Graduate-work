@@ -127,4 +127,36 @@ private:   // このクラスだけがアクセス可能
 	D3DXHANDLE m_hLightDiffuse[MAXLIGHT];
 };
 
+//*****************************************************************************
+//    アウトラインシェーダークラスの定義
+//*****************************************************************************
+class COutlineShader : public CShader
+{
+public:    // 誰でもアクセス可能
+	COutlineShader(char *pFileName);
+	~COutlineShader();
+
+	static COutlineShader *Create(char *pFileName);
+
+	HRESULT Init(void);
+	void Uninit(void);
+	void SetParamToEffect(void);
+
+	void SetMtxView(const D3DXMATRIX mtxView) { m_MtxView = mtxView; }
+	void SetMtxProjection(const D3DXMATRIX mtxProjection) { m_MtxProjection = mtxProjection; }
+	void SetMtxWorld(const D3DXMATRIX mtxWorld) { m_MtxWorld = mtxWorld; }
+
+protected: // このクラスと派生クラスだけがアクセス可能
+
+private:   // このクラスだけがアクセス可能
+	D3DXMATRIX m_MtxView;				// ビューマトリックス
+	D3DXMATRIX m_MtxProjection;			// プロジェクションマトリックス
+	D3DXMATRIX m_MtxWorld;				// ワールドマトリックス
+
+	// 各パラメータのハンドル
+	D3DXHANDLE m_hMtxView;
+	D3DXHANDLE m_hMtxProjection;
+	D3DXHANDLE m_hMtxWorld;
+};
+
 #endif

@@ -13,6 +13,12 @@
 // マクロ定義
 //*****************************************************************************
 
+
+//*****************************************************************************
+// 前方宣言
+//*****************************************************************************
+class COutlineShader;
+
 //=====================
 //  CModel 単独クラス
 //=====================
@@ -25,7 +31,10 @@ public://誰でも扱える
 	void Uninit(void);
 	void Update(void);
 	void Draw(float fAlpha);
+	void DrawOutline(void);
 	static CModel * Create(const D3DXVECTOR3 pos, char FileName[40], D3DXVECTOR3 Scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	static HRESULT ShaderLoad(void);
+	static void ShaderUnLoad(void);
 
 	void SetPos(D3DXVECTOR3 pos) { m_Pos = pos; }
 	void SetMove(D3DXVECTOR3 move) { m_Pos += move; }
@@ -75,5 +84,6 @@ private://個人のみ使える
 	static int m_nCreateNum;
 	//	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★	★
 
+	static COutlineShader *m_pOutlineShader;
 };
 #endif

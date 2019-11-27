@@ -41,6 +41,7 @@
 #include "audience.h"
 #include "effect3D.h"
 #include "effectManager.h"
+#include "model.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -180,6 +181,8 @@ void CGame::Init(void)
 	//地雷の読み込み
 	CMine::Load();
 
+	//アウトライン読み込み
+	CModel::ShaderLoad();
 	//エフェクトの読み込み
 	if (m_pLoadEffect == NULL)
 	{
@@ -696,6 +699,9 @@ void CGame::Uninit(void)
 	CTimerLogo::Unload();
 	CSkilicon::UnLoad();
 	CEffect3D::UnLoad();
+
+	//アウトライン破棄
+	CModel::ShaderUnLoad();
 
 	//奇跡の破棄
 	CSceneOrbit::Unload();

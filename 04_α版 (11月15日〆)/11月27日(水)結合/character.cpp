@@ -404,6 +404,15 @@ void CCharacter::Draw()
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
+	// アウトラインの描画
+	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
+	{
+		if (m_ppModel[nCnt] != NULL)
+		{
+			m_ppModel[nCnt]->DrawOutline();
+		}
+	}
+
 	for (int nCnt = 0; nCnt < m_nPartsNum; nCnt++)
 	{
 		if (m_ppModel[nCnt] != NULL)

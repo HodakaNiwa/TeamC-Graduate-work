@@ -205,6 +205,7 @@
     <ClCompile Include="movie.cpp" />
     <ClCompile Include="number2D.cpp" />
     <ClCompile Include="objbase.cpp" />
+    <ClCompile Include="outlineShader.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="player.cpp" />
