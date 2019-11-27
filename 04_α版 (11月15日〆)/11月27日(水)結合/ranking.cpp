@@ -136,6 +136,7 @@ void CRanking::Init(void)
 
 	//テクスチャの読み込み
 	CNumber2D::Load();
+	CScoreRanking::LoadTex();
 	LoadTexture();
 
 	// ランキングBGを生成
@@ -210,6 +211,7 @@ void CRanking::Uninit(void)
 	// テクスチャの開放
 	CNumber2D::Unload();
 	UnloadTexture();
+	CScoreRanking::UnloadTex();
 
 	for (int nCntTex = 0; nCntTex < 9; nCntTex++)
 	{
@@ -237,7 +239,6 @@ void CRanking::Update(void)
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
 	CInputXPad * pXPad = CManager::GetXPad();
 	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
-	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
 
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
@@ -284,6 +285,9 @@ void CRanking::Update(void)
 			CFade::SetFade(CManager::MODE_TITLE);
 		}
 	}
+
+	// 地面の更新処理
+	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 
 	//音量の調節
 	//pSound->SetVolume(CSound::SOUND_LABEL_SE007, 10.0f);

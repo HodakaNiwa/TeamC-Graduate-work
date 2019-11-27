@@ -42,14 +42,14 @@
 #define TEXT_2DTEXTURE		("data/TEXT/2DTexture.txt")				//2Dテクスチャの情報テキスト
 #define TEXT_STAGEGAME		("data/TEXT/STAGE/Stage.txt")			//ゲームステージの情報テキスト
 #define TEXT_STAGETUTORIAL	("data/TEXT/STAGE/TutorialStage.txt")	//チュートリアルステージの情報テキスト
-#define RANK_1				(100)									//ランキングの初期スコア
-#define RANK_2				(200)
-#define RANK_3				(300)
-#define RANK_4				(400)
-#define RANK_5				(500)
-#define RANK_6				(600)									//ランキングの初期スコア
-#define RANK_7				(700)
-#define RANK_8				(800)
+#define RANK_1				(30)									//ランキングの初期スコア
+#define RANK_2				(25)
+#define RANK_3				(20)
+#define RANK_4				(15)
+#define RANK_5				(10)
+#define RANK_6				(5)									//ランキングの初期スコア
+#define RANK_7				(3)
+#define RANK_8				(1)
 
 //=============================================================================
 // 静的メンバ変数宣言
@@ -64,18 +64,21 @@ CInputMouse * CManager::m_pInputMouse = NULL;
 CRawMouse * CManager::m_pRawMouse = NULL;
 CDebugProc * CManager::m_pDebugProc = NULL;
 HWND CManager::m_hWnd = NULL;
+
 //画面
 CModeBase * CManager::m_pModeBase = NULL;
 
 CFade * CManager::m_pFade = NULL;
 
-int CManager::m_nScore = 0;
+int CManager::m_nScore[MAX_PLAYERNUM] = {};
+int CManager::m_nCuntry[MAX_PLAYERNUM] = {};
+int CManager::m_nCharType[MAX_PLAYERNUM] = {};
 int CManager::m_nRankScore[RANK] = {};
-int CManager::m_nMaxConbo = 0;
-int CManager::m_nDethButterfly = 0;
+int CManager::m_nRankCuntry[RANK] = {};
+int CManager::m_nRankCharType[RANK] = {};
 
 //モード
-CManager::MODE CManager::m_mode = CManager::MODE_TUTORIAL;
+CManager::MODE CManager::m_mode = CManager::MODE_SELECT;
 
 //=============================================================================
 // コンストラクタ
@@ -104,6 +107,26 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 	m_nRankScore[5] = RANK_6;
 	m_nRankScore[6] = RANK_7;
 	m_nRankScore[7] = RANK_8;
+
+	//国番号の設定
+	m_nRankCuntry[0] = 7;
+	m_nRankCuntry[1] = 6;
+	m_nRankCuntry[2] = 5;
+	m_nRankCuntry[3] = 4;
+	m_nRankCuntry[4] = 3;
+	m_nRankCuntry[5] = 2;
+	m_nRankCuntry[6] = 1;
+	m_nRankCuntry[7] = 0;
+
+	//キャラタイプの設定
+	m_nRankCharType[0] = 0;
+	m_nRankCharType[1] = 2;
+	m_nRankCharType[2] = 2;
+	m_nRankCharType[3] = 1;
+	m_nRankCharType[4] = 1;
+	m_nRankCharType[5] = 2;
+	m_nRankCharType[6] = 0;
+	m_nRankCharType[7] = 0;
 
 	//サウンド処理
 	if (m_pSound == NULL)

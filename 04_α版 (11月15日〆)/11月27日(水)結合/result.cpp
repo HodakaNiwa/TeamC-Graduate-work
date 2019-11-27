@@ -24,7 +24,6 @@
 #include "number2D.h"
 #include "select.h"
 #include "audience.h"
-#include "RawMouse.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -171,6 +170,10 @@ void CResult::Init(void)
 		m_pThanksBG[nCnt] = NULL;
 		m_pThanks[nCnt] = NULL;
 		m_bThanksFlagDown[nCnt] = false;
+		m_nCountMakeShape[nCnt] = 0;
+		m_nCountGetTerritory[nCnt] = 0;
+		m_nCountRobbotedTerritory[nCnt] = 0;
+		m_nTotalScore[nCnt] = 0;
 	}
 
 	//スコアテクスチャの読み込み
@@ -203,6 +206,9 @@ void CResult::Init(void)
 
 	//スコア順にソートする
 	SortScore();
+
+	//スコアの計算
+	GetScoreResult();
 
 	//キャラテクスチャを読み込む
 	InitCharImage();
@@ -332,9 +338,6 @@ void CResult::Uninit(void)
 		m_pThanks[nCnt] = NULL;
 	}
 
-	m_nTime = 0;
-	m_nCounter = 0;
-
 	//テクスチャの破棄
 	UnloadTex();
 	CNumber2D::Unload();
@@ -353,9 +356,9 @@ void CResult::Update(void)
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
 	CInputXPad * pXPad = CManager::GetXPad();
 	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
-	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
-	////サウンドの取得
-	CSound *pSound = CManager::GetSound();
+
+	// 地面の更新処理
+	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 
 	m_nCounter++;
 	if (m_nCounter % 60 == 0)
@@ -370,7 +373,6 @@ void CResult::Update(void)
 			CSound::PlaySound(CSound::SOUND_LABEL_BGM002);
 		}
 	}
-
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
 		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true ||
@@ -818,7 +820,11 @@ void CResult::UpdateScoreResult(void)
 
 		for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
 		{//トータルの表示
-			if (m_pTotalScore[nCnt] == NULL) { m_pTotalScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 430.0f, 0.0f), D3DXVECTOR3(25.0f, 40.0f, 0.0f)); }
+			if (m_pTotalScore[nCnt] == NULL)
+			{ 
+				m_pTotalScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 430.0f, 0.0f), D3DXVECTOR3(25.0f, 40.0f, 0.0f)); 
+				m_pTotalScore[nCnt]->AddScore(m_nTotalScore[nCnt]);
+			}
 		}
 	}
 	if (m_nTime > 140)
@@ -831,7 +837,11 @@ void CResult::UpdateScoreResult(void)
 
 		for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
 		{//獲得数の表示
-			if (m_pGetScore[nCnt] == NULL) { m_pGetScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 510.0f, 0.0f), D3DXVECTOR3(20.0f, 30.0f, 0.0f)); }
+			if (m_pGetScore[nCnt] == NULL)
+			{
+				m_pGetScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 510.0f, 0.0f), D3DXVECTOR3(20.0f, 32.0f, 0.0f)); 
+				m_pGetScore[nCnt]->AddScore(m_nCountGetTerritory[nCnt]);
+			}
 		}
 	}
 	if (m_nTime > 160)
@@ -844,7 +854,11 @@ void CResult::UpdateScoreResult(void)
 
 		for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
 		{//作成数の表示
-			if (m_pMakeScore[nCnt] == NULL) { m_pMakeScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 582.0f, 0.0f), D3DXVECTOR3(20.0f, 30.0f, 0.0f)); }
+			if (m_pMakeScore[nCnt] == NULL)
+			{
+				m_pMakeScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 582.0f, 0.0f), D3DXVECTOR3(20.0f, 32.0f, 0.0f));
+				m_pMakeScore[nCnt]->AddScore(m_nCountMakeShape[nCnt]);
+			}
 		}
 	}
 	if (m_nTime > 180)
@@ -857,7 +871,11 @@ void CResult::UpdateScoreResult(void)
 
 		for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
 		{//奪われた数の表示
-			if (m_pRobotedScore[nCnt] == NULL) { m_pRobotedScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 652.0f, 0.0f), D3DXVECTOR3(20.0f, 30.0f, 0.0f)); }
+			if (m_pRobotedScore[nCnt] == NULL) 
+			{ 
+				m_pRobotedScore[nCnt] = CScore::Create(CScore::TYPE_GAME, 6, D3DXVECTOR3(40.0f + (160.0f * nCnt), 652.0f, 0.0f), D3DXVECTOR3(20.0f, 32.0f, 0.0f)); 
+				m_pRobotedScore[nCnt]->AddScore(m_nCountRobbotedTerritory[nCnt]);
+			}
 		}
 	}
 	if (m_nTime > 181)
@@ -1055,6 +1073,14 @@ void CResult::SortScore(void)
 			}
 		}
 	}
+
+	//マネージャーにスコア情報を渡す
+	for (int nCnt = 0; nCnt < m_nMaxPlayer; nCnt++)
+	{
+		CManager::SetScore(nCnt, m_CharResultScore[nCnt].nScore);		//スコアの保存
+		CManager::SetCuntry(nCnt, m_CharResultScore[nCnt].nCuntry);		//国番号の保存
+		CManager::SetCharType(nCnt, m_CharResultScore[nCnt].nType);		//タイプの保存
+	}
 }
 
 //=============================================================================
@@ -1138,6 +1164,21 @@ void CResult::CreateThankyou(int nCnt)
 }
 
 //=============================================================================
+// キャラクターのスコアを計算する
+//=============================================================================
+void CResult::GetScoreResult(void)
+{
+	for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
+	{
+		m_nCountMakeShape[nCnt] = CGame::GetCountMakeShape(nCnt);				//図形の作った数を取得
+		m_nCountGetTerritory[nCnt] = CGame::GetCountGetTerritory(nCnt);			//テリトリーの取得数
+		m_nCountRobbotedTerritory[nCnt] = CGame::GetRobbotedTerritory(nCnt);	//テリトリーの奪われた数
+
+		m_nTotalScore[nCnt] = m_nCountMakeShape[nCnt] + m_nCountGetTerritory[nCnt] - m_nCountRobbotedTerritory[nCnt];
+	}
+}
+
+//=============================================================================
 // キャライメージ画像の読み込み処理
 //=============================================================================
 void CResult::InitCharImage(void)
@@ -1153,7 +1194,6 @@ void CResult::InitCharImage(void)
 	D3DXCreateTextureFromFile(pDevice, CHR_ITALY, &m_pCharaTex[5]);
 	D3DXCreateTextureFromFile(pDevice, CHR_NEWZEALAND, &m_pCharaTex[6]);
 	D3DXCreateTextureFromFile(pDevice, CHR_SOUTHAFRICA, &m_pCharaTex[7]);
-
 }
 
 //=============================================================================

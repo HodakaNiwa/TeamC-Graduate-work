@@ -288,6 +288,9 @@ void CSelect::Update(void)
 	case STATE_DICISION: UpdateDicision(); break;					//Œˆ’è
 	}
 
+	// ’n–Ê‚ÌXVˆ—
+	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
+
 	CScene::DeathCheck();
 	CCollider::DeathCheck();
 }

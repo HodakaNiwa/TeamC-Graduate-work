@@ -167,12 +167,16 @@
     <ClCompile Include="cylinderCollider.cpp" />
     <ClCompile Include="debuglog.cpp" />
     <ClCompile Include="effect3D.cpp" />
+    <ClCompile Include="effectManager.cpp" />
     <ClCompile Include="effecttool.cpp" />
+    <ClCompile Include="emitter.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="enemyAttackSphereCollider.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="fieldmanager.cpp" />
+    <ClCompile Include="fieldRender.cpp" />
+    <ClCompile Include="fieldShader.cpp" />
     <ClCompile Include="fileLoader.cpp" />
     <ClCompile Include="fileSaver.cpp" />
     <ClCompile Include="functionlib.cpp" />
@@ -190,6 +194,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="meshCollider.cpp" />
+    <ClCompile Include="meshRing.cpp" />
     <ClCompile Include="meshSphere.cpp" />
     <ClCompile Include="mine.cpp" />
     <ClCompile Include="minimap.cpp" />
@@ -212,6 +217,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="resultCharUI.cpp" />
     <ClCompile Include="ring.cpp" />
+    <ClCompile Include="ringEffect.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene2D.cpp" />
     <ClCompile Include="scene3D.cpp" />
@@ -231,6 +237,7 @@
     <ClCompile Include="sphereCollider.cpp" />
     <ClCompile Include="teqplayer.cpp" />
     <ClCompile Include="territory.cpp" />
+    <ClCompile Include="textureManager.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="timerlogo.cpp" />
     <ClCompile Include="title.cpp" />
@@ -254,11 +261,14 @@
     <ClInclude Include="debuglog.h" />
     <ClInclude Include="debugwindow.h" />
     <ClInclude Include="effect3D.h" />
+    <ClInclude Include="effectManager.h" />
     <ClInclude Include="effecttool.h" />
+    <ClInclude Include="emitter.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="fieldmanager.h" />
+    <ClInclude Include="fieldRender.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gamepad.h" />
     <ClInclude Include="input.h" />
@@ -272,6 +282,7 @@
     <ClInclude Include="logo.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="meshRing.h" />
     <ClInclude Include="meshSphere.h" />
     <ClInclude Include="mine.h" />
     <ClInclude Include="minimap.h" />
@@ -292,6 +303,7 @@
     <ClInclude Include="result.h" />
     <ClInclude Include="resultCharUI.h" />
     <ClInclude Include="ring.h" />
+    <ClInclude Include="ringEffect.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scene2D.h" />
     <ClInclude Include="scene3D.h" />
@@ -308,6 +320,7 @@
     <ClInclude Include="skilicon.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="territory.h" />
+    <ClInclude Include="textureManager.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="timerlogo.h" />
     <ClInclude Include="title.h" />

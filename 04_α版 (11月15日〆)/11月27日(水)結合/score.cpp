@@ -9,6 +9,9 @@
 #include "scene2D.h"
 #include "number2D.h"
 #include "scene.h"
+#include "game.h"
+#include "select.h"
+#include "moveUI.h"
 
 //=============================================================================
 // マクロ定義
@@ -16,6 +19,41 @@
 #define CLEAR_TIME	(15)
 #define RED_TIME	(20)
 #define GAMESCORE_INTERVAL (1.8f)
+#define SCORE_DESTPOS (1000.0f)
+#define FLAG_POS_X	  (310.0f)
+#define NAME_POS_X	  (215.0f)
+#define CHARNAME_POS_X	(560.0f)
+#define POS_Y	  (180.0f)
+
+//国旗
+#define JAPAN_FLAG			("data/TEXTURE/Select/NationalFlag/Japan.png")
+#define ROSSIA_FLAG			("data/TEXTURE/Select/NationalFlag/Russia.png")
+#define AMERICA_FLAG		("data/TEXTURE/Select/NationalFlag/America.png")
+#define BLAZIL_FLAG			("data/TEXTURE/Select/NationalFlag/Brazil.png")
+#define ENGLAND_FLAG		("data/TEXTURE/Select/NationalFlag/Engrand.png")
+#define ITARY_FLAG			("data/TEXTURE/Select/NationalFlag/Italy.png")
+#define NEWZYLAND_FLAG		("data/TEXTURE/Select/NationalFlag/Newzealand.png")
+#define SOUTHAFRICA_FLAG	("data/TEXTURE/Select/NationalFlag/SouthAfrica.png")
+
+//国名
+#define JAPAN_NAME			("data/TEXTURE/Select/CountryName/JPN.png")
+#define ROSSIA_NAME			("data/TEXTURE/Select/CountryName/RUS.png")
+#define AMERICA_NAME		("data/TEXTURE/Select/CountryName/USA.png")
+#define BLAZIL_NAME			("data/TEXTURE/Select/CountryName/BRA.png")
+#define ENGLAND_NAME		("data/TEXTURE/Select/CountryName/GBR.png")
+#define ITARY_NAME			("data/TEXTURE/Select/CountryName/ITA.png")
+#define NEWZYLAND_NAME		("data/TEXTURE/Select/CountryName/NGL.png")
+#define SOUTHAFRICA_NAME	("data/TEXTURE/Select/CountryName/ZAF.png")
+
+//キャラ名
+#define JAPAN_NAME_CHAR			("data/TEXTURE/Ranking/CharName/JapanName.png")
+#define ROSSIA_NAME_CHAR		("data/TEXTURE/Ranking/CharName/RossiaName.png")
+#define AMERICA_NAME_CHAR		("data/TEXTURE/Ranking/CharName/AmericaName.png")
+#define BLAZIL_NAME_CHAR		("data/TEXTURE/Ranking/CharName/BrazilName.png")
+#define ENGLAND_NAME_CHAR		("data/TEXTURE/Ranking/CharName/EnglandName.png")
+#define ITARY_NAME_CHAR			("data/TEXTURE/Ranking/CharName/ItalyName.png")
+#define NEWZYLAND_NAME_CHAR		("data/TEXTURE/Ranking/CharName/NewzyLandName.png")
+#define SOUTHAFRICA_NAME_CHAR	("data/TEXTURE/Ranking/CharName/SouthAfricaName.png")
 
 //=============================================================================
 // 静的メンバ変数宣言
@@ -27,9 +65,10 @@
 //スコアランキングクラス
 int CScoreRanking::m_nNumber[RANK][MAX_NUMBER] = {};
 int CScoreRanking::m_nHighScore[RANK] = {};
-int CScoreRanking::m_nTime = 0;
 CScoreRanking::FLASH CScoreRanking::m_Flash[RANK] = {};
-bool CScoreRanking::m_bFlash = false;
+LPDIRECT3DTEXTURE9 CScoreRanking::m_pCuntryTex[CUNTRY] = {};
+LPDIRECT3DTEXTURE9 CScoreRanking::m_pCuntryNameTex[CUNTRY] = {};
+LPDIRECT3DTEXTURE9 CScoreRanking::m_pCharNameTex[CUNTRY] = {};
 
 //=============================================================================
 // 生成処理
@@ -164,8 +203,6 @@ void CScoreGame::Uninit(void)
 	//変数宣言
 	int nCntNumber;
 
-	CManager::SetScore(m_nScore);	//スコアのセット
-
 	for (nCntNumber = 0; nCntNumber < MAX_NUMBER; nCntNumber++)
 	{
 		if (m_pNumber[nCntNumber] != NULL)
@@ -291,8 +328,7 @@ HRESULT CScoreRanking::Init()
 {
 	//変数宣言
 	int nCntNum;
-	m_bFlash = false;	//新しいスコアの更新した状態じゃない
-
+	
 	for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
 	{
 		for (nCntNum = 0; nCntNum < MAX_NUMBER; nCntNum++)
@@ -300,8 +336,19 @@ HRESULT CScoreRanking::Init()
 			m_nNumber[nCntRank][nCntNum] = 0;
 		}
 
+		//変数の初期化
+		m_bFlash = false;
+		m_nTime[nCntRank] = 0;
+		m_nCuntry[nCntRank] = 0;
+		m_nCharType[nCntRank] = 0;
+		m_pCuntryFlag[nCntRank] = NULL;
+		m_pCuntryName[nCntRank] = NULL;
+		m_pCharName[nCntRank] = NULL;
+
 		//スコアの設定
 		m_nHighScore[nCntRank] = CManager::GetRankScore(nCntRank);
+		m_nCuntry[nCntRank] = CManager::GetRankCuntry(nCntRank);
+		m_nCharType[nCntRank] = CManager::GetRankCharType(nCntRank);
 		m_Flash[nCntRank] = FLASH_OFF;
 	}
 	//ランキングのソート
@@ -309,11 +356,32 @@ HRESULT CScoreRanking::Init()
 
 	Set(m_pos, m_size);
 
-
 	for (int nCnt = 0; nCnt < RANK; nCnt++)
 	{
 		m_ScorePos[nCnt] = m_pNumber[nCnt][0]->GetPos();
 		m_bMoving[nCnt] = false;
+
+		//国旗の生成
+		if (m_pCuntryFlag[nCnt] == NULL)
+		{
+			m_pCuntryFlag[nCnt] = CMoveUI::Create(D3DXVECTOR3(1460.0f, POS_Y + (nCnt * 60.0f), 0.0f), D3DXVECTOR3(37.0f, 27.0f, 0.0f), m_pCuntryTex[m_nCuntry[nCnt]]);
+		}
+
+		//国名の生成
+		if (m_pCuntryName[nCnt] == NULL)
+		{
+			m_pCuntryName[nCnt] = CMoveUI::Create(D3DXVECTOR3(1400.0f, POS_Y + (nCnt * 60.0f), 0.0f), D3DXVECTOR3(50.0f, 27.0f, 0.0f), m_pCuntryNameTex[m_nCuntry[nCnt]]);
+		}
+
+		//キャラ名の生成
+		if (m_pCharName[nCnt] == NULL)
+		{
+			m_pCharName[nCnt] = CMoveUI::Create(D3DXVECTOR3(1660.0f, POS_Y + (nCnt * 60.0f), 0.0f), D3DXVECTOR3(200.0f, 27.0f, 0.0f), m_pCharNameTex[m_nCuntry[nCnt]]);
+
+			//UV設定
+			int nType = m_nCharType[nCnt];
+			m_pCharName[nCnt]->SetTexUV(0.0f, 1.0f, 0.0f + (nType * 0.25f), 0.25f + (nType * 0.25f));
+		}
 	}
 
 	m_bMoving[RANK - 1] = true;
@@ -333,7 +401,12 @@ void CScoreRanking::Uninit(void)
 	//ランキングのスコアを保存する
 	for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
 	{
-		CManager::SetRankScore(nCntRank, m_nHighScore[nCntRank]);
+		CManager::SetRankScore(nCntRank, m_nHighScore[nCntRank]);	//スコアの保存
+		CManager::SetRankCuntry(nCntRank, m_nCuntry[nCntRank]);		//国の保存
+		CManager::SetRankCharType(nCntRank, m_nCharType[nCntRank]);	//キャラタイプの保存
+
+		m_pCuntryFlag[nCntRank] = NULL;
+		m_pCuntryName[nCntRank] = NULL;
 	}
 
 	for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
@@ -363,7 +436,7 @@ void CScoreRanking::Update(void)
 		switch (m_Flash[nCntRank])
 		{
 		case FLASH_CLEAR:
-			m_nTime++;	//時間の加算
+			m_nTime[nCntRank]++;	//時間の加算
 
 						//色の設定
 			for (int nCntNumber = 0; nCntNumber < MAX_NUMBER; nCntNumber++)
@@ -372,15 +445,15 @@ void CScoreRanking::Update(void)
 			}
 
 			//状態の変更
-			if ((m_nTime % CLEAR_TIME) == 0)
+			if ((m_nTime[nCntRank] % CLEAR_TIME) == 0)
 			{
 				m_Flash[nCntRank] = FLASH_RED;
-				m_nTime = 0;
+				m_nTime[nCntRank] = 0;
 			}
 			break;
 
 		case FLASH_RED:
-			m_nTime++;	//時間の加算
+			m_nTime[nCntRank]++;	//時間の加算
 
 						//色の設定
 			for (int nCntNumber = 0; nCntNumber < MAX_NUMBER; nCntNumber++)
@@ -389,18 +462,14 @@ void CScoreRanking::Update(void)
 			}
 
 			//状態の変更
-			if ((m_nTime % RED_TIME) == 0)
+			if ((m_nTime[nCntRank] % RED_TIME) == 0)
 			{
 				m_Flash[nCntRank] = FLASH_CLEAR;
-				m_nTime = 0;
+				m_nTime[nCntRank] = 0;
 			}
 			break;
 		}
 	}
-
-	float destPos = 1000.0;
-
-
 
 	// カウンターを増加
 	m_nCounter++;
@@ -413,17 +482,22 @@ void CScoreRanking::Update(void)
 	}
 
 
-	for (int nCnt = 0; nCnt < 8; nCnt++)
+	for (int nCnt = 0; nCnt < RANK; nCnt++)
 	{
 		if (m_bMoving[nCnt] == true)
 		{
 			m_ScorePos[nCnt].x -= 60.0f;
+
+			//移動処理
+			if (m_pCuntryFlag[nCnt] != NULL) { m_pCuntryFlag[nCnt]->UpdateMoveDest(D3DXVECTOR3(FLAG_POS_X, POS_Y + (nCnt * 60.0f), 0.0f), 60.0f); }
+			if (m_pCuntryName[nCnt] != NULL) { m_pCuntryName[nCnt]->UpdateMoveDest(D3DXVECTOR3(NAME_POS_X, POS_Y + (nCnt * 60.0f), 0.0f), 60.0f); }
+			if (m_pCharName[nCnt] != NULL) { m_pCharName[nCnt]->UpdateMoveDest(D3DXVECTOR3(CHARNAME_POS_X, POS_Y + (nCnt * 60.0f), 0.0f), 60.0f); }
 		}
 
 		// 目的の位置より上に動かしていたら戻す
-		if (m_ScorePos[nCnt].x < destPos)
+		if (m_ScorePos[nCnt].x < SCORE_DESTPOS)
 		{
-			m_ScorePos[nCnt].x = destPos;
+			m_ScorePos[nCnt].x = SCORE_DESTPOS;
 		}
 		m_pNumber[nCnt][2]->SetPos(D3DXVECTOR3(m_ScorePos[nCnt].x, 180.0f + (60 * nCnt), 0.0f));
 		m_pNumber[nCnt][1]->SetPos(D3DXVECTOR3(m_ScorePos[nCnt].x - 40, 180.0f + (60 * nCnt), 0.0f));
@@ -487,43 +561,59 @@ void CScoreRanking::SortRanking(void)
 	bool bGetNewScore = false;
 	int nNum = 1;
 	int nNum2 = 1;
+	int nScore = 0;
+	int nSubCuntry = 0;
+	int nCuntry = 0;
+	int nSubCharType = 0;
+	int nCharType = 0;
+	int nMaxPlayer = CSelect::GetEntryPlayer();
 
-	int nScore = CManager::GetScore();	//マネージャーから値を取得
-
-										//ランキングのソート
-	for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
+	for (int nCntChar = 0; nCntChar < nMaxPlayer; nCntChar++)
 	{
-		for (int nCntRank2 = 0; nCntRank2 < RANK - 1; nCntRank2++)
+		nScore = CManager::GetScore(nCntChar);			//マネージャーから値を取得
+		nCuntry = CManager::GetCuntry(nCntChar);		//マネージャーから国のタイプを取得
+		nCharType = CManager::GetCharType(nCntChar);	//マネージャーからキャラタイプ取得
+
+		for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
 		{
-			if (m_nHighScore[nCntRank] > m_nHighScore[nCntRank2])
+			if (m_nHighScore[nCntRank] < nScore)
 			{
-				nSubScore = m_nHighScore[nCntRank2];
-				m_nHighScore[nCntRank2] = m_nHighScore[nCntRank];
-				m_nHighScore[nCntRank] = nSubScore;
+				//スコアの入替え
+				nSubScore = m_nHighScore[nCntRank];
+				m_nHighScore[nCntRank] = nScore;
+				nScore = nSubScore;
+
+				//国の入替え
+				nSubCuntry = m_nCuntry[nCntRank];
+				m_nCuntry[nCntRank] = nCuntry;
+				nCuntry = nSubCuntry;
+
+				//キャラタイプの入替え
+				nSubCharType = m_nCharType[nCntRank];
+				m_nCharType[nCntRank] = nCharType;
+				nCharType = nSubCharType;
+
+				if (m_bFlash == false)
+				{
+					for (int nCnt = RANK; nCnt > nCntRank; nCnt--)
+					{
+						if (m_Flash[nCnt] == FLASH_CLEAR)
+						{
+							m_Flash[nCnt] = FLASH_OFF;
+							
+							if (nCnt < RANK - 1) { m_Flash[nCnt + 1] = FLASH_CLEAR; }
+						}
+					}
+
+					//状態の設定
+					SetState(nCntRank, STATE_NEW);
+					m_bFlash = true;
+				}
 			}
 		}
+
+		m_bFlash = false;
 	}
-
-	for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
-	{
-		if (m_nHighScore[nCntRank] < nScore)
-		{
-			nSubScore = m_nHighScore[nCntRank];
-			m_nHighScore[nCntRank] = nScore;
-			nScore = nSubScore;
-
-			if (m_bFlash == false)
-			{
-				//状態の設定
-				SetState(nCntRank, STATE_NEW);
-				m_bFlash = true;
-			}
-		}
-	}
-
-	//スコアを初期化する
-	nScore = 0;
-	CManager::SetScore(nScore);
 
 	for (int nCntRank = 0; nCntRank < RANK; nCntRank++)
 	{
@@ -561,5 +651,71 @@ void CScoreRanking::SetState(int nCnt, STATE state)
 	if (state == STATE_NEW)
 	{
 		m_Flash[nCnt] = FLASH_CLEAR;
+	}
+}
+
+//=============================================================================
+// テクスチャの読み込み
+//=============================================================================
+void CScoreRanking::LoadTex(void)
+{
+	//デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
+
+	//国旗テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice, JAPAN_FLAG, &m_pCuntryTex[0]);
+	D3DXCreateTextureFromFile(pDevice, ROSSIA_FLAG, &m_pCuntryTex[1]);
+	D3DXCreateTextureFromFile(pDevice, AMERICA_FLAG, &m_pCuntryTex[2]);
+	D3DXCreateTextureFromFile(pDevice, BLAZIL_FLAG, &m_pCuntryTex[3]);
+	D3DXCreateTextureFromFile(pDevice, ENGLAND_FLAG, &m_pCuntryTex[4]);
+	D3DXCreateTextureFromFile(pDevice, ITARY_FLAG, &m_pCuntryTex[5]);
+	D3DXCreateTextureFromFile(pDevice, NEWZYLAND_FLAG, &m_pCuntryTex[6]);
+	D3DXCreateTextureFromFile(pDevice, SOUTHAFRICA_FLAG, &m_pCuntryTex[7]);
+
+	//国名テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice, JAPAN_NAME, &m_pCuntryNameTex[0]);
+	D3DXCreateTextureFromFile(pDevice, ROSSIA_NAME, &m_pCuntryNameTex[1]);
+	D3DXCreateTextureFromFile(pDevice, AMERICA_NAME, &m_pCuntryNameTex[2]);
+	D3DXCreateTextureFromFile(pDevice, BLAZIL_NAME, &m_pCuntryNameTex[3]);
+	D3DXCreateTextureFromFile(pDevice, ENGLAND_NAME, &m_pCuntryNameTex[4]);
+	D3DXCreateTextureFromFile(pDevice, ITARY_NAME, &m_pCuntryNameTex[5]);
+	D3DXCreateTextureFromFile(pDevice, NEWZYLAND_NAME, &m_pCuntryNameTex[6]);
+	D3DXCreateTextureFromFile(pDevice, SOUTHAFRICA_NAME, &m_pCuntryNameTex[7]);
+
+	//キャラ名テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice, JAPAN_NAME_CHAR, &m_pCharNameTex[0]);
+	D3DXCreateTextureFromFile(pDevice, ROSSIA_NAME_CHAR, &m_pCharNameTex[1]);
+	D3DXCreateTextureFromFile(pDevice, AMERICA_NAME_CHAR, &m_pCharNameTex[2]);
+	D3DXCreateTextureFromFile(pDevice, BLAZIL_NAME_CHAR, &m_pCharNameTex[3]);
+	D3DXCreateTextureFromFile(pDevice, ENGLAND_NAME_CHAR, &m_pCharNameTex[4]);
+	D3DXCreateTextureFromFile(pDevice, ITARY_NAME_CHAR, &m_pCharNameTex[5]);
+	D3DXCreateTextureFromFile(pDevice, NEWZYLAND_NAME_CHAR, &m_pCharNameTex[6]);
+	D3DXCreateTextureFromFile(pDevice, SOUTHAFRICA_NAME_CHAR, &m_pCharNameTex[7]);
+}
+
+//=============================================================================
+// テクスチャの破棄
+//=============================================================================
+void CScoreRanking::UnloadTex(void)
+{
+	for (int nCnt = 0; nCnt < CUNTRY; nCnt++)
+	{
+		if (m_pCuntryTex[nCnt] != NULL)
+		{//国旗テクスチャの破棄
+			m_pCuntryTex[nCnt]->Release();
+			m_pCuntryTex[nCnt] = NULL;
+		}
+
+		if (m_pCuntryNameTex[nCnt] != NULL)
+		{//国名テクスチャの破棄
+			m_pCuntryNameTex[nCnt]->Release();
+			m_pCuntryNameTex[nCnt] = NULL;
+		}
+
+		if (m_pCharNameTex[nCnt] != NULL)
+		{//キャラ名テクスチャの破棄
+			m_pCharNameTex[nCnt]->Release();
+			m_pCharNameTex[nCnt] = NULL;
+		}
 	}
 }

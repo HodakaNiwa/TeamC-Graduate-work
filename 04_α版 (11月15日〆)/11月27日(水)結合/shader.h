@@ -11,6 +11,7 @@
 //    インクルードファイル
 //*****************************************************************************
 #include "main.h"
+#include "light.h"
 
 //*****************************************************************************
 //    シェーダークラスの定義
@@ -86,6 +87,44 @@ private:   // このクラスだけがアクセス可能
 	D3DXHANDLE m_hLightDir;
 	D3DXHANDLE m_hLightDiffuse;
 	D3DXHANDLE m_hLightAmbient;
+};
+
+//*****************************************************************************
+//    地面シェーダークラスの定義
+//*****************************************************************************
+class CFieldShader : public CShader
+{
+public:    // 誰でもアクセス可能
+	CFieldShader(char *pFileName);
+	~CFieldShader();
+
+	static CFieldShader *Create(char *pFileName);
+
+	HRESULT Init(void);
+	void Uninit(void);
+	void SetParamToEffect(void);
+
+	void SetMtxView(const D3DXMATRIX mtxView) { m_MtxView = mtxView; }
+	void SetMtxProjection(const D3DXMATRIX mtxProjection) { m_MtxProjection = mtxProjection; }
+	void BindTexture(const LPDIRECT3DTEXTURE9 pTexture) { m_pTexture = pTexture; }
+	void SetLightDir(const D3DXVECTOR3 LightDir, const int nIdx) { m_LightDir[nIdx] = LightDir; }
+	void SetLightDiffuse(const D3DXCOLOR LightDiffuse, const int nIdx) { m_LightDiffuse[nIdx] = LightDiffuse; }
+
+protected: // このクラスと派生クラスだけがアクセス可能
+
+private:   // このクラスだけがアクセス可能
+	D3DXMATRIX m_MtxView;					// ビューマトリックス
+	D3DXMATRIX m_MtxProjection;				// プロジェクションマトリックス
+	LPDIRECT3DTEXTURE9 m_pTexture;			// テクスチャへのポインタ
+	D3DXVECTOR3 m_LightDir[MAXLIGHT];		// ライトの方向
+	D3DXCOLOR m_LightDiffuse[MAXLIGHT];		// ライトの拡散光
+
+	// 各パラメータのハンドル
+	D3DXHANDLE m_hMtxView;
+	D3DXHANDLE m_hMtxProjection;
+	D3DXHANDLE m_hTexture;
+	D3DXHANDLE m_hLightDir[MAXLIGHT];
+	D3DXHANDLE m_hLightDiffuse[MAXLIGHT];
 };
 
 #endif

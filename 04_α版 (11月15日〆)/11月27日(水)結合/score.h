@@ -15,12 +15,14 @@
 // 前方宣言
 //=============================================================================
 class CNumber2D;
+class CMoveUI;
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define MAX_NUMBER	(3)
 #define RANK		(8)
+#define CUNTRY		(8)
 
 //=============================================================================
 // スコアクラス
@@ -99,19 +101,29 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+	static void LoadTex(void);
+	static void UnloadTex(void);
 
 private:
-	static void SortRanking(void);
+	void SortRanking(void);
 	static void SetState(int nCnt, STATE state);
 
 	//関数宣言
+	static LPDIRECT3DTEXTURE9 m_pCuntryTex[CUNTRY];
+	static LPDIRECT3DTEXTURE9 m_pCuntryNameTex[CUNTRY];
+	static LPDIRECT3DTEXTURE9 m_pCharNameTex[CUNTRY];
 	void Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);
-	CNumber2D * m_pNumber[RANK][MAX_NUMBER];						//ナンバーのポインタ
+	CNumber2D * m_pNumber[RANK][MAX_NUMBER];					//ナンバーのポインタ
+	CMoveUI * m_pCuntryFlag[RANK];								//国旗
+	CMoveUI * m_pCuntryName[RANK];								//国名
+	CMoveUI * m_pCharName[RANK];								//キャラ名
 	static int			m_nNumber[RANK][MAX_NUMBER];			//各数字番号
 	static int			m_nHighScore[RANK];						//スコアの数
-	static int			m_nTime;								//時間の加算
+	int					m_nCuntry[RANK];						//国の種類
+	int					m_nCharType[RANK];						//キャラタイプ
 	static FLASH		m_Flash[RANK];							//フラッシュ状態
-	static bool			m_bFlash;								//新しいスコアを取得したかどうか
+	bool				m_bFlash;							//新しいスコアを取得したかどうか
+	int					m_nTime[RANK];								//時間の加算
 	int					m_nCounter = 0;
 	bool                m_bMoving[RANK];
 	int                 m_nMovingIdx;

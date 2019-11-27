@@ -237,7 +237,8 @@ void  CTechniquePlayer::PlayerActionPad(void)
 	CUI *pUi = pGame->GetUI();
 	CInputXPad * pXPad = CManager::GetXPad();
 	CCharacter *pCharacter = pGame->GetChara(m_nNumPlayer);
-
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
 
 	if (pXPad->GetTrigger(XINPUT_GAMEPAD_B, m_nControllerIndx) == true)
 	{
@@ -250,6 +251,8 @@ void  CTechniquePlayer::PlayerActionPad(void)
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
 				m_bMineUse = true;
+				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
+				//pSound->SetVolume(CSound::SOUND_LABEL_SE024, 30.0f);
 			}
 		}
 	}
@@ -264,7 +267,8 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 	CUI *pUi = pGame->GetUI();
 	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
 	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
-
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
 
 	if (pRawMouse->GetTrigger(CRawMouse::RIMS_BUTTON_LEFT, m_nControllerIndx) == true)
 	{
@@ -277,6 +281,8 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
 				m_bMineUse = true;
+				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
+				pSound->SetVolume(CSound::SOUND_LABEL_SE024, 20.0f);
 			}
 		}
 	}
@@ -293,6 +299,8 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nControllerIndx)->RevivalIconMask();	//スキルアイコン
 				m_bMineUse = true;
+				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
+				pSound->SetVolume(CSound::SOUND_LABEL_SE024, 20.0f);
 			}
 		}
 	}

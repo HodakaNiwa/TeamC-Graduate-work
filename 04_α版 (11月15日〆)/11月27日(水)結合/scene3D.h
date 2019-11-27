@@ -34,6 +34,9 @@ public:
 	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; };					//向きの設定
 	D3DXVECTOR3 GetPos(void) { return m_pos; };						//位置の取得
 	D3DXVECTOR3 GetRot(void) { return m_rot; };						//位置の取得
+	D3DXVECTOR3 GetSize(void) { return m_size; };					//大きさの取得
+	D3DXCOLOR GetCol(void) { return m_col; }						//頂点カラーの取得
+	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }				//ワールドマトリックスの取得
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }	//バッファの取得
 private:
 	//変数宣言
@@ -47,6 +50,7 @@ private:
 	D3DXVECTOR3				m_vtxMin;			//ポリゴンの最小値
 	D3DXVECTOR3				m_vtxMax;			//ポリゴンの最小値
 	D3DXMATRIX				m_mtxWorld;			//ワールドマトリックス
+	D3DXCOLOR				m_col;				// 頂点カラー
 	D3DXVECTOR2				m_Division;			//分割数
 
 	D3DXVECTOR3 m_nor[2];

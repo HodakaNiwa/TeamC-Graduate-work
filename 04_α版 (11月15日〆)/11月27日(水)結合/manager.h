@@ -71,16 +71,27 @@ public:
 	static void SetMode(MODE mode);																		//モードの設定
 	static CFade * GetFade(void) { return m_pFade; };													//フェードポインタの取得
 	static MODE GetMode(void) { return m_mode; };														//モードの取得
-	static void SetScore(int nScore) { m_nScore = nScore; };											//スコアの設定
-	static int GetScore(void) { return m_nScore; };														//スコアの取得
-	static int GetNumDethButterfly(void) { return m_nDethButterfly; };									//倒した蝶の数を取得
-	static int GetMaxCombo(void) { return m_nMaxConbo; };												//コンボ数の追加
+	
+	//ランキング
+	static void SetScore(int nIndx, int nScore) { m_nScore[nIndx] = nScore; };							//スコアの設定
+	static int GetScore(int nIndx) { return m_nScore[nIndx]; };											//スコアの取得
+	static void SetCuntry(int nIndx, int nCuntry) { m_nCuntry[nIndx] = nCuntry; }						//国番号
+	static int GetCuntry(int nIndx) { return m_nCuntry[nIndx]; }
+	static void SetCharType(int nIndx, int nCharType) { m_nCharType[nIndx] = nCharType; }				//キャラタイプ番号
+	static int GetCharType(int nIndx) { return m_nCharType[nIndx]; }
 	static int GetRankScore(int nCntRank) { return m_nRankScore[nCntRank]; };							//ランキングスコアの取得
 	static void SetRankScore(int nCntRank, int nRankScore) { m_nRankScore[nCntRank] = nRankScore; };	//ランキングスコアの設定
+	static int GetRankCuntry(int nIndx) { return m_nRankCuntry[nIndx]; }								//ランキングの国番号
+	static void SetRankCuntry(int nIndx, int nRankCuntry) { m_nRankCuntry[nIndx] = nRankCuntry; }
+	static void SetRankCharType(int nIndx, int nRankCharType) { m_nRankCharType[nIndx] = nRankCharType; } //国タイプ
+	static int GetRankCharType(int nIndx) { return m_nRankCharType[nIndx]; }
+
+
 	static CInputXPad * GetXPad(void) { return m_pXPad; }												//Xインプットの取得
 	static CInputMouse * GetInputMouse(void) { return m_pInputMouse; }									//マウスの取得
 	static CRawMouse * GetRawMouse(void) { return m_pRawMouse; }										//ラウマウスの取得
 	static void CreateRawMouse(HWND hWnd);
+
 	//画面の取得
 	static CTitle * GetTitle(void) { return (CTitle *)m_pModeBase; }			//タイトル
 	static CSelect * GetSelect(void) { return(CSelect *)m_pModeBase; }			//セレクト
@@ -100,8 +111,12 @@ private:
 	static CModeBase * m_pModeBase;
 	static CFade * m_pFade;
 	static MODE m_mode;
-	static int m_nScore;
+	static int m_nScore[MAX_PLAYERNUM];
+	static int m_nCuntry[MAX_PLAYERNUM];
+	static int m_nCharType[MAX_PLAYERNUM];
 	static int m_nRankScore[RANK];
+	static int m_nRankCuntry[RANK];
+	static int m_nRankCharType[RANK];
 	static int m_nMaxConbo;
 	static int m_nDethButterfly;
 	static CInputXPad * m_pXPad;

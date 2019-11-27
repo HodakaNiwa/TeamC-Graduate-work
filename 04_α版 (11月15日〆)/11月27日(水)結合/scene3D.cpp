@@ -41,6 +41,7 @@ CScene3D::CScene3D() : CScene(3, OBJTYPE_FLOR)
 	m_pVtxBuff = NULL;
 	m_pos = D3DXVECTOR3(0, 0, 0);
 	m_rot = D3DXVECTOR3(0, 0, 0);
+	m_col = INITIALIZE_VECTOR4;
 }
 
 //=============================================================================
@@ -114,6 +115,9 @@ HRESULT CScene3D::Init(void)
 
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+
+	// 色の情報を保存
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	return S_OK;
 }
@@ -239,6 +243,9 @@ void CScene3D::SetColor(D3DXCOLOR col)
 
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+
+	// 頂点カラー情報を保存
+	m_col = col;
 }
 
 //=============================================================================

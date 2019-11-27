@@ -119,7 +119,6 @@ HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 	m_bSprint = false;
 	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
 	m_nLineNum = 2;
-	m_bBreakTime = false;
 
 	m_bStop = false;
 	return S_OK;
@@ -239,27 +238,3 @@ void  CTypeSpeed::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
 
 }
 
-//=============================================================================
-// ラインの生成処理
-//=============================================================================
-void CTypeSpeed::CreateOrbitLine(void)
-{
-	if (m_pOrbitLine == NULL)
-	{
-		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());
-		m_pOrbitLine->SetMtxParent(&m_pModel[10]->GetMtxWorld());
-		m_pOrbitLine->SetMtxParentEnd(&m_pModel[1]->GetMtxWorld());
-	}
-}
-
-//=============================================================================
-// ラインの破棄
-//=============================================================================
-void CTypeSpeed::UninitOrtbitLine(void)
-{
-	if (m_pOrbitLine != NULL)
-	{
-		m_pOrbitLine->Uninit();
-		m_pOrbitLine = NULL;
-	}
-}

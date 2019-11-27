@@ -27,6 +27,8 @@ class CCamera;
 class CFieldManager;
 class CUI;
 class CCharacter;
+class CEffectManager;
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -73,6 +75,7 @@ public:
 	static CLoadTextEffect * GetEffectLoad(void) { return m_pLoadEffect; }
 	static GAMESTATE GetGameState(void) { return m_gameState; }
 	static int GetScore(int nIdx) { return m_nScore[nIdx]; }
+	CEffectManager *GetEffectManager(void) { return m_pEffectManager; }
 	CGameCamera * GetGameCamera(int nIdx) { return m_pGameCamera[nIdx]; }
 	CPlayer * GetPlayer(int nNumPlayer) { return m_pPlayer[nNumPlayer]; }
 	CFieldManager * GetFieldManger(void) { return m_pFieldManager; }
@@ -86,6 +89,9 @@ public:
 	int GetCountry(int nNum) { return m_nCountry[nNum]; }
 
 	static int GetEnemyNumResult(void) { return m_nEnemyNumResult; }
+	static int GetCountMakeShape(int nIndx) { return m_nCountMakeScore[nIndx]; }
+	static int GetCountGetTerritory(int nIndx) { return m_nCountGetTerritry[nIndx]; }
+	static int GetRobbotedTerritory(int nIndx) { return m_nCountRobottedTerritory[nIndx]; }
 private:
 	//--------------------
 	//	関数
@@ -96,7 +102,7 @@ private:
 	void ReleaseUI(void);
 	void UpdateUI(void);
 	void DrawUI_Icon(const int nIdx);
-
+	void GetCharInfo(void);
 
 	//--------------------
 	//	メンバ変数
@@ -110,6 +116,7 @@ private:
 	static int m_nScore[MAX_CHARACTER];			// スコアを保存
 	static CSceneMeshFiled * m_pMeshFiled;		//メッシュフィールド
 	static CLoadTextEffect * m_pLoadEffect;		// エフェクト読み込み
+	CEffectManager *m_pEffectManager;			//	エフェクト管轄クラスへのポインタ
 	CLoadTextObject * m_pLoadObject;			// オブジェクトの読み込み
 	CLoadTextTerritory * m_pLoadTerritory;		// テリトリーの読み込み
 	CGameCamera * m_pGameCamera[MAX_GAMECAMERA];				// ゲームカメラ
@@ -134,5 +141,11 @@ private:
 	int m_nSpeedNo, m_nPowerNo, m_nSweeperNo;
 	bool m_bTypeMax;
 	D3DXVECTOR3 InitPos[MAX_CHARACTER];	//	各キャラクターの初期位置
+
+	//リザルト用変数
+	static int m_nCountMakeScore[MAX_CHARACTER];			//図形を作った数
+	static int m_nCountGetTerritry[MAX_CHARACTER];			//テリトリーの取得数
+	static int m_nCountRobottedTerritory[MAX_CHARACTER];	//テリトリーの奪われた数
+
 };
 #endif

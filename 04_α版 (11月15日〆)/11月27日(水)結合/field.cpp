@@ -57,7 +57,7 @@ CField::~CField(){}
 HRESULT CField::Init(void)
 {
 	CScene3D::Init();
-	
+
 	//変数の初期化
 	m_state = STATE_NOT_UPDATE;
 	m_bLight = false;
@@ -99,13 +99,7 @@ void CField::Update(void)
 //=============================================================================
 void CField::Draw(void)
 {
-	//描画処理
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	//デバイスの取得
-	if (m_bLight) { pDevice->SetRenderState(D3DRS_LIGHTING, FALSE); }
 
-	CScene3D::Draw();
-	
-	if (m_bLight) { pDevice->SetRenderState(D3DRS_LIGHTING, TRUE); }
 }
 
 //=============================================================================
@@ -122,6 +116,7 @@ void CField::UpdateXturn(void)
 	{
 		Rot.x = 0.0f;
 		m_state = STATE_NORMAL;
+		SetColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 	}
 
 	//回転値の設定

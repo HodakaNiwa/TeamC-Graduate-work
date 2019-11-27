@@ -96,6 +96,10 @@ HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],in
 	m_bCharaMotionState = false;
 	m_nDestPlayer = 0;
 	m_nGetScorePoint = 0;
+	m_nPointCounter = 0;
+	m_nCountMakeShape = 0;			//図形を作った数
+	m_nCountGetTerritry = 0;		//テリトリーの取得数
+	m_nCountRobbtedTerritory = 0;	//テリトリーの奪われた数
 
 	m_cModelTxt[0] = &ModelTxt[0];
 	m_cMotionTxt[0] = &MotionTxt[0];
@@ -385,7 +389,6 @@ void CCharacter::Draw()
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 
 	D3DXMATRIX mtxRot, mtxTrans, mtxParent, mtxScale;	//計算
-
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -1020,6 +1023,9 @@ void CCharacter::UpdateShapeComplete(void)
 //=============================================================================
 void CCharacter::AddTerritoryList(CTerritory * pTerritory)
 {
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
+
 	//図形が完成しているかどうかの判定
 	if (m_nCountTerritory >= MIN_TERRITORY)
 	{
@@ -1031,6 +1037,17 @@ void CCharacter::AddTerritoryList(CTerritory * pTerritory)
 			ResetList();				//リストの初期化
 			UninitOrtbitLine();			//奇跡の破棄
 			ResetLine();				//ラインの初期化
+			m_nCountMakeShape++;		//図形の完成した数加算
+
+			if (m_nPointCounter >= 9)
+			{
+				pSound->PlaySound(CSound::SOUND_LABEL_SE027);
+				pSound->SetVolume(CSound::SOUND_LABEL_SE027, 3.0f);
+			}
+			//初期化する
+			m_nPointCounter = 0;
+			//pSound->StopSound(CSound::SOUND_LABEL_SE027);
+
 			return;
 		}
 	}
@@ -1112,7 +1129,11 @@ void CCharacter::ShapeComplete(CTerritory * pTerritory)
 	//テリトリーの取得
 	for (int nCnt = 0; nCnt < m_nCountTerritory; nCnt++)
 	{
-		if (m_apTerritory[nCnt] != NULL) { GetTerritory(m_apTerritory[nCnt]); }
+		if (m_apTerritory[nCnt] != NULL) 
+		{
+			m_nPointCounter++;
+			GetTerritory(m_apTerritory[nCnt]); 
+		}
 	}
 }
 
@@ -1229,6 +1250,7 @@ void CCharacter::ChackInShape(void)
 					//範囲内ならテリトリーの取得
 					if (nCountEnter == TRIANGLE_VERTEX)
 					{
+						m_nPointCounter++;
 						GetTerritory(pTerritory);
 						bEnter = true;
 						break;
@@ -1300,6 +1322,7 @@ void CCharacter::ChackInShape(void)
 						//範囲内ならテリトリーの取得
 						if (nCountEnter == TRIANGLE_VERTEX)
 						{
+							m_nPointCounter++;
 							GetTerritory(pTerritory);
 							break;
 						}
@@ -1369,6 +1392,7 @@ void CCharacter::GetTerritory(CTerritory * pTerritory)
 															//前回のプレイヤーの減点処理
 	if (nOldNumPlayer != -1)
 	{
+		m_nCountRobbtedTerritory++;	//テリトリーの奪われた数を加算
 		CutTerritoryPoint(pTerritory, nOldNumPlayer);
 	}
 	//領地獲得音
@@ -1377,6 +1401,8 @@ void CCharacter::GetTerritory(CTerritory * pTerritory)
 	AddTerritoryPoint(pTerritory);
 	//エフェクトの生成
 	pTerritory->CreateGetEffect();
+	//テリトリーの取得数の加算
+	m_nCountGetTerritry++;
 }
 
 //=============================================================================

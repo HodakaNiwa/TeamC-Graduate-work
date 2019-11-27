@@ -15,6 +15,7 @@
 #include "rawmouse.h"
 #include "UI.h"
 #include "skilicon.h"
+#include "effectManager.h"
 
 //*****************************************************************************
 // マクロ
@@ -142,6 +143,9 @@ void  CPowerPlayer::Update(void)
 //=============================================================================
 void  CPowerPlayer::ActionUpdate(void)
 {
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
+
 	if (m_nControllerType == 0)
 	{
 		//コントローラー操作
@@ -164,8 +168,11 @@ void  CPowerPlayer::ActionUpdate(void)
 			m_nColliderTimer++;
 			if (m_nColliderTimer >= WAVE)
 			{//
+				
 				if (m_PlayerState != PLAYERSTATE_DAMAGE && m_nColliderTimer == 1)
 				{
+					pSound->PlaySound(CSound::SOUND_LABEL_SE022);
+					pSound->SetVolume(CSound::SOUND_LABEL_SE022, 30.0f);
 					CreateColliderSphere();	//衝撃波の当たり判定を付与
 				}
 				if (m_nColliderTimer == 2)
@@ -237,7 +244,7 @@ void  CPowerPlayer::PlayerActionPad(void)
 	CGame *pGame = CManager::GetGame();
 	CUI *pUi = pGame->GetUI();
 	CInputXPad * pXPad = CManager::GetXPad();
-
+	
 
 	if (pXPad->GetTrigger(XINPUT_GAMEPAD_B, m_nControllerIndx) == true)
 	{
@@ -250,7 +257,7 @@ void  CPowerPlayer::PlayerActionPad(void)
 			pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();
 			m_PlayerState = PLAYERSTATE_ACTION;
 			m_pMotion->SetNumMotion(PLAYERSTATE_ACTION);	//攻撃モーション
-
+			
 		}
 	}
 }
@@ -264,6 +271,8 @@ void  CPowerPlayer::PlayerActionMouse(void)
 	CUI *pUi = pGame->GetUI();
 	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
 	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
 
 	if (pRawMouse->GetTrigger(CRawMouse::RIMS_BUTTON_LEFT, m_nControllerIndx) == true)
 	{
@@ -276,7 +285,6 @@ void  CPowerPlayer::PlayerActionMouse(void)
 			pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();
 			m_PlayerState = PLAYERSTATE_ACTION;
 			m_pMotion->SetNumMotion(PLAYERSTATE_ACTION);	//攻撃モーション
-
 		}
 	}
 
@@ -369,12 +377,19 @@ void CPowerPlayer::CreateStartUpCollider(void)
 //=============================================================================
 void CPowerPlayer::CreateColliderSphere(void)
 {
+	//ゲームの取得
+	CGame *pGame = CManager::GetGame();
+	//エフェクト
+	CEffectManager *pEffectManager = pGame->GetEffectManager();
+
 	D3DXVECTOR3 pos = D3DXVECTOR3(0.0f,0.0f,0.0f);
 	D3DXVec3TransformCoord(&pos, &m_pModel[15]->GetPos(), &m_pModel[15]->GetMtxWorld());
 
 	// スフィアを生成
-	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(pos.x,pos.y,pos.z + 75.0f), 
-		D3DXVECTOR3(1.0f, 1.0f, 1.0f),140.0f, 110, 1);
+	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(pos.x,pos.y,pos.z - 60.0f), 
+		D3DXVECTOR3(1.0f, 1.0f, 1.0f),150.0f, 40, 1);
+
+	pEffectManager->SetEffect(D3DXVECTOR3(pos.x,pos.y - 30.0f,pos.z - 30.0f), INITIALIZE_VECTOR3, 0);
 
 	if (pSphere == NULL) { return; }
 

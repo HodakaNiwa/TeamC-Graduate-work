@@ -92,6 +92,7 @@ private:
 	void InitWinerChar(int nCuntry, int nType, int nNumPlayer);
 	void InitScoreResult(void);
 	void SortScore(void);
+	void GetScoreResult(void);
 	void CreateThankyou(int nCnt);
 	void UninitCharRanking(void);
 	static TYPE m_type;					//結果状態
@@ -139,6 +140,10 @@ private:
 	int m_nFadeOutTime;
 	int m_nCountID;							//IDのカウンター
 	int m_nMaxPlayer;						//プレイヤーの最大数
+	int m_nCountMakeShape[MAX_CHARACTER];			//図形を作った数
+	int m_nCountGetTerritory[MAX_CHARACTER];		//テリトリーの取得数
+	int m_nCountRobbotedTerritory[MAX_CHARACTER];	//テリトリーの奪われた数
+	int m_nTotalScore[MAX_CHARACTER];				//トータルスコア
 	bool m_bWhiteIn;						//フェードイン出来るかどうか
 	bool m_bCharFlagDown[MAX_CHARACTER];	//キャラクター画像を下すフラグ
 	bool m_bThanksFlagDown[MAX_CHARACTER];	//画像を下すフラグ

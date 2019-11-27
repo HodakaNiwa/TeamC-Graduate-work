@@ -13,10 +13,6 @@
 #include "model.h"
 #include "territory.h"
 #include "mine.h"
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//静的メンバ変数宣言
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-CSceneX *CEnemy::m_apSceneX = NULL;
 
 //*****************************************************************************
 // マクロ定義
@@ -44,7 +40,6 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_posOld = INITIALIZE_VECTOR3;
 	m_nDamageCounter = 0;
 	m_bSuperArmor = false;
-	m_bTrigger = false;
 	m_bTarget = false;
 }
 
@@ -177,7 +172,7 @@ void  CEnemy::Update(void)
 	}
 
 	Program_Line();		//	ライン関数まとめ
-	Program_Motion();	//	モーション関連
+	Program_State();	//	モーション関連
 	
 }
 
@@ -409,7 +404,7 @@ void  CEnemy::AIBasicAction(void)
 			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
 		}
 
-		MotionAction();	//	モーションアクション(キャラ同士のぶつかり等)
+		Program_Motion();	//	モーションアクション(キャラ同士のぶつかり等)
 		Program_Move(pos,m_nTerrStart);	//	移動処理
 	}
 	else //! [[始点を除く拠点の計算]]
@@ -471,7 +466,7 @@ void  CEnemy::AIBasicAction(void)
 			DisSort(pos);	//	距離の再計算
 		}
 
-		MotionAction();	//	モーションアクション(キャラ同士のぶつかり等)
+		Program_Motion();	//	モーションアクション(キャラ同士のぶつかり等)
 		Program_Move(pos,m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//	移動処理
 	}
 }
@@ -534,7 +529,7 @@ void  CEnemy::Program_Line(void)
 //=============================================================================
 // モーション処理まとめ
 //=============================================================================
-void CEnemy::Program_Motion(void)
+void CEnemy::Program_State(void)
 {
 #if 1
 	switch (m_state)
@@ -554,9 +549,12 @@ void CEnemy::Program_Motion(void)
 		break;
 
 	case STATE_BLOWAWAY:	//	[[吹っ飛ばされてる状態]]
-
 		m_nDamageCount++;
 
+		if (m_nDamageCount <= MAX_DAMAGECOUNT)
+		{
+			m_state = STATE_BLOWAWAY;
+		}
 		if (m_nDamageCount >= MAX_DAMAGECOUNT)
 		{
 			m_nDamageCount = 0;
@@ -564,7 +562,6 @@ void CEnemy::Program_Motion(void)
 			m_bSprintMotion = true;
 
 			m_state = STATE_NONE;
-			m_pMotion->SetNumMotion(m_state);
 		}
 
 		// 吹っ飛ばす
@@ -582,11 +579,11 @@ void CEnemy::Program_Motion(void)
 	case STATE_DAMAGE:		//	[[ダメージ状態]]
 
 		m_nDamageCount++;
-		if (m_nDamageCount == 60)
+		if (m_nDamageCount == 70)
 		{//60秒たったら起き上がる
 			m_pMotion->SetNumMotion(5);
 		}
-		if (m_nDamageCount == 110)
+		if (m_nDamageCount == 120)
 		{//110秒で動けるようになる
 			m_nDamageCount = 0;
 			m_bWalk = true;
@@ -627,7 +624,7 @@ void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
 //=============================================================================
 //　モーションアクション(キャラ同士ぶつかった際)
 //=============================================================================
-void CEnemy::MotionAction(void)
+void CEnemy::Program_Motion(void)
 {
 	CSound *pSound = CManager::GetSound();	//	サウンドの取得
 
@@ -742,9 +739,19 @@ bool CEnemy::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTO
 		if (CollisionCylinderyCollider((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true)
 		{
 		}
-		//	スキルを使用する範囲
-		if (CollisionSkillTiming((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true)
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
 		{
+			CGame * pGame = CManager::GetGame();
+			if (pGame != NULL) 
+			{ 
+				CCharacter *pChara = pGame->GetChara(m_nEnemyNo); 
+				if (pChara != NULL)
+				{
+					CTypePower *pPower = (CTypePower*)pChara;
+					if (pPower->CollisionSkillTiming((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true) {}
+				}
+			}
+			
 		}
 	}
 	else if (pCollider->GetType() == CCollider::TYPE_SPHERE_PLAYERATTACK)
@@ -836,17 +843,18 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 				}
 			}
 		}
-		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
+		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ENEMY)
 		{
-			//if (m_bCollision == true)
+			//当たってる間はダメージ状態
+			m_state = STATE_DAMAGE;
+
+			if (m_nDamageCounter == 0)
 			{
+				m_bSuperArmor = true;
 				m_pMotion->SetNumMotion(4);
+				m_nDamageCounter = 1;
 			}
 
-		}
-		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
-		{
-			//m_pMotion->SetNumMotion(3);
 		}
 		return true;
 	}
@@ -855,46 +863,6 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 }
 
 
-//=============================================================================
-//	スキルを使用する範囲
-//=============================================================================
-bool CEnemy::CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange)
-{
-	bool bLand = false;
 
-	// [[★スキル発動範囲]]
-	if (pCylinderCollider->Collision(&pos, &posOld, &Move, 150.0f, 50.0f, this, &bLand) == true)
-	{
-		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
-		{
-			D3DXVECTOR3 thisPos = CCharacter::GetPos(); // 自身の位置情報
-			CScene *pParent = pCylinderCollider->GetParent(); // 他キャラの情報を取得
-
-			if (m_bBreakTime == false) // ブレイクタイムでなければ...
-			{
-				m_bTrigger = true;	//	使用フラグを立てる
-
-				CCharacter *pCharacter = (CCharacter*)pParent;
-				if (pCharacter == NULL) { return true; }
-				D3DXVECTOR3 targetPos = pCharacter->GetPos(); // 対象の位置情報を取得
-				
-				// [[★角度調整の処理]]^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-				float fDestAngle = atan2f(thisPos.x - targetPos.x, thisPos.z - targetPos.z);
-				float fAngle = fDestAngle - m_rot.y;
-				if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
-				if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
-				m_rot.y += fAngle * 0.1f;
-				if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
-				if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
-				CCharacter::SetPos(targetPos);
-				CCharacter::SetRot(m_rot);
-				// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-			}
-			return true;
-		}
-	}
-
-	return false;
-}
 
 #endif

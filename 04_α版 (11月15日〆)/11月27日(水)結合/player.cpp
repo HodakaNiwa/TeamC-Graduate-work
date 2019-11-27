@@ -798,7 +798,9 @@ bool CPlayer::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D
 //=============================================================================
 bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
 {
-	m_nDamageCounter;
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
+
 	if (pShere->Collision(&pos, CYLINDER_COLRADIUS, this) == true && pShere->GetParent() != this)
 	{// 自分以外の攻撃球が当たったら
 		CScene *pParent = pShere->GetParent();
@@ -813,7 +815,11 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 
 				if (m_nDamageCounter == 0)
 				{
-					m_bSuperArmor = true;
+					pSound->PlaySound(CSound::SOUND_LABEL_SE025);	//地雷音
+					pSound->PlaySound(CSound::SOUND_LABEL_SE019);	//ダウン音
+					/*pSound->SetVolume(CSound::SOUND_LABEL_SE025, 20.0f);
+					pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);
+					m_bSuperArmor = true;*/
 					m_pMotion->SetNumMotion(4);
 					m_nDamageCounter = 1;
 				}
@@ -826,6 +832,11 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 
 			if (m_nDamageCounter == 0)
 			{
+				pSound->PlaySound(CSound::SOUND_LABEL_SE023);	//衝撃波音
+				pSound->PlaySound(CSound::SOUND_LABEL_SE019);	//ダウン音
+				/*pSound->SetVolume(CSound::SOUND_LABEL_SE023, 20.0f);
+				pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);*/
+
 				m_bSuperArmor = true;
 				m_pMotion->SetNumMotion(4);
 				m_nDamageCounter = 1;

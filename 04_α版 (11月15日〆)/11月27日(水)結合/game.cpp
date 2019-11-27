@@ -40,6 +40,7 @@
 #include "skilicon.h"
 #include "audience.h"
 #include "effect3D.h"
+#include "effectManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -79,6 +80,9 @@
 #define MAPCOLLIDER_DEPTH_0 (100.0f)
 #define MAPCOLLIDER_DEPTH_1 (3000.0f)
 
+// エフェクトデータのファイル名
+#define EFFECTMANAGER_FILENAME "data/TEXT/EFFECT/ringEffect.txt"
+
 //*****************************************************************************
 // 静的メンバ変数
 //*****************************************************************************
@@ -90,6 +94,9 @@ CSceneMeshFiled * CGame::m_pMeshFiled = NULL;
 CLoadTextEffect * CGame::m_pLoadEffect = NULL;
 int CGame::m_nEnemyNumResult = 0;
 int CGame::m_nScore[MAX_CHARACTER] = {};
+int CGame::m_nCountMakeScore[MAX_CHARACTER] = {};
+int CGame::m_nCountGetTerritry[MAX_CHARACTER] = {};
+int CGame::m_nCountRobottedTerritory[MAX_CHARACTER] = {};
 
 //=============================================================================
 // デフォルトコンストラクタ
@@ -159,6 +166,7 @@ void CGame::Init(void)
 	m_nPowerNo = 0;
 	m_nSweeperNo = 0;
 	m_bTypeMax = false;
+	m_pEffectManager = NULL;
 
 	//テクスチャの読み込み
 	CNumber2D::Load();
@@ -284,6 +292,9 @@ void CGame::Init(void)
 
 	//観客を生成
 	CAudience::Create();
+
+	// エフェクト管轄クラスを生成
+	m_pEffectManager = CEffectManager::Create(EFFECTMANAGER_FILENAME);
 }
 
 //=============================================================================
@@ -602,6 +613,8 @@ void CGame::CreateMapCollider(void)
 //=============================================================================
 void CGame::Uninit(void)
 {	
+	//スコアの情報
+	GetCharInfo();
 	//-----------------
 	//		Uninit
 	//-----------------
@@ -668,6 +681,14 @@ void CGame::Uninit(void)
 		m_pLoadEffect->Uninit();
 		delete m_pLoadEffect;
 		m_pLoadEffect = NULL;
+	}
+
+	// エフェクト管轄クラスの破棄
+	if (m_pEffectManager != NULL)
+	{
+		m_pEffectManager->Uninit();
+		delete m_pEffectManager;
+		m_pEffectManager = NULL;
 	}
 
 	//テクスチャの破棄
@@ -821,7 +842,7 @@ void CGame::Update(void)
 
 	if (pCInputKeyBoard->GetKeyboardTrigger(DIK_8) == true)
 	{
-		m_pUI->GetSkilicon(0)->RevivalIconMask();
+		m_pEffectManager->SetEffect(INITIALIZE_VECTOR3, INITIALIZE_VECTOR3, 0);
 	}
 }
 
@@ -1070,6 +1091,22 @@ void CGame::SetPause(bool bPause)
 		{
 			m_pPause->Uninit();
 			m_pPause = NULL;
+		}
+	}
+}
+
+//=============================================================================
+// キャラの取得情報
+//=============================================================================
+void CGame::GetCharInfo(void)
+{
+	for (int nCnt = 0; nCnt < MAX_CHARACTER; nCnt++)
+	{
+		if (m_pCharacter[nCnt] != NULL)
+		{
+			m_nCountMakeScore[nCnt] = m_pCharacter[nCnt]->GetCountMakeShape();					//図形を作った数を取得
+			m_nCountGetTerritry[nCnt] = m_pCharacter[nCnt]->GetCountGetTerritory();				//テリトリーの取得数
+			m_nCountRobottedTerritory[nCnt] = m_pCharacter[nCnt]->GetCountRobbtedTerritory();	//テリトリーの奪われた数
 		}
 	}
 }

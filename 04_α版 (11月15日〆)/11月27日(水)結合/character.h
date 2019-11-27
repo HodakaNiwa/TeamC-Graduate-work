@@ -128,6 +128,9 @@ public:
 	//リザルト用キャラタイプと国の取得
 	static CHARCTERTYPE GetCharcterTypeResult(int nType) { return m_CharcterTypeResult[nType]; }
 	int GetCuntryResult(int nNumCuntry) { return m_nCuntry[nNumCuntry]; }
+	int GetCountMakeShape(void) { return m_nCountMakeShape; }				//図形の作った数
+	int GetCountGetTerritory(void) { return m_nCountGetTerritry; }			//テリトリーの取得数
+	int GetCountRobbtedTerritory(void) { return m_nCountRobbtedTerritory; }	//奪われたテリトリーの数
 
 protected:
 	//	---<<コリジョン関連関数>>---
@@ -230,6 +233,14 @@ private:
 	// スコア変動用
 	int m_nGetScorePoint;					// 1フレームのうちに取得したスコア量
 	int m_nDestPlayer;						// 何番のプレイヤーに獲得されたのか
+
+	// どれだけポイントを獲得したか
+	int m_nPointCounter;
+
+	//結果用変数
+	int m_nCountMakeShape;		//図形を作った数
+	int m_nCountGetTerritry;	//テリトリーを取得した数
+	int m_nCountRobbtedTerritory;		//テリトリーの奪われた数
 };
 
 #endif
