@@ -75,6 +75,7 @@ public:
 		STATE_WALK,
 		STATE_ACTION,
 		STATE_BLOWAWAY,
+		STATE_DAMAGE,
 		STATE_MAX
 	}STATE;
 
@@ -89,21 +90,25 @@ public:
 
 	//	---<<基盤関数>>---
 	HRESULT Init(void);	//	デフォルト関数
-	HRESULT Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
+	HRESULT Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int nType);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-
-	//	---<<Set関数>>---
 	void  Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);	//	デフォルト関数
 
-																//	---<<追加関数>>---
-	void Move(void);				//	移動処理
-	void Collision(void);
+	//	---<<追加関数>>---
 	void InitSort(D3DXVECTOR3 pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
 	void DisSort(D3DXVECTOR3 pos);	//	距離間ソート計算(エネミーの現在地)
+	void AIBasicAction(void);		//	AIの共通処理
+	void Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory);		//	移動・位置変更
+	void Program_Line(void);		//	ライン関数まとめ
+	void Program_Motion(void);		//	モーション処理まとめ
 
-									// ---<<モデルタイプ>>---
+	void Collision(void);
+
+	
+
+	// ---<<モデルタイプ>>---
 	MODEL_TYPE GetModelType(void) { return m_modelType; }
 
 	// ---<<モーション情報>>---
@@ -121,7 +126,7 @@ protected:
 	bool m_bSprintMotion;
 	float m_fSpeed;					//	プレイヤーの速さ
 
-	bool m_bCheckS;					//	複数回処理を実行させない用(各タイプのAIスキル処理で使用)
+	bool m_bStop;					//	複数回処理を実行させない用(各タイプのAIスキル処理で使用)
 
 	int m_nDamageCount;		// ダメージを受けてからの時間を計測する
 	float m_fBlowAngle;		// 吹っ飛ぶ方向
@@ -136,11 +141,22 @@ protected:
 	bool m_bFinish;							//	図形を完成させるかどうか
 	int m_nCreateTime;						//	始点に帰るまでの時間
 
+	//!	---<<スキル使用関連>>---
+	bool CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, //	スキルを使用する範囲
+								D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
+	bool m_bTrigger;						//	スキルの使用
+	bool m_bBreakTime;						//	使用可能か
+	bool m_bTarget;							//	ターゲットの切り替え
+	D3DXVECTOR3 m_targetPos;
+
+	//!	---<<ダメージ処理>>---
+	int m_nDamageCounter;					//	ダメージカウンター
+	bool m_bSuperArmor;						//	スーパーアーマ状態
 private:
 	//D3DXVECTOR3 m_pos;						//	位置
 	D3DXVECTOR3 m_posOld;					//	古い位置情報
-	D3DXVECTOR3 m_move;						//	移動量
 	D3DXVECTOR3 m_rot;						//	移動量
+	D3DXVECTOR3 m_move;						//	移動量
 	D3DXCOLOR   m_col;
 	D3DXMATRIX	m_mtxWorld;					//	ワールドマトリックス
 	bool m_bUse;							//	使用しているかどうか
@@ -151,8 +167,6 @@ private:
 	bool CollisionBoxCollider(CBoxCollider *pBoxCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 	bool CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 	bool CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange);
-	//	スキルを使用する範囲
-	bool CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 
 	// ---<<モデルタイプ>>---
 	MODEL_TYPE m_modelType;
@@ -162,21 +176,21 @@ private:
 	int m_nTargetCnt;							//	拠点の通過回数を記憶
 	bool m_bBreak;								//	ループ解除用
 
-	//!	---<<テリトリー関連>>---
+												//!	---<<テリトリー関連>>---
 	CTerritory* m_pTerritory;				//	クラスポインタ
 	TERRITORY_INFO* m_TerritoryInfo;		//	構造体ポインタ
 	TERRITORY_INFO* m_AreaInfo[AREA_MAX];	//	構造体ポインタ
 	int m_nAreaTerrNum[AREA_MAX];			//	各エリアのテリトリー数
 	int m_nAreaNow;							//	現在いるエリア番号
 
-	//!	---<<ラインの判定に必要>>---
+											//!	---<<ラインの判定に必要>>---
 	void CreateOrbitLine(void);				//	軌跡の線の生成
 	void UninitOrtbitLine(void);			//	ラインの破棄
 
-	//!	---<<ラインを繋ぐ変数>>---
+											//!	---<<ラインを繋ぐ変数>>---
 	TERRITORY_INFO m_nTerrStart;			//	図形となるラインを繋ぐ際の始点・終点を記憶(始点・終点は同じ位置)
 
-	
+
 
 };
 //==============================================
@@ -189,7 +203,7 @@ public:
 	~CTypeSpeed();
 
 	static CTypeSpeed *Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
-	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
+	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], int country);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -215,7 +229,7 @@ public:
 	~CTypePower();
 
 	static CTypePower *Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
-	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
+	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -236,7 +250,7 @@ private:
 	int m_nColliderCnt;
 	int m_nColliderTimer;
 	float m_fScale;
-	bool m_bAction;
+	
 };
 
 //==============================================
@@ -250,7 +264,7 @@ public:
 
 	static CTypeSweeper *Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
 	HRESULT Init(void);
-	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
+	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);

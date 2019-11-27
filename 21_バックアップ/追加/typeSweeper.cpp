@@ -15,7 +15,7 @@
 #include "skilicon.h"
 #include "RawMouse.h"
 #include "mine.h"
-#include "territory.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -30,15 +30,6 @@
 //*****************************************************************************
 CTypeSweeper::CTypeSweeper()
 {
-	m_nRecastCounter = 0;
-	m_nRecastTimer = 0;
-	m_nButtonCounter = 0;
-	m_bRecast = false;
-	m_nMinePoint = 0;
-	m_nReCounter = 0;			//回復カウンター
-	m_nReTimer = 0;				//回復タイマー
-	m_nInstallationCounter = 0;
-	m_nInstallationTimer = 0;
 
 }
 
@@ -64,7 +55,11 @@ CTypeSweeper *CTypeSweeper::Create(int nChara, int country, CHARCTERTYPE type, D
 		{
 			pSpeedType->SetType(country);
 			pSpeedType->m_CharcterType = type;
-			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt);
+			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt, country);
+			//佐藤追加しました
+			pSpeedType->m_CharcterTypeResult[nChara] = type;
+			pSpeedType->m_nCuntry[nChara] = country;
+
 		}
 		else
 		{
@@ -81,7 +76,7 @@ CTypeSweeper *CTypeSweeper::Create(int nChara, int country, CHARCTERTYPE type, D
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
+HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country)
 {
 	//プレイヤーのナンバーを格納
 	m_nEnemyNo = nChara;
@@ -90,7 +85,7 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	m_bWalk = true;
 	m_bSprintMotion = false;
 	//キャラクターの初期化
-	CCharacter::Init(nChara,ModelTxt, MotionTxt,m_CharcterType);
+	CCharacter::Init(nChara,ModelTxt, MotionTxt,m_CharcterType,country);
 	CCharacter::SetPos(pos);
 
 	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
@@ -127,8 +122,8 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	ResetLine();	//ラインの初期化
 
 	
-	//	各変数の初期化
-	m_fSpeed = 1.0f;				
+					//	各変数の初期化
+	m_fSpeed = 1.0f;
 	m_nRecastCounter = 0;
 	m_nRecastTimer = 0;
 	m_nButtonCounter = 0;
@@ -141,7 +136,8 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	m_nInstallationTimer = 0;
 	m_nLineNum = 2;
 	m_nTiming = 0;
-	m_bCheckS = false;
+	m_bStop = false;
+	m_bBreakTime = false;
 
 	return S_OK;
 }
@@ -185,6 +181,23 @@ void  CTypeSweeper::Update(void)
 	}
 }
 
+
+
+//=============================================================================
+// 描画処理
+//=============================================================================
+void  CTypeSweeper::Draw(void)
+{
+	CEnemy::Draw();
+}
+
+//=============================================================================
+//
+//=============================================================================
+void  CTypeSweeper::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
+{
+
+}
 //=============================================================================
 // スプリント処理
 //=============================================================================
@@ -195,7 +208,7 @@ void  CTypeSweeper::ActionUpdate(void)
 		Process();
 
 	}
-	
+
 	if (m_apTerritory[0] != NULL)
 	{
 		m_nTiming++;
@@ -218,7 +231,6 @@ void  CTypeSweeper::ActionUpdate(void)
 		}
 	}
 }
-
 //=============================================================================
 // 地雷使用時の処理
 //=============================================================================
@@ -228,36 +240,22 @@ void CTypeSweeper::Process()
 	CCharacter *pCharacter = pGame->GetChara(m_nEnemyNo);
 
 	//	(残りポイントがあれば)
-	if (m_nMinePoint >= REDUCED_MINE_POINT)
+	if (m_state != STATE_DAMAGE)
 	{
-		//	設置
-		CMine::Create(CCharacter::GetPos(), pCharacter);
-
-		//	使用可能ポイントを減らす
-		m_nMinePoint -= REDUCED_MINE_POINT;
-		if (m_nMinePoint <= 0)	//	0以下にさせない
+		if (m_nMinePoint >= REDUCED_MINE_POINT)
 		{
-			m_nMinePoint = 0;
+			//	設置
+			CMine::Create(CCharacter::GetPos(), pCharacter);
+
+			//	使用可能ポイントを減らす
+			m_nMinePoint -= REDUCED_MINE_POINT;
+			if (m_nMinePoint <= 0)	//	0以下にさせない
+			{
+				m_nMinePoint = 0;
+			}
 		}
 	}
 }
-
-//=============================================================================
-// 描画処理
-//=============================================================================
-void  CTypeSweeper::Draw(void)
-{
-	CEnemy::Draw();
-}
-
-//=============================================================================
-//
-//=============================================================================
-void  CTypeSweeper::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
-{
-
-}
-
 //=============================================================================
 // ラインの生成処理
 //=============================================================================
@@ -282,3 +280,4 @@ void CTypeSweeper::UninitOrtbitLine(void)
 		m_pOrbitLine = NULL;
 	}
 }
+

@@ -49,7 +49,10 @@ CTypeSpeed *CTypeSpeed::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 		{
 			pSpeedType->SetType(country);
 			pSpeedType->m_CharcterType = type;
-			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt);
+			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt,country);
+			//佐藤追加しました
+			pSpeedType->m_CharcterTypeResult[nChara] = type;
+			pSpeedType->m_nCuntry[nChara] = country;
 		}
 		else
 		{
@@ -66,15 +69,15 @@ CTypeSpeed *CTypeSpeed::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
+HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country)
 {
 	m_bWalk = true;
 
 	m_nEnemyNo = nChara;	//	キャラ番号の記憶(生成順)
 
-	CCharacter::Init(nChara, ModelTxt, MotionTxt,m_CharcterType);	//	初期化
+	CCharacter::Init(nChara, ModelTxt, MotionTxt,m_CharcterType, country);	//	初期化
 	CCharacter::SetPos(pos);						//	位置反映
-	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせ
+
 	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
 
 	m_pModel = CCharacter::GetModel();	//	モデル情報の取得
@@ -116,8 +119,9 @@ HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 	m_bSprint = false;
 	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
 	m_nLineNum = 2;
+	m_bBreakTime = false;
 
-	m_bCheckS = false;
+	m_bStop = false;
 	return S_OK;
 }
 
@@ -167,9 +171,9 @@ void  CTypeSpeed::Update(void)
 void  CTypeSpeed::SprintUpdate(void)
 {
 
-	if (m_bRecast == false && m_bCheckS == false)
+	if (m_bRecast == false && m_bStop == false)
 	{
-		m_bCheckS = true;
+		m_bStop = true;
 		m_state = STATE_ACTION;	//スプリント状態
 		m_fSpeed = 1.5f;		//スピード型の速さを1.5倍にする
 		m_bSprint = true;		//スプリント中にする
@@ -209,7 +213,7 @@ void  CTypeSpeed::SprintUpdate(void)
 			}
 			else
 			{//10秒たったらスプリントを使用できるようにする
-				m_bCheckS = false;
+				m_bStop = false;
 				m_bRecast = false;		//リキャスト中じゃない
 				m_nRecastTimer = 0;		//リキャストタイマーの初期化
 				m_bSprint = false;
@@ -217,8 +221,6 @@ void  CTypeSpeed::SprintUpdate(void)
 			}
 		}
 	}
-
-
 }
 
 //=============================================================================

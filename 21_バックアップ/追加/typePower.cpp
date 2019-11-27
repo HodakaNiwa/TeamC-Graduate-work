@@ -22,21 +22,18 @@
 #define MAX_SPRINTTIMER (8)		//	スプリント時間
 #define WAVE (1)				//	
 #define RECAST (10)				//	スプリントのリキャスト時間
+
+#define SKILL_RANGE			(150.0f)
+
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
-CTypePower::CTypePower(int nPriority, OBJTYPE objType) : CEnemy(nPriority, objType)
-{
-
-}
+CTypePower::CTypePower(int nPriority, OBJTYPE objType) : CEnemy(nPriority, objType) { }
 
 //*****************************************************************************
 // デストラクタ
 //*****************************************************************************
-CTypePower::~CTypePower()
-{
-
-}
+CTypePower::~CTypePower() { }
 
 //=============================================================================
 //オブジェクトの生成処理
@@ -52,7 +49,10 @@ CTypePower *CTypePower::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 		{
 			pSpeedType->SetType(country);
 			pSpeedType->m_CharcterType = type;
-			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt);
+			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt,country);
+			//佐藤追加しました
+			pSpeedType->m_CharcterTypeResult[nChara] = type;
+			pSpeedType->m_nCuntry[nChara] = country;
 		}
 		else
 		{
@@ -69,14 +69,14 @@ CTypePower *CTypePower::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CTypePower::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
+HRESULT CTypePower::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country)
 {
 	m_bWalk = true;
 
 	m_nEnemyNo = nChara;	//	キャラ番号の記憶(生成順)
 	m_bSprintMotion = false;
 
-	CCharacter::Init(nChara, ModelTxt, MotionTxt,m_CharcterType);	//	初期化
+	CCharacter::Init(nChara, ModelTxt, MotionTxt,m_CharcterType,country);	//	初期化
 	CCharacter::SetPos(pos);						//	位置反映
 	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせ
 	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
@@ -85,7 +85,7 @@ HRESULT CTypePower::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 	m_pModel = CCharacter::GetModel();	//	モデル情報の取得
 	m_pMotion = CCharacter::GetMotion();//	モーション情報の取得
 
-										//ライン変数の初期化
+	//	ライン変数の初期化
 	m_nMaxLineTime = FIRST_LINETIME;
 	m_nLineTime = m_nMaxLineTime;
 	m_bBlockStartTerritory = false;
@@ -116,14 +116,13 @@ HRESULT CTypePower::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 	m_nColliderCnt = 0;
 	m_nColliderTimer = 0;
 	m_nRecastCounter = 0;
-	m_nRecastTimer = 0;
 	m_fScale = 0.0f;
-	m_bAction = false;
+	m_bBreakTime = false;
 	m_bRecast = false;
-	//m_bCollision = false;
 	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
 	m_nLineNum = 2;
-	m_bCheckS = false;
+	m_bStop = false;
+	m_bTrigger = false;
 	return S_OK;
 }
 
@@ -155,69 +154,13 @@ void  CTypePower::Uninit(void)
 //=============================================================================
 void  CTypePower::Update(void)
 {
-	//ゲームの状態を取得
+	//	ゲームの状態を取得
 	int nGameState = CGame::GetGameState();
 
 	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
 	{
-		ActionUpdate();	//	スキル処理
 		CEnemy::Update();
-	}
-}
-
-//=============================================================================
-// スキル処理
-//=============================================================================
-void  CTypePower::ActionUpdate(void)
-{
-	if (m_bRecast == false && m_bCheckS == false)
-	{
-		m_bCheckS = true;			//	複数回この処理を通らないようにする
-		CreateStartUpCollider();	//　ハンマー自体の当たり判定
-		m_pMotion->SetNumMotion(2);	//　攻撃モーション
-		m_bAction = true;			//　アクション中にする
-
-	}
-
-	//アクション中
-	if (m_bAction == true)
-	{
-		m_nColliderCnt++;
-
-		if (m_nColliderCnt % 60 == 0)
-		{
-			m_nColliderTimer++;
-			if (m_nColliderTimer >= WAVE)
-			{//1秒経過したら衝撃波を出す
-
-				CreateColliderSphere();	//衝撃波の当たり判定を付与
-				m_nColliderTimer = 0;	//タイマーを初期化
-				m_nColliderCnt = 0;
-				m_bRecast = true;		//リキャスト中にする	
-				m_bAction = false;		//アクションを終了
-			}
-		}
-	}
-
-	//リキャスト中
-	if (m_bRecast == true)
-	{
-		m_nRecastCounter++;
-		if (m_nRecastCounter % 60 == 0)
-		{
-			m_nRecastTimer++;
-			if (m_nRecastTimer <= RECAST)
-			{//リキャスト中はアクションを使用できない
-				m_bRecast = true;
-			}
-			else
-			{//10秒経過したらアクションを使用できる
-				m_bCheckS = false;
-				m_nRecastTimer = 0;					//タイマーを初期化
-				m_bRecast = false;					//リキャスト終了
-				m_bAction = false;					//アクションを使用できる
-			}
-		}
+		ActionUpdate();	//	スキル処理
 	}
 }
 
@@ -231,10 +174,50 @@ void  CTypePower::Draw(void)
 //=============================================================================
 //
 //=============================================================================
-void  CTypePower::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
-{
+void  CTypePower::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) { }
 
+//=============================================================================
+// スキル処理
+//=============================================================================
+void  CTypePower::ActionUpdate(void)
+{
+	// ブレイクタイムではない && スキルの発動フラグを立てた && 処理を一回しか通さない
+	if (m_bBreakTime == false && m_bTrigger == true && m_bStop == false)
+	{
+		m_bStop = true;				//	更新を一時的に止める
+		CreateStartUpCollider();	//　ハンマーの当たり判定
+		m_pMotion->SetNumMotion(2);	//　攻撃モーション
+		m_fSpeed = 0.0f;			//	アクション中は動きを止める
+		m_bTarget = true;			//	ターゲットを変更
+	}
+
+	//	スキルの発動フラグが立っている
+	if (m_bTrigger == true)
+	{
+		m_nRecastCounter++;
+	}
+
+	switch(m_nRecastCounter)
+	{
+	case 60:
+		CreateColliderSphere();	//	衝撃波の当たり判定を付与
+		break;
+
+	case 80:
+		m_fSpeed = 1.0f;		//	アクション終了時、動けるように
+		m_bBreakTime = true;	//	ブレイクタイムの発生
+		m_bTarget = false;		//	ターゲットを拠点に戻す
+		break;
+
+	case 60 * RECAST:
+		m_bStop = false;		//	また更新できるように
+		m_nRecastCounter = 0;	//	カウントの初期化(衝撃波の発生のために)
+		m_bBreakTime = false;	//	ブレイクタイムの終了
+		m_bTrigger = false;		//	スキルの発動フラグをリセット
+		break;
+	}
 }
+
 
 //=============================================================================
 //    ハンマーの当たり判定を生成する処理

@@ -3,23 +3,16 @@
 //			Author : Kobayashi_Sho-hei / 小林 将兵
 //◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆
 #include "enemy.h"
-#include "input.h"
-#include "camera.h"
 #include "manager.h"
 #include "renderer.h"
-#include "scene2D.h"
-#include "scene3D.h"
-#include "game.h"
-#include "title.h"
-#include "tutorial.h"
-#include "collision.h"
-#include "model.h"
-#include "AIController.h"
+#include "debuglog.h"
 #include "library.h"
-#include "territory.h"
+#include "collision.h"
 #include "line.h"
+#include "AIController.h"
+#include "model.h"
+#include "territory.h"
 #include "mine.h"
-
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //静的メンバ変数宣言
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -29,19 +22,6 @@ CSceneX *CEnemy::m_apSceneX = NULL;
 // マクロ定義
 //*****************************************************************************
 #define SPEED (1.0f)
-#define MODEL_RENG (50)
-#define MAX_BUNDCNT (120)
-#define MAX_BULLET (50)
-
-//国の色の設定
-#define COLOR_RED	 (D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))	//赤
-#define COLOR_BULE	 (D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f))	//青
-#define COLOR_GREEN	 (D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f))	//緑
-#define COLOR_WHITE	 (D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	//白
-#define COLOR_BRACK	 (D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f))	//黒
-#define COLOR_YELLOW (D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f))	//黄
-#define COLOR_ORENGE (D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f))	//オレンジ
-#define COLOR_PAPULE (D3DXCOLOR(0.5f, 0.0f, 1.0f, 1.0f))	//紫
 
 //	当たり判定・ダメージ関連
 #define CYLINDER_COLRADIUS (20.0f)
@@ -52,7 +32,7 @@ CSceneX *CEnemy::m_apSceneX = NULL;
 
 
 //*****************************************************************************
-// コンストラクタ
+//	コンストラクタ
 //*****************************************************************************
 CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 {
@@ -62,29 +42,62 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_fBlowLength = 0.0f;
 	m_rot = INITIALIZE_VECTOR3;
 	m_posOld = INITIALIZE_VECTOR3;
+	m_nDamageCounter = 0;
+	m_bSuperArmor = false;
+	m_bTrigger = false;
+	m_bTarget = false;
 }
 
 //*****************************************************************************
-// デストラクタ
+//	デストラクタ
 //*****************************************************************************
-CEnemy::~CEnemy()
+CEnemy::~CEnemy() { }
+//=============================================================================
+//	生成処理
+//=============================================================================
+CEnemy *CEnemy::Create(int nNum, TYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], CHARCTERTYPE charatype)
 {
+#if 0
+	CEnemy *pEnemy = NULL;
 
+	if (pEnemy == NULL)
+	{
+		pEnemy = new CEnemy;
+
+		if (pEnemy != NULL)
+		{
+			pEnemy->m_CharcterType = charatype;
+			pEnemy->SetType(type);
+			pEnemy->Init(nNum, pos, ModelTxt, MotionTxt, (int)type);
+		}
+		else
+		{
+			MessageBox(0, "territoryがNULLでした", "警告", MB_OK);
+		}
+	}
+	else
+	{
+		MessageBox(0, "territoryがNULLじゃないです", "警告", MB_OK);
+	}
+	return pEnemy;
+#endif
+	return NULL;	//	←使用するなら消す
 }
 
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT CEnemy::Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
+HRESULT CEnemy::Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int nType)
 {
-	CCharacter::Init(nNum, ModelTxt, MotionTxt, m_CharcterType);
+#if 0
+	CCharacter::Init(nNum, ModelTxt, MotionTxt, m_CharcterType,nType);
 	m_pModel = CCharacter::GetModel();
 	CCharacter::SetPos(pos);
 
 	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせる)
 	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
 
-	//ライン変数の初期化
+	//	---<<ライン関連>>---
 	m_nMaxLineTime = FIRST_LINETIME;
 	m_nLineTime = m_nMaxLineTime;
 	m_bBlockStartTerritory = false;
@@ -94,15 +107,14 @@ HRESULT CEnemy::Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTx
 	m_bMakeShape = false;
 	m_nCntTimeCopyLine = 0;
 	m_bCheckS = false;
-
-	//コピーラインの初期化
+	
 	for (int nCnt = 0; nCnt < MAX_TERRITORY; nCnt++)
 	{
 		m_apCopyLine[nCnt] = NULL;
 	}
 
-	ResetLine();	//ラインの初期化
-
+	ResetLine();
+#endif
 	return S_OK;
 }
 
@@ -129,14 +141,14 @@ void  CEnemy::Uninit(void)
 		}
 	}
 
-	//	テリトリー情報の解放
+	//	個々のテリトリー情報の解放
 	if (m_TerritoryInfo != NULL)
 	{
 		delete[] m_TerritoryInfo;
 		m_TerritoryInfo = NULL;
 	}
 
-
+	//	親に責任をもって消させる
 	CCharacter::Uninit();
 }
 
@@ -147,71 +159,26 @@ void  CEnemy::Update(void)
 {
 	CCharacter::Update();
 
-	Move();	//	エネミー移動処理
+	//	ゲーム開始まで更新させない
+	int nGameState = CGame::GetGameState();
+	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
+	{
+		AIBasicAction();	//	AI共通処理
+	}
+	//	ゲーム終了時
+	else if (nGameState == CGame::GAMESTATE_END)
+	{
+		if (m_bCharaMotionState == false)
+		{
+			m_state = STATE_NONE;
+			m_pMotion->SetNumMotion(m_state);
+			m_bCharaMotionState = true;
+		}
+	}
+
+	Program_Line();		//	ライン関数まとめ
+	Program_Motion();	//	モーション関連
 	
-
-//	ラインのカウントダウン処理
-	CountDownLineTime();
-
-	//	ライン引きの開始(カウントアップ)
-	if (m_bBlockStartTerritory)
-	{
-		m_nCountTime++;
-		if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
-	}
-
-	//	図形が完成した後の処理
-	UpdateShapeComplete();
-
-	//	現在の状態
-	switch (m_state)
-	{
-	case STATE_NONE://	通常
-					//	歩行可能
-		m_bWalk = true;
-		m_bSprintMotion = true;
-		break;
-
-	case STATE_WALK://	移動状態
-					//m_bSprintMotion = true;
-
-		break;
-
-	case STATE_ACTION: //アクション状態
-					   //m_bWalk = true;
-
-		break;
-
-	case STATE_BLOWAWAY:	//吹っ飛ばされてる状態
-							// ダメージカウント加算
-		m_nDamageCount++;
-
-		if (m_nDamageCount >= MAX_DAMAGECOUNT)
-		{
-			m_nDamageCount = 0;
-			m_bWalk = true;
-			m_bSprintMotion = true;
-
-			//if (m_bSprintMotion == true)
-			{
-				m_state = STATE_NONE;
-				m_pMotion->SetNumMotion(m_state);
-			}
-
-		}
-
-		// 吹っ飛ばす
-		m_fBlowLength -= BLOW_MOVING_CUT;
-		if (m_fBlowLength >= 0.0f)
-		{
-			D3DXVECTOR3 pos = CCharacter::GetPos();
-			pos.x -= sinf(m_fBlowAngle) * m_fBlowLength;
-			pos.z -= cosf(m_fBlowAngle) * m_fBlowLength;
-			CCharacter::SetPos(pos);
-		}
-
-		break;
-	}
 }
 
 //=============================================================================
@@ -224,43 +191,11 @@ void  CEnemy::Draw(void)
 	D3DXMatrixIdentity(&mtxWorld);
 	CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
 }
-
 //=============================================================================
-//オブジェクトの生成処理
+//	デフォルト関数
 //=============================================================================
-CEnemy *CEnemy::Create(int nNum, TYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],CHARCTERTYPE charatype)
-{
-	CEnemy *pEnemy = NULL;
+void  CEnemy::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) { }
 
-	if (pEnemy == NULL)
-	{
-		pEnemy = new CEnemy;
-
-		if (pEnemy != NULL)
-		{
-			pEnemy->m_CharcterType = charatype;
-			pEnemy->SetType(type);
-			pEnemy->Init(nNum, pos, ModelTxt, MotionTxt);
-		}
-		else
-		{
-			MessageBox(0, "territoryがNULLでした", "警告", MB_OK);
-		}
-	}
-	else
-	{
-		MessageBox(0, "territoryがNULLじゃないです", "警告", MB_OK);
-	}
-	return pEnemy;
-}
-
-//=============================================================================
-//
-//=============================================================================
-void  CEnemy::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
-{
-
-}
 //=============================================================================
 //	初期距離ソート処理
 //=============================================================================
@@ -269,18 +204,16 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 	for (int nCntArea = 0; nCntArea < AREA_MAX; nCntArea++)
 	{
 		m_nAreaTerrNum[nCntArea] = 0;
+		m_AreaInfo[nCntArea] = NULL;
 	}
 
-	//	テリトリー情報の取得 / 確保
-	int nMax = 0;
+	//	[[★テリトリー情報の取得 / 確保]]
+	int nMax = 0;		//	テリトリー最大数の記憶
 	int nCnt01 = 0;
 	CScene* pSceneTop = CScene::GetTop(TERRITORY_PRIORITY);
 	CScene* pScene = pSceneTop;
-
 	while (pScene != NULL)
 	{
-		CScene * pSceneNext = pScene->GetpNext();
-
 		if (CScene::OBJTYPE_TERRITORY == pScene->GetObjType())
 		{
 			m_pTerritory = (CTerritory*)pScene;
@@ -295,12 +228,13 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 			m_TerritoryInfo[nCnt01].pos = m_pTerritory->GetPos();			//	位置情報
 			m_TerritoryInfo[nCnt01].nAreaNum = m_pTerritory->GetErea();		//	割り振られたエリア番号
 
-																			//	各エリア事のテリトリーの数をカウントアップ[エリアの番号]
+			//	各エリア事のテリトリーの数をカウントアップ(m_TerritoryInfo[割り振られたエリア番号]の数)
 			m_nAreaTerrNum[m_TerritoryInfo[nCnt01].nAreaNum] += 1;
 
 			nCnt01 += 1;
 		}
-		pScene = pSceneNext;
+
+		pScene = pScene->GetpNext();	//	次のテリトリー情報へ
 	}
 
 	//	エリアごとの情報が欲しいのでエリアの数分newする
@@ -371,14 +305,13 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 	}
 
 	//	ゲーム開始の際に、どこのエリアが一番近いかを決める(ソート処理)
-	float fSort = 0.0f;
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
 		for (int nAreaCnt02 = 0; nAreaCnt02 < AREA_MAX; nAreaCnt02++)
 		{
 			if (m_AreaInfo[nAreaCnt][0].fDisSort < m_AreaInfo[nAreaCnt02][0].fDisSort)
 			{
-				fSort = m_AreaInfo[nAreaCnt][0].fDisSort;
+				float fSort = m_AreaInfo[nAreaCnt][0].fDisSort;
 				m_AreaInfo[nAreaCnt][0].fDisSort = m_AreaInfo[nAreaCnt02][0].fDisSort;
 				m_AreaInfo[nAreaCnt02][0].fDisSort = fSort;
 			}
@@ -402,142 +335,6 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		nAreaCnt += 1;
 	}
 }
-//=============================================================================
-//　プレイヤーの移動処理
-//=============================================================================
-void  CEnemy::Move(void)
-{
-
-	D3DXVECTOR3 pos = CCharacter::GetPos();
-	m_posOld = pos;				//	ワンフレーム前の位置
-	float fSpeed = GetSpeed();	//	速さ
-
-	if (m_bFinish == true)	//!	[[始点への移動処理 / その後、進む拠点を決める]]
-	{
-		//	★角度計算
-		m_nTerrStart.fRadian = (float)atan2(m_nTerrStart.pos.z - pos.z, m_nTerrStart.pos.x - pos.x);
-
-		//	★目的地範囲内に入った
-		if (pos.x <= m_nTerrStart.pos.x + 25.0f && pos.x >= m_nTerrStart.pos.x - 25.0f &&
-			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
-		{
-			//	距離の再計算
-			DisSort(pos);
-
-			//	ライン数の初期化 / 新たな始点・終点を決める
-			m_bFinish = false;
-			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
-		}
-
-		MotionAction();	//	モーションアクション(キャラ同士のぶつかり等)
-
-						//	移動加算処理
-		if (m_state == STATE_WALK || m_state == STATE_ACTION)
-		{
-			pos.x += (float)cos(m_nTerrStart.fRadian) * (fSpeed * m_fSpeed);
-			pos.z += (float)sin(m_nTerrStart.fRadian) * (fSpeed * m_fSpeed);
-		}
-		// ★拠点までの角度 / 自身の軸調整
-		float fDestAngle = atan2f(pos.x - m_nTerrStart.pos.x, pos.z - m_nTerrStart.pos.z);
-		float fAngle = fDestAngle - m_rot.y;
-
-		if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
-		if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
-
-		//	移動方向に角度調整
-		m_rot.y += fAngle * 0.1f;
-
-		if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
-		if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
-
-		//	位置・回転情報の反映
-		CCharacter::SetPos(pos);
-		CCharacter::SetRot(m_rot);
-	}
-	else //! [[始点を除く拠点の計算]]
-	{
-		//	★角度計算
-		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-		{
-			m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
-		}
-
-		//	★目的地範囲内に入った
-		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
-			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
-		{
-			//	[[最新の始点・終点に更新]]
-			if (m_apTerritory[0] != NULL)
-			{
-				m_nTerrStart.pos = m_apTerritory[0]->GetPos();
-			}
-	
-			//	[[ラインを?本引いたら始点に戻る]]
-			if (m_apTerritory[m_nLineNum] != NULL)
-			{
-				if (m_nLineTime <= (12 - m_nCreateTime) * 100)	// 制限時間が迫ってきたら
-				{
-					m_nCreateTime = (rand() % 4);
-					m_nLineNum = 2;
-					m_bFinish = true;	//	始点に戻す
-				}
-				else//	ラインを伸ばす時間に余裕があれば
-				{
-					m_nLineNum += 1;
-				}
-
-			}
-			//	[[フラグを立てる]]
-			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
-			//	[[通過記録カウントアップ]]
-			m_nTargetCnt += 1;
-
-			if (m_nTargetCnt == m_nAreaTerrNum[m_nAreaNow])	//	通過回数もフラグもリセット
-			{
-				m_nTargetCnt = 0;
-
-				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-				{
-					m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
-
-				}
-
-				m_nAreaNow += 1; // 別エリアへ
-				if (m_nAreaNow == AREA_MAX)
-				{
-					m_nAreaNow = 0;
-				}
-			}
-
-			DisSort(pos);	//	距離の再計算
-		}
-
-		MotionAction();	//	モーションアクション(キャラ同士のぶつかり等)
-
-						//	移動加算処理
-		if (m_state == STATE_WALK || m_state == STATE_ACTION)
-		{
-			//pos.x += (float)cos(m_AreaInfo[m_nAreaNow][m_nTargetNum].fRadian) * (fSpeed * m_fSpeed);
-			//pos.z += (float)sin(m_AreaInfo[m_nAreaNow][m_nTargetNum].fRadian) * (fSpeed * m_fSpeed);
-		}
-		// ★拠点までの角度 / 自身の軸調整
-		float fDestAngle = atan2f(pos.x - m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x, pos.z - m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z);
-		float fAngle = fDestAngle - m_rot.y;
-
-		if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
-		if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
-
-		//	移動方向に角度調整
-		m_rot.y += fAngle * 0.1f;
-
-		if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
-		if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
-
-		//	位置・回転情報の反映
-		CCharacter::SetPos(pos);
-		CCharacter::SetRot(m_rot);
-	}
-}
 
 //=============================================================================
 //　距離間ソート処理
@@ -548,12 +345,11 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 	m_bBreak = false;
 	int nNextNum = 0;//	次の近いターゲット拠点番号(0は現在自分がいる場所)
 
-					 //	[[再度距離を計算]]
+	//	[[再度距離を計算]]
 	for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 	{
 		m_AreaInfo[m_nAreaNow][nCnt].fDistance = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
 		m_AreaInfo[m_nAreaNow][nCnt].fDisSort = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
-
 	}
 
 	//	[[短い距離順に変える]]
@@ -589,6 +385,222 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 }
 
 //=============================================================================
+//　プレイヤーの移動処理
+//=============================================================================
+void  CEnemy::AIBasicAction(void)
+{
+	D3DXVECTOR3 pos = CCharacter::GetPos();
+	m_posOld = pos;				//	ワンフレーム前の位置
+
+	if (m_bFinish == true)	//!	[[始点への移動処理 / その後、進む拠点を決める]]
+	{
+		//	★角度計算
+		m_nTerrStart.fRadian = (float)atan2(m_nTerrStart.pos.z - pos.z, m_nTerrStart.pos.x - pos.x);
+
+		//	★目的地範囲内に入った
+		if (pos.x <= m_nTerrStart.pos.x + 25.0f && pos.x >= m_nTerrStart.pos.x - 25.0f &&
+			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
+		{
+			//	距離の再計算
+			DisSort(pos);
+
+			//	ライン数の初期化 / 新たな始点・終点を決める
+			m_bFinish = false;
+			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
+		}
+
+		MotionAction();	//	モーションアクション(キャラ同士のぶつかり等)
+		Program_Move(pos,m_nTerrStart);	//	移動処理
+	}
+	else //! [[始点を除く拠点の計算]]
+	{
+		//	★角度計算
+		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+		{
+			m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
+		}
+
+		//	★目的地範囲内に入った
+		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
+			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
+		{
+			//	[[最新の始点・終点に更新]]
+			if (m_apTerritory[0] != NULL)
+			{
+				m_nTerrStart.pos = m_apTerritory[0]->GetPos();
+			}
+	
+			//	[[ラインを(m_nLineNum)本引いたら始点に戻る]]
+			if (m_apTerritory[m_nLineNum] != NULL)
+			{
+				if (m_nLineTime <= (12 - m_nCreateTime) * 100&& m_bFinish == false ||	// 制限時間が迫ってきたら
+					m_nLineNum == TERRITORY_MAX-1)										//	最大ライン分引いていたら
+				{
+					m_nCreateTime = (rand() % 4);
+					m_nLineNum = 2;		//	初期最低値に戻す
+					m_bFinish = true;	//	始点に戻す
+				}
+				else//	ラインを伸ばす時間に余裕があれば
+				{
+					m_nLineNum += 1;
+				}
+
+			}
+			//	[[フラグを立てる]]
+			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
+			//	[[通過記録カウントアップ]]
+			m_nTargetCnt += 1;
+
+			if (m_nTargetCnt == m_nAreaTerrNum[m_nAreaNow])	//	通過回数もフラグもリセット
+			{
+				m_nTargetCnt = 0;
+
+				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+				{
+					m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+				}
+				
+				m_nAreaNow += 1;
+				if (m_nAreaNow == AREA_MAX)
+				{
+					m_nAreaNow = 0;
+				}
+			}
+
+			DisSort(pos);	//	距離の再計算
+		}
+
+		MotionAction();	//	モーションアクション(キャラ同士のぶつかり等)
+		Program_Move(pos,m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//	移動処理
+	}
+}
+
+//=============================================================================
+//　移動・位置変更
+//=============================================================================
+void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
+{
+#if 1
+	if (m_bTarget == false)
+	{
+		float fSpeed = GetSpeed();	//	速さ
+
+		//	移動加算処理
+		if (m_state == STATE_WALK || m_state == STATE_ACTION)
+		{
+			pos.x += (float)cos(territory.fRadian) * (fSpeed * m_fSpeed);
+			pos.z += (float)sin(territory.fRadian) * (fSpeed * m_fSpeed);
+		}
+		// ★拠点までの角度 / 自身の軸調整
+		float fDestAngle = atan2f(pos.x - territory.pos.x, pos.z - territory.pos.z);
+		float fAngle = fDestAngle - m_rot.y;
+
+		if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
+		if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
+
+		//	移動方向に角度調整
+		m_rot.y += fAngle * 0.1f;
+
+		if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
+		if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
+
+		//	位置・回転情報の反映
+		CCharacter::SetPos(pos);
+		CCharacter::SetRot(m_rot);
+	}
+#endif
+}
+//=============================================================================
+// ライン関数まとめ
+//=============================================================================
+void  CEnemy::Program_Line(void)
+{
+#if 1
+	//	ラインのカウントダウン処理
+	CountDownLineTime();
+
+	//	ライン引きの開始(カウントアップ)
+	if (m_bBlockStartTerritory)
+	{
+		m_nCountTime++;
+		if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
+	}
+
+	//	図形が完成した後の処理
+	UpdateShapeComplete();
+#endif
+}
+//=============================================================================
+// モーション処理まとめ
+//=============================================================================
+void CEnemy::Program_Motion(void)
+{
+#if 1
+	switch (m_state)
+	{
+	case STATE_NONE:		//	[[通常]]
+
+		m_bWalk = true;
+		m_bSprintMotion = true;
+		break;
+
+	case STATE_WALK:		//	[[移動状態]]
+
+		break;
+
+	case STATE_ACTION:		//	[[アクション状態]]
+
+		break;
+
+	case STATE_BLOWAWAY:	//	[[吹っ飛ばされてる状態]]
+
+		m_nDamageCount++;
+
+		if (m_nDamageCount >= MAX_DAMAGECOUNT)
+		{
+			m_nDamageCount = 0;
+			m_bWalk = true;
+			m_bSprintMotion = true;
+
+			m_state = STATE_NONE;
+			m_pMotion->SetNumMotion(m_state);
+		}
+
+		// 吹っ飛ばす
+		m_fBlowLength -= BLOW_MOVING_CUT;
+		if (m_fBlowLength >= 0.0f)
+		{
+			D3DXVECTOR3 pos = CCharacter::GetPos();
+			pos.x -= sinf(m_fBlowAngle) * m_fBlowLength;
+			pos.z -= cosf(m_fBlowAngle) * m_fBlowLength;
+			CCharacter::SetPos(pos);
+		}
+
+		break;
+
+	case STATE_DAMAGE:		//	[[ダメージ状態]]
+
+		m_nDamageCount++;
+		if (m_nDamageCount == 60)
+		{//60秒たったら起き上がる
+			m_pMotion->SetNumMotion(5);
+		}
+		if (m_nDamageCount == 110)
+		{//110秒で動けるようになる
+			m_nDamageCount = 0;
+			m_bWalk = true;
+			m_bSprintMotion = true;
+			m_nDamageCounter = 0;
+			m_bSuperArmor = false;
+			m_state = STATE_NONE;
+		}
+		break;
+	}
+#endif
+}
+
+//=============================================================================
 //　吹っ飛び処理
 //=============================================================================
 void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
@@ -619,15 +631,20 @@ void CEnemy::MotionAction(void)
 {
 	CSound *pSound = CManager::GetSound();	//	サウンドの取得
 
-											//移動状態
-	if (m_state != STATE_BLOWAWAY)
+	//移動状態
+	if (m_state != STATE_BLOWAWAY && m_state != STATE_DAMAGE)
 	{
-		if (m_state != STATE_ACTION && m_bSprint != true)
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state != STATE_ACTION && m_bSprint != true)
 		{
 			//移動状態
 			m_state = STATE_WALK;
 		}
-		if (m_bSprint == true)
+		else if ((m_CharcterType == CCharacter::CHARCTERTYPE_POWER || m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE) &&
+			m_state != STATE_ACTION)
+		{
+			m_state = STATE_WALK;
+		}
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_bSprint == true)
 		{
 			//移動状態
 			m_state = STATE_ACTION;
@@ -644,7 +661,7 @@ void CEnemy::MotionAction(void)
 	}
 	if (m_bSprintMotion == true)
 	{//スプリントモーション
-		if (m_state == STATE_ACTION)
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state == STATE_ACTION)
 		{
 			pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
 			m_pMotion->SetNumMotion(STATE_ACTION);
@@ -725,6 +742,10 @@ bool CEnemy::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTO
 		if (CollisionCylinderyCollider((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true)
 		{
 		}
+		//	スキルを使用する範囲
+		if (CollisionSkillTiming((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true)
+		{
+		}
 	}
 	else if (pCollider->GetType() == CCollider::TYPE_SPHERE_PLAYERATTACK)
 	{
@@ -773,7 +794,11 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 			CCharacter *pCharacter = (CCharacter*)pParent;
 			if (pCharacter == NULL) { return true; }
 			D3DXVECTOR3 AnotherPos = pCharacter->GetPos();
-			BlowAway(AnotherPos);
+
+			if (m_bSuperArmor != true)
+			{//スーパーアーマ状態じゃないなら
+				BlowAway(AnotherPos);
+			}
 		}
 		else if (pParent->GetObjType() == OBJTYPE_MINE)
 		{// 地雷だったら
@@ -802,7 +827,13 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 			CMine *pMine = (CMine*)pParent;
 			if (pMine->GetParentChara() != this)
 			{// 自分以外が出した地雷ならダメージ
-
+				m_state = STATE_DAMAGE;
+				if (m_nDamageCounter == 0)
+				{
+					m_bSuperArmor = true;
+					m_pMotion->SetNumMotion(4);
+					m_nDamageCounter = 1;
+				}
 			}
 		}
 		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
@@ -823,33 +854,44 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 	return false;
 }
 
+
 //=============================================================================
 //	スキルを使用する範囲
 //=============================================================================
 bool CEnemy::CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange)
 {
 	bool bLand = false;
-	if (pCylinderCollider->Collision(&pos, &posOld, &Move, CYLINDER_COLRADIUS, CYLINDER_COLHEIGHT, this, &bLand) == true)
+
+	// [[★スキル発動範囲]]
+	if (pCylinderCollider->Collision(&pos, &posOld, &Move, 150.0f, 50.0f, this, &bLand) == true)
 	{
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
+		{
+			D3DXVECTOR3 thisPos = CCharacter::GetPos(); // 自身の位置情報
+			CScene *pParent = pCylinderCollider->GetParent(); // 他キャラの情報を取得
 
-		CScene *pParent = pCylinderCollider->GetParent();
-		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
-		{// 親が敵かプレイヤーだった場合自分を吹っ飛ばす
-			CCharacter *pCharacter = (CCharacter*)pParent;
-			if (pCharacter == NULL) { return true; }
-			D3DXVECTOR3 AnotherPos = pCharacter->GetPos();
-			BlowAway(AnotherPos);
-		}
-		else if (pParent->GetObjType() == OBJTYPE_MINE)
-		{// 地雷だったら
-			CMine *pMine = (CMine*)pParent;
-			if (pMine->GetParentChara() != this && pMine->GetType() == CMine::TYPE_NONE)
-			{// 自分以外が出した地雷なら起動
-				pMine->SetType(CMine::TYPE_STARTUP);
+			if (m_bBreakTime == false) // ブレイクタイムでなければ...
+			{
+				m_bTrigger = true;	//	使用フラグを立てる
+
+				CCharacter *pCharacter = (CCharacter*)pParent;
+				if (pCharacter == NULL) { return true; }
+				D3DXVECTOR3 targetPos = pCharacter->GetPos(); // 対象の位置情報を取得
+				
+				// [[★角度調整の処理]]^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+				float fDestAngle = atan2f(thisPos.x - targetPos.x, thisPos.z - targetPos.z);
+				float fAngle = fDestAngle - m_rot.y;
+				if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
+				if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
+				m_rot.y += fAngle * 0.1f;
+				if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
+				if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
+				CCharacter::SetPos(targetPos);
+				CCharacter::SetRot(m_rot);
+				// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 			}
+			return true;
 		}
-
-		return true;
 	}
 
 	return false;
