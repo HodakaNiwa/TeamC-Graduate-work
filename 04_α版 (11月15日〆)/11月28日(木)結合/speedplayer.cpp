@@ -68,7 +68,7 @@ HRESULT CSpeedPlayer::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40
 	m_bMakeShape = false;
 	m_nCntTimeCopyLine = 0;
 	m_pLoadEffect = NULL;
-
+	m_pLoadEffectSpeed = NULL;
 
 	//コピーラインの初期化
 	for (int nCnt = 0; nCnt < MAX_TERRITORY; nCnt++)
@@ -80,6 +80,10 @@ HRESULT CSpeedPlayer::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40
 	if (m_pLoadEffect == NULL)
 	{
 		m_pLoadEffect = CLoadEffect::Create(1, D3DXVECTOR3(pos.x, pos.y + 60.0f, pos.z), 8);
+	}
+	if (m_pLoadEffectSpeed == NULL)
+	{
+		m_pLoadEffectSpeed = CLoadEffect::Create(2, D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z), 8);
 	}
 
 	//モーションの情報を取得
@@ -118,6 +122,13 @@ void  CSpeedPlayer::Uninit(void)
 {
 	//プレイヤーの終了処理
 	CPlayer::Uninit();
+
+	if (m_pLoadEffectSpeed != NULL)
+	{
+		m_pLoadEffectSpeed->Uninit();
+		delete m_pLoadEffectSpeed;
+		m_pLoadEffectSpeed = NULL;
+	}
 }
 
 //=============================================================================
@@ -137,7 +148,8 @@ void  CSpeedPlayer::Update(void)
 //=============================================================================
 void  CSpeedPlayer::SprintUpdate(void)
 {
-	
+	D3DXVECTOR3 pos = CCharacter::GetPos();							//位置の取得
+
 	if (m_nControllerType == 0)
 	{
 		//コントローラー操作
@@ -163,14 +175,8 @@ void  CSpeedPlayer::SprintUpdate(void)
 			{//8秒間速さを上げる
 				//m_PlayerState = PLAYERSTATE_ACTION;	//スプリント状態
 				
-				if (m_bSprintMotion == false)
-				{
-					//m_bSprintMotion = true;
-				}
-				//if (m_PlayerState == PLAYERSTATE_BLOWAWAY && m_PlayerState == PLAYERSTATE_NONE && m_PlayerState == PLAYERSTATE_WALK)
-				//{//スプリント中にぶつかったらスプリント状態に戻す
-				//	m_PlayerState = PLAYERSTATE_ACTION;
-				//}
+				m_pLoadEffectSpeed->SetPos(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
+				m_pLoadEffectSpeed->OnTimeEffect();
 			}
 			else
 			{//8秒超えたら普通の速さに戻す
@@ -276,6 +282,11 @@ void  CSpeedPlayer::PlayerActionMouse(void)
 void  CSpeedPlayer::Draw(void)
 {
 	CPlayer::Draw();
+
+	if (m_pLoadEffectSpeed != NULL)
+	{
+		m_pLoadEffectSpeed->Draw();
+	}
 }
 
 //=============================================================================

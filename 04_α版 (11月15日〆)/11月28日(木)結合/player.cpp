@@ -208,14 +208,14 @@ void  CPlayer::Update(void)
 		{//60秒たったら起き上がる
 			m_pMotion->SetNumMotion(5);
 		}
-		if (m_nDownCount == 120)
+		if (m_nDownCount >= 120)
 		{//110秒で動けるようになる
-			m_nDamageCount = 0;
 			m_bWalk = true;
 			m_bSprintMotion = true;
-			m_nDamageCounter = 0;
+			m_nDownCount = 0;
 			m_bSuperArmor = false;
 			m_PlayerState = PLAYERSTATE_NONE;
+			m_nDamageCounter = 0;
 		}
 		break;
 	}
@@ -584,10 +584,6 @@ void  CPlayer::PlayerMoveMouse(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 	{
 		m_fMouse = Mouse;
 		m_bMouse = true;
-
-		
-		
-		
 	}
 	
 
@@ -666,19 +662,12 @@ void  CPlayer::PlayerMoveMouse(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 
 		
 	}
-
-	
-
 	//移動処理
 	pos += m_move;
 
 	//慣性
 	m_move.x += (0.0f - m_move.x) * m_fInertia;
 	m_move.z += (0.0f - m_move.z) * m_fInertia;
-	CDebugProc::Print("スピード : %.1f\n", fSpeed);
-	CDebugProc::Print("マウス : %d/%d", MouseX,MouseY);
-	CDebugProc::Print("慣性 : %.1f\n", m_fInertia);
-
 }
 
 //=============================================================================

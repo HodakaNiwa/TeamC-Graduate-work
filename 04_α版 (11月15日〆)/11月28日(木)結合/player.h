@@ -162,6 +162,8 @@ public:
 private:
 	int m_nSprintCounter;	//スプリント用カウンター
 	int m_nSprintTimer;		//スプリント用タイマー
+	CLoadEffect * m_pLoadEffectSpeed;			//エフェクトの情報
+
 };
 //==============================================
 //		パワー型プレイヤー

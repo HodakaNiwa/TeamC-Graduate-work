@@ -167,6 +167,22 @@ void CMovie::Uninit(void)
 		{//再生中だったら動画を止める
 			m_pMediaControl->Stop();
 		}
+		// グラフのフィルタを列挙
+		IEnumFilters *pEnum = NULL;
+		HRESULT hr = m_pGraphBuilder->EnumFilters(&pEnum);
+		if (SUCCEEDED(hr))
+		{
+			IBaseFilter *pFilter = NULL;
+			while (S_OK == pEnum->Next(1, &pFilter, NULL))
+			{
+				// フィルタを削除する
+				m_pGraphBuilder->RemoveFilter(pFilter);
+				// 列挙子をリセットする
+				pEnum->Reset();
+				pFilter->Release();
+			}
+			pEnum->Release();
+		}
 
 		m_pMediaControl->Release();
 		m_pMediaControl = NULL;
