@@ -31,7 +31,7 @@ SOUNDPARAM g_aSoundParam[CSound::SOUND_LABEL_MAX] =
 	{"data/SOUND/BGM/Game000.wav", -1},					// ゲーム
 	{"data/SOUND/BGM/Result000.wav", -1},				// リザルト
 	{"data/SOUND/BGM/Result001.wav", 0},				// リザルト
-	{"data/SOUND/BGM/Ranking000.wav", -1 },				// ランキング
+	{"data/SOUND/BGM/Ranking000.wav", 0 },				// ランキング
 	{"data/SOUND/BGM/Tutorial.wav", -1 },				// チュートリアル
 	{"data/SOUND/BGM/Select.wav", -1 },					// セレクト
 	{ "data/SOUND/SE/decide000.wav", 0 },				// 決定音

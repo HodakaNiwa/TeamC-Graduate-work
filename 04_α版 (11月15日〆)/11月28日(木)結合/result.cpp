@@ -26,6 +26,7 @@
 #include "audience.h"
 #include "barun.h"
 #include "sky.h"
+#include "RawMouse.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -365,16 +366,38 @@ void CResult::Update(void)
 	//インプットの取得　
 	CGamePad	*pGamePad = CManager::GetInputGamePad();
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
-	
-	if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true)
+	CInputXPad * pXPad = CManager::GetXPad();
+	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
+	//サウンドの取得
+	CSound *pSound = CManager::GetSound();
+
+	m_nCounter++;
+	if (m_nCounter % 60 == 0)
 	{
-		if (CFade::FADE_OUT != CFade::GetFadeMode())
+		m_nTime++;
+		if (m_nTime <= 1)
 		{
-			//決定音
-			CSound::PlaySound(CSound::SOUND_LABEL_SE007);
-			CFade::SetFade(CManager::MODE_RANKING);
+			CSound::PlaySound(CSound::SOUND_LABEL_BGM003);
+		}
+		if (m_nTime == 5)
+		{
+			CSound::PlaySound(CSound::SOUND_LABEL_BGM002);
 		}
 	}
+	for (int nCnt = 0; nCnt < 4; nCnt++)
+	{
+		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true ||
+			pRawMouse->GetTrigger(CRawMouse::RIMS_BUTTON_LEFT, nCnt) == true)
+		{
+			if (CFade::FADE_OUT != CFade::GetFadeMode())
+			{
+				//決定音
+				CSound::PlaySound(CSound::SOUND_LABEL_SE007);
+				CFade::SetFade(CManager::MODE_RANKING);
+			}
+		}
+	}
+	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 
 	//カメラの更新処理
 	if (m_pCamera != NULL) { m_pCamera->Update(); }
@@ -557,7 +580,7 @@ void CResult::UpdateRanking(void)
 
 	for (int nCnt = 0; nCnt < NUMPLAYER; nCnt++)
 	{
-		if (pInputXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true)
+		if (pInputXPad->GetTrigger(XINPUT_GAMEPAD_B, nCnt) == true)
 		{
 			m_state = STATE_SCORERESULT;	//スコア表示状態にする
 			InitScoreResult();				//スコア表の初期化

@@ -132,8 +132,14 @@ void  CPowerPlayer::Uninit(void)
 //=============================================================================
 void  CPowerPlayer::Update(void)
 {
-	//アクションの更新
-	ActionUpdate();
+	//ゲームの状態を取得
+	int nGameState = CGame::GetGameState();
+
+	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
+	{
+		//アクションの更新
+		ActionUpdate();
+	}
 	//プレイヤーの更新
 	CPlayer::Update();
 }
@@ -160,7 +166,6 @@ void  CPowerPlayer::ActionUpdate(void)
 	//アクション中
 	if (m_bAction == true)
 	{
-		m_bSuperArmor = true;
 		m_nColliderCnt++;
 		if (m_nColliderCnt % 60 == 0)
 		{
@@ -174,10 +179,11 @@ void  CPowerPlayer::ActionUpdate(void)
 					//pSound->SetVolume(CSound::SOUND_LABEL_SE022, 30.0f);
 					CreateColliderSphere();	//衝撃波の当たり判定を付与
 					m_PlayerState = PLAYERSTATE_NONE;
-
 				}
 				if (m_nColliderTimer == 2)
 				{
+					m_bSuperArmor = false;
+
 					m_bInit = true;
 				}
 			}
@@ -191,15 +197,11 @@ void  CPowerPlayer::ActionUpdate(void)
 		//m_PlayerState = PLAYERSTATE_NONE;
 	}
 
-	if (m_bWalk == false)
-	{
-		int nData = 0;
-	}
 	//リキャスト中
 	if (m_bRecast == true)
 	{
 		m_nRecastCounter++;
-		if (m_nRecastCounter % (60 * RECASTTIME) == 0)
+		if (m_nRecastCounter == (60 * RECASTTIME))
 		{
 			m_bRecast = false;					//リキャスト終了
 			m_bAction = false;					//アクションを使用できる
@@ -216,20 +218,23 @@ void CPowerPlayer::InitNum(void)
 {
 	m_nInitCnt++;
 	//1秒経過したら衝撃波を出す
-
-	if (m_nInitCnt >= 30)
+	if (m_nInitCnt == 20)
 	{
+		//m_bWalk = true;
+	}
+
+	if (m_nInitCnt >= 40)
+	{
+
 		m_nInitCnt = 0;
 		m_nColliderTimer = 0;	//タイマーを初期化
 		m_nColliderCnt = 0;
 		m_bRecast = true;		//リキャスト中にする	
 		m_bAction = false;		//アクションを終了
 		m_bInit = false;
-		m_bWalk = true;
 
 		if (m_bAction == false)
 		{//アクションが終わったらスーパーアーマを解除
-			m_bSuperArmor = false;
 		}
 		
 	}

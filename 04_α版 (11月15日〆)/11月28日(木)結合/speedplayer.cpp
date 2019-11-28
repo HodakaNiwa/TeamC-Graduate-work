@@ -136,8 +136,14 @@ void  CSpeedPlayer::Uninit(void)
 //=============================================================================
 void  CSpeedPlayer::Update(void)
 {
-	//スピード型のスキル処理
-	SprintUpdate();
+	//ゲームの状態を取得
+	int nGameState = CGame::GetGameState();
+
+	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
+	{
+		//スピード型のスキル処理
+		SprintUpdate();
+	}
 
 	//プレイヤーの更新
 	CPlayer::Update();

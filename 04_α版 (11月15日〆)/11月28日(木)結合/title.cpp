@@ -19,6 +19,7 @@
 #include "audience.h"
 #include "barun.h"
 #include "sky.h"
+#include "RawMouse.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
@@ -197,14 +198,19 @@ void CTitle::Update(void)
 	CGamePad	*pGamePad = CManager::GetInputGamePad();
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
 	CInputXPad * pXPad = CManager::GetXPad();
+	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouse‚ÌŽæ“¾
 
-	if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, 0) == true)
+	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
-		if (CFade::GetFadeMode() != CFade::FADE_OUT)
+		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true ||
+			pRawMouse->GetTrigger(CRawMouse::RIMS_BUTTON_LEFT, nCnt) == true)
 		{
-			//Œˆ’è‰¹
-			pSound->PlaySound(CSound::SOUND_LABEL_SE007);
-			CFade::SetFade(CManager::MODE_SELECT);
+			if (CFade::GetFadeMode() != CFade::FADE_OUT)
+			{
+				//Œˆ’è‰¹
+				pSound->PlaySound(CSound::SOUND_LABEL_SE007);
+				CFade::SetFade(CManager::MODE_SELECT);
+			}
 		}
 	}
 	if ((m_nCounter > FADE_TIME))
@@ -214,6 +220,9 @@ void CTitle::Update(void)
 			CFade::SetFade(CManager::MODE_TUTORIAL);
 		}
 	}
+
+	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
+
 }
 
 //=============================================================================

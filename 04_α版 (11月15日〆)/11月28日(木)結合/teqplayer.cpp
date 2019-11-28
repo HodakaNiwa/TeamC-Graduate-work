@@ -137,8 +137,15 @@ void  CTechniquePlayer::Uninit(void)
 //=============================================================================
 void  CTechniquePlayer::Update(void)
 {
-	//アクションの更新
-	ActionUpdate();
+	//ゲームの状態を取得
+	int nGameState = CGame::GetGameState();
+
+	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
+	{
+		//アクションの更新
+		ActionUpdate();
+	}
+
 	//プレイヤーの更新
 	CPlayer::Update();
 }
@@ -184,7 +191,6 @@ void  CTechniquePlayer::ActionUpdate(void)
 
 	if (m_bMineUse == true)
 	{
-
 		m_bSuperArmor = true;
 		m_nInstallationCounter++;
 		if (m_nInstallationCounter % 30 == 0)
@@ -196,10 +202,11 @@ void  CTechniquePlayer::ActionUpdate(void)
 				CMine::Create(pos, pCharacter);
 				m_nInstallationTimer = 0;
 				m_bMineUse = false;
-				m_bWalk = true;
 				if (m_bMineUse == false)
 				{//地雷設置が終わったらスーパーアーマを解除
 					m_bSuperArmor = false;
+					m_bWalk = true;
+
 					m_PlayerState = PLAYERSTATE_NONE;
 				}
 			}
@@ -285,14 +292,14 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
 				m_bMineUse = true;
 				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
-				pSound->SetVolume(CSound::SOUND_LABEL_SE024, 20.0f);
+				//pSound->SetVolume(CSound::SOUND_LABEL_SE024, 30.0f);
 			}
 		}
 	}
 
 	if (pInputKeyboard->GetKeyboardPress(DIK_RETURN) == true && m_nControllerIndx == 0)
 	{
-		if (m_PlayerState != PLAYERSTATE_DAMAGE)
+		if (m_PlayerState != PLAYERSTATE_DAMAGE && m_PlayerState != PLAYERSTATE_ACTION)
 		{
 
 			//マインポイントが20以上なら設置可能
