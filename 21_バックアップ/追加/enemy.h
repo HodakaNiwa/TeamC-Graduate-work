@@ -9,9 +9,7 @@
 //		include / 他のデータ・コードの呼び出し・利用
 //=================================================
 #include "main.h"
-#include "sceneX.h"
 #include "game.h"
-#include "scene.h"
 #include "character.h"
 //==============================================
 //					マクロ定義
@@ -106,6 +104,10 @@ public:
 	void CreateOrbitLine(void);
 	void UninitOrtbitLine(void);
 
+	// マージ関連
+	void MergeSort(TERRITORY_INFO*, int, int, int); // (TERRITORY_INFO*, 0, 拠点数-1, 拠点数)
+
+
 
 protected:
 	int m_nEnemyNo;					//	割り当てられたキャラ番号
@@ -170,6 +172,9 @@ private:
 											//!	---<<ラインを繋ぐ変数>>---
 	TERRITORY_INFO m_nTerrStart;			//	図形となるラインを繋ぐ際の始点・終点を記憶(始点・終点は同じ位置)
 
+	//マージ関連変数
+	float *m_tmp[4]; // [Temporary]一時的に値を記憶する変数
+	bool m_bCheck; // 複数回newさせないため
 
 
 };

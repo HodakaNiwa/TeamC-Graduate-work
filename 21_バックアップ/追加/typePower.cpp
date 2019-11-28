@@ -4,25 +4,17 @@
 //◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆
 #include "enemy.h"
 #include "manager.h"
-#include "camera.h"
-#include "input.h"
-#include "inputmouce.h"
-#include "loadEffect.h"
-#include "line.h"
-#include "sceneOrbit.h"
 #include "model.h"
-#include "UI.h"
-#include "skilicon.h"
-#include "RawMouse.h"
+#include "loadEffect.h"
+#include "effectManager.h"
+#include "line.h"
 #include "collision.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define MAX_SPRINTTIMER (8)		//	スプリント時間
-#define WAVE (1)				//	
 #define RECAST (10)				//	スプリントのリキャスト時間
-
 #define SKILL_RANGE			(150.0f)
 
 //*****************************************************************************
@@ -224,12 +216,19 @@ void  CTypePower::ActionUpdate(void)
 //=============================================================================
 void CTypePower::CreateColliderSphere(void)
 {
+	//ゲームの取得
+	CGame *pGame = CManager::GetGame();
+	//エフェクト
+	CEffectManager *pEffectManager = pGame->GetEffectManager();
+
 	D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVec3TransformCoord(&pos, &m_pModel[15]->GetPos(), &m_pModel[15]->GetMtxWorld());
 
 	//	スフィアを生成
 	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(pos.x, pos.y, pos.z),
-		D3DXVECTOR3(1.0f, 1.0f, 1.0f), 140.0f, 110, 1);
+		D3DXVECTOR3(1.0f, 1.0f, 1.0f), 150.0f, 40, 1);
+
+	pEffectManager->SetEffect(D3DXVECTOR3(pos.x, pos.y - 30.0f, pos.z - 30.0f), INITIALIZE_VECTOR3, 0);
 
 	if (pSphere == NULL) { return; }
 
