@@ -16,7 +16,7 @@ char       CDebugProc::m_aStr[MAX_DEBUG_LOG] = "";     // ï∂éöóÒäiî[ópïœêî
 #ifdef _DEBUG
 bool       CDebugProc::m_bDisp = true;                 // ï`âÊÇ∑ÇÈÇ©ÇµÇ»Ç¢Ç©
 #else
-bool       CDebugProc::m_bDisp = false;                // ï`âÊÇ∑ÇÈÇ©ÇµÇ»Ç¢Ç©
+bool       CDebugProc::m_bDisp = true;                // ï`âÊÇ∑ÇÈÇ©ÇµÇ»Ç¢Ç©
 #endif
 
 //=============================================================================

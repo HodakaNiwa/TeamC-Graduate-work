@@ -56,7 +56,7 @@ CScene::CScene(int nPriority, OBJTYPE ObjType)
 	m_pCur[nPriority] = this;
 
 	//最後尾の次のオブジェクトをNULL状態にする
-	m_pNext = NULL;			
+	m_pNext = NULL;
 
 	//前回のオブジェクトのm_pNextに現在位置（最後尾）のポインタを渡す
 	if (m_pPrev != NULL)
@@ -181,7 +181,7 @@ void CScene::ReleaseFade(void)
 //	メモリの開放
 //=============================================================================
 void CScene::Release(void)
-{	
+{
 	m_bDeth = true;
 }
 
@@ -190,10 +190,6 @@ void CScene::Release(void)
 //=============================================================================
 void CScene::UpdateAll(void)
 {
-	//デバック表示の取得
-	CDebugProc * pDebugLeft = CRenderer::GetDebugLeft();
-	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
-
 	//変数宣言
 	CScene * pScene = NULL;
 
@@ -312,7 +308,7 @@ void CScene::Deth(int nCntLayer)
 
 	m_anNumOBJ[nCntLayer]--;	//各レイヤーのオブジェクトの総数を減らす
 	m_nNumAll--;				//オブジェクトの総数を減らす
-	delete this;	
+	delete this;
 }
 
 //=============================================================================
@@ -320,10 +316,6 @@ void CScene::Deth(int nCntLayer)
 //=============================================================================
 void CScene::CheckCollisionAll(void)
 {
-	//デバック表示の取得
-	CDebugProc * pDebugLeft = CRenderer::GetDebugLeft();
-	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
-
 	//変数宣言
 	CScene * pScene = NULL;
 

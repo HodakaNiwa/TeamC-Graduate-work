@@ -13,7 +13,7 @@
 #include "model.h"
 #include "territory.h"
 #include "mine.h"
-
+#include <windows.h>
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -25,6 +25,9 @@
 #define BLOW_MOVING        (12.0f)
 #define BLOW_MOVING_CUT    (1.5f)
 #define MAX_DAMAGECOUNT    (23)
+
+// 静的メンバ変数
+//float* CEnemy::m_tmp[4] = {};
 
 
 //*****************************************************************************
@@ -41,6 +44,7 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_nDamageCounter = 0;
 	m_bSuperArmor = false;
 	m_bTarget = false;
+	m_bCheck = false;
 }
 
 //*****************************************************************************
@@ -126,6 +130,14 @@ HRESULT CEnemy::Init(void)
 //=============================================================================
 void  CEnemy::Uninit(void)
 {
+	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
+	{
+		if (m_tmp[nCnt] != NULL)
+		{
+			delete[] m_tmp[nCnt];
+			m_tmp[nCnt] = NULL;
+		}
+	}
 	//	各エリアのテリトリー情報の解放
 	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
 	{
@@ -196,12 +208,18 @@ void  CEnemy::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) { }
 //=============================================================================
 void CEnemy::InitSort(D3DXVECTOR3 pos)
 {
+	//LARGE_INTEGER freq;
+	//QueryPerformanceFrequency(&freq);
+	//LARGE_INTEGER start, end;
+	//QueryPerformanceCounter(&start);
+
 	for (int nCntArea = 0; nCntArea < AREA_MAX; nCntArea++)
 	{
 		m_nAreaTerrNum[nCntArea] = 0;
 		m_AreaInfo[nCntArea] = NULL;
+		m_tmp[nCntArea] = NULL;
 	}
-
+	
 	//	[[★テリトリー情報の取得 / 確保]]
 	int nMax = 0;		//	テリトリー最大数の記憶
 	int nCnt01 = 0;
@@ -264,6 +282,11 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		}
 	}
 
+	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)	//	エリアごとのテリトリー数分回す
+	{
+		m_tmp[nCnt] = new float[m_nAreaTerrNum[nCnt]];
+	}
+
 	//	ループ解除用
 	m_bBreak = false;
 
@@ -282,22 +305,28 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 	}
 
 	//	距離を短い順にソート
+	//for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
+	//{
+	//	//	ここからソート処理
+	//	for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//	エリアごとのテリトリー数分回す
+	//	{
+	//		for (int nTerrCnt02 = 0; nTerrCnt02 < m_nAreaTerrNum[nAreaCnt]; nTerrCnt02++)
+	//		{
+	//			if (m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort < m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort)
+	//			{
+	//				float fDisSort = m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort;
+	//				m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort = m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort;
+	//				m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort = fDisSort;
+	//			}
+	//		}
+	//	}
+	//}
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
-		//	ここからソート処理
-		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//	エリアごとのテリトリー数分回す
-		{
-			for (int nTerrCnt02 = 0; nTerrCnt02 < m_nAreaTerrNum[nAreaCnt]; nTerrCnt02++)
-			{
-				if (m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort < m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort)
-				{
-					float fDisSort = m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort;
-					m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort = m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort;
-					m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort = fDisSort;
-				}
-			}
-		}
+		MergeSort(m_AreaInfo[nAreaCnt], 0, m_nAreaTerrNum[nAreaCnt] - 1, nAreaCnt);
+		
 	}
+
 
 	//	ゲーム開始の際に、どこのエリアが一番近いかを決める(ソート処理)
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
@@ -329,6 +358,11 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		}
 		nAreaCnt += 1;
 	}
+
+	//QueryPerformanceCounter(&end);
+	//double time = static_cast<double>(end.QuadPart - start.QuadPart) * 1000.0 / freq.QuadPart;
+	//CDebugProc::Print("\n 処理時間time %lf[ms]\n", time);
+
 }
 
 //=============================================================================
@@ -348,7 +382,7 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 	}
 
 	//	[[短い距離順に変える]]
-	for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+	/*for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 	{
 		for (int nCnt2 = 0; nCnt2 < m_nAreaTerrNum[m_nAreaNow]; nCnt2++)
 		{
@@ -359,7 +393,10 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 				m_AreaInfo[m_nAreaNow][nCnt2].fDisSort = fDisSort;
 			}
 		}
-	}
+	}*/
+
+	MergeSort(m_AreaInfo[m_nAreaNow], 0, m_nAreaTerrNum[m_nAreaNow] - 1, m_nAreaNow);
+	
 
 	while (m_bBreak != true)
 	{
@@ -457,6 +494,7 @@ void  CEnemy::AIBasicAction(void)
 				}
 				
 				m_nAreaNow += 1;
+
 				if (m_nAreaNow == AREA_MAX)
 				{
 					m_nAreaNow = 0;
@@ -862,6 +900,44 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 	return false;
 }
 
+void CEnemy::MergeSort(TERRITORY_INFO* pArray, int start, int end, int AreaNum)
+{
+	//  作業用のデータ
+	int middle, i, j, k;
+	if (start >= end) {
+		return;
+	}
+	//  startとendの中間地点を分割点とする
+	middle = (start + end) / 2;
+	//  前半部分を再帰的に整列
+	MergeSort(pArray, start, middle, AreaNum);
+	//  後半部分を再帰的に整列
+	MergeSort(pArray, middle + 1, end, AreaNum);
+	k = 0;
+	//  仮想領域のデータをマージしながらコピーする。
+	for (i = start; i <= middle; i++) {
+		m_tmp[AreaNum][k] = pArray[i].fDisSort;
+		k++;
+	}
+	for (j = end; j >= middle + 1; j--) {
+		m_tmp[AreaNum][k] = pArray[j].fDisSort;
+		k++;
+	}
+	//  末端からデータを取得して、マージしていく。
+	i = 0;
+	j = end - start;
+	for (k = start; k <= end; k++) {
+		if (m_tmp[AreaNum][i] <= m_tmp[AreaNum][j]) {
+			pArray[k].fDisSort = m_tmp[AreaNum][i];
+			i++;
+		}
+		else {
+			pArray[k].fDisSort = m_tmp[AreaNum][j];
+			j--;
+		}
+	}
+
+}
 
 
 

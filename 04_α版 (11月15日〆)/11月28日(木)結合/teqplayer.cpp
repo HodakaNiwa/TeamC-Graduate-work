@@ -184,7 +184,6 @@ void  CTechniquePlayer::ActionUpdate(void)
 
 	if (m_bMineUse == true)
 	{
-		m_PlayerState = PLAYERSTATE_ACTION;
 
 		m_bSuperArmor = true;
 		m_nInstallationCounter++;
@@ -247,6 +246,8 @@ void  CTechniquePlayer::PlayerActionPad(void)
 			//マインポイントが20以上なら設置可能
 			if (m_nMinePoint >= REDUCED_MINE_POINT)
 			{
+				m_PlayerState = PLAYERSTATE_ACTION;
+
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
@@ -277,6 +278,8 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 			//マインポイントが20以上なら設置可能
 			if (m_nMinePoint >= REDUCED_MINE_POINT)
 			{
+				m_PlayerState = PLAYERSTATE_ACTION;
+
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
@@ -295,6 +298,8 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 			//マインポイントが20以上なら設置可能
 			if (m_nMinePoint >= REDUCED_MINE_POINT)
 			{
+				m_PlayerState = PLAYERSTATE_ACTION;
+
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nControllerIndx)->RevivalIconMask();	//スキルアイコン

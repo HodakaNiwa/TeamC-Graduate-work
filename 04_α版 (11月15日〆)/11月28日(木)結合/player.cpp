@@ -96,8 +96,6 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int
 	//プレイヤーのナンバーを取得
 	m_nNumPlayer = nNumPlayer;
 
-	
-
 	//キャラクターの初期化
 	CCharacter::Init(nNumPlayer,ModelTxt, MotionTxt, m_CharcterType,nType);
 	CCharacter::SetPos(pos);
@@ -167,6 +165,7 @@ void  CPlayer::Update(void)
 	 //m_nDamageCounter = 0;
 
 	 //m_bWalk = true;
+		//m_nDownCount = 0;
 
 		break;
 
@@ -204,9 +203,12 @@ void  CPlayer::Update(void)
 		// ダメージカウント加算
 		m_nDownCount++;
 
-		if (m_nDownCount == 70)
+		//if (m_nDownCount >= 70)
 		{//60秒たったら起き上がる
-			m_pMotion->SetNumMotion(5);
+			if (m_nDownCount == 70)
+			{
+				m_pMotion->SetNumMotion(5);
+			}
 		}
 		if (m_nDownCount >= 120)
 		{//110秒で動けるようになる
@@ -250,11 +252,11 @@ void  CPlayer::Update(void)
 		}
 	}
 	
-	CDebugProc::Print("スーパーarmor : %d", m_bSuperArmor);
+	CDebugProc::Print("\nスーパーarmor : %d\n", m_bSuperArmor);
 	CDebugProc::Print("ダメージ : %d\n", m_nDamageCount);
 	CDebugProc::Print("ステート : %d\n", m_PlayerState);
-	CDebugProc::Print("歩き　: %d\n", m_bWalk);
-	CDebugProc::Print("ダウン : %d", m_nDownCount);
+	CDebugProc::Print("ダメカン　: %d\n", m_nDamageCounter);
+	CDebugProc::Print("ダウン : %d\n", m_nDownCount);
 }
 
 //=============================================================================
@@ -385,8 +387,6 @@ void  CPlayer::PlayerMove(void)
 		m_Angle.y = D3DX_PI + rot.y;
 	}
 
-	
-
 	if (pInputKeyboard->GetKeyboardTrigger(DIK_2) == true)
 	{
 		//スピードUPの時はこっち
@@ -428,8 +428,6 @@ void  CPlayer::PlayerMove(void)
 		m_rot.y += D3DX_PI * 2.0f;
 	}
 	
-	
-
 	//位置を設定
 	CCharacter::SetPos(pos);
 
@@ -808,8 +806,8 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 					pSound->PlaySound(CSound::SOUND_LABEL_SE025);	//地雷音
 					pSound->PlaySound(CSound::SOUND_LABEL_SE019);	//ダウン音
 					/*pSound->SetVolume(CSound::SOUND_LABEL_SE025, 20.0f);
-					pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);
-					m_bSuperArmor = true;*/
+					pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);*/
+					m_bSuperArmor = true;
 					m_pMotion->SetNumMotion(4);
 					m_nDamageCounter = 1;
 				}
@@ -817,16 +815,15 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 		}
 		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ENEMY)
 		{
+			
 			//当たってる間はダメージ状態
 			m_PlayerState = PLAYERSTATE_DAMAGE;
-
 			if (m_nDamageCounter == 0)
 			{
 				pSound->PlaySound(CSound::SOUND_LABEL_SE023);	//衝撃波音
 				pSound->PlaySound(CSound::SOUND_LABEL_SE019);	//ダウン音
 				/*pSound->SetVolume(CSound::SOUND_LABEL_SE023, 20.0f);
 				pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);*/
-
 				m_bSuperArmor = true;
 				m_pMotion->SetNumMotion(4);
 				m_nDamageCounter = 1;
@@ -870,6 +867,8 @@ void CPlayer::BlowAway(D3DXVECTOR3 AnotherPos)
 //=============================================================================
 void CPlayer::CreateOrbitLine(void)
 {
+	return;
+
 	if (m_pOrbitLine == NULL)
 	{
 		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());

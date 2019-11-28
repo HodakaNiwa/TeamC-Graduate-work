@@ -163,10 +163,9 @@ void CMovie::Uninit(void)
 	if (m_pMediaControl != NULL)
 	{//動画コントローラーの破棄
 
-		if (!m_bEndMovie)
-		{//再生中だったら動画を止める
-			m_pMediaControl->Stop();
-		}
+		//再生中だったら動画を止める
+		m_pMediaControl->Stop();
+
 		// グラフのフィルタを列挙
 		IEnumFilters *pEnum = NULL;
 		HRESULT hr = m_pGraphBuilder->EnumFilters(&pEnum);

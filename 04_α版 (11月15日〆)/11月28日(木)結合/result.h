@@ -95,6 +95,7 @@ private:
 	void GetScoreResult(void);
 	void CreateThankyou(int nCnt);
 	void UninitCharRanking(void);
+	void CreateBarun(void);
 	static TYPE m_type;					//Œ‹‰Êó‘Ô
 
 	STATE m_state;

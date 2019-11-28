@@ -93,6 +93,7 @@ void CRing::Uninit(void)
 //=============================================================================
 void CRing::Update(void)
 {
+	return;
 	// Œü‚«‚ÌŽæ“¾
 	D3DXVECTOR3 rot = GetRot();
 

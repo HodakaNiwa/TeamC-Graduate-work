@@ -1,13 +1,15 @@
 //*****************************************************************************
 //
 //     エフェクト(3D)の処理[effect3D.cpp]
-//     Author:Hodaka Niwa
+//     Author:Hodaka Niwa & Sato Asumi
 //
 //*****************************************************************************
 #include "effect3D.h"
 #include "manager.h"
 #include "renderer.h"
 #include "library.h"
+#include "game.h"
+#include "camera.h"
 
 //*****************************************************************************
 //     マクロ定義
@@ -128,6 +130,34 @@ void CEffect3D::Uninit(void)
 //=============================================================================
 void CEffect3D::Update(void)
 {
+	//変数宣言
+	CGame * pGame = CManager::GetGame();
+	bool bDraw[MAX_NUMPLAYER] = {};
+	bool bDrawChack = true;
+	
+	//カメラごとの描画判定
+	if (pGame != NULL)
+	{
+		for (int nCnt = 0; nCnt < MAX_NUMPLAYER; nCnt++)
+		{
+			//NULLチェック
+			CGameCamera * pGameCamera = pGame->GetGameCamera(nCnt);
+			if (pGameCamera == NULL) { continue; }
+
+			bDraw[nCnt] = pGame->GetGameCamera(nCnt)->ReflectObject(m_Pos);
+
+			if (bDraw[nCnt])
+			{
+				bDrawChack = false;	//描画フラグ
+				SetDraw(true);
+				break;
+			}
+		}
+
+		//描画しない状態にする
+		if(bDrawChack){ SetDraw(false); }		
+	}
+
 	// 透明度を削る
 	m_Col.a -= m_fCutAlpha;
 

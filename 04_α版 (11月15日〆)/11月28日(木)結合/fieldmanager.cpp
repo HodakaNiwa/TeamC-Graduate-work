@@ -34,9 +34,33 @@
 #define TEX_RED			(2)		//赤
 #define TEX_YELLOW		(3)		//黄色
 
-// 地面シェーダーのファイル名
-#define FIELDRENDER_PRIORITY (3)
+// 地面シェーダー用
+#define FIELDRENDER_PRIORITY        (3)
 #define FIELDRENDER_SHADER_FILENAME "data/field.hlsl"
+
+// 通常
+#define FIELD_NONE_NUMINSTANCE      (MAX_FIELD)
+#define FIELD_NONE_TEXIDX           (1)
+#define FIELD_NONE_DISP             (false)
+#define FIELD_NONE_LIGHTING         (false)
+
+// 補間用
+#define FIELD_GROUND_NUMINSTANCE    (MAX_FIELD)
+#define FIELD_GROUND_TEXIDX         (0)
+#define FIELD_GROUND_DISP           (false)
+#define FIELD_GROUND_LIGHTING       (true)
+
+// メイン
+#define FIELD_MAIN_NUMINSTANCE      (1)
+#define FIELD_MAIN_TEXIDX           (0)
+#define FIELD_MAIN_DISP             (false)
+#define FIELD_MAIN_LIGHTING         (true)
+
+// カウントダウン
+#define FIELD_COUNTDOWN_NUMINSTANCE (1)
+#define FIELD_COUNTDOWN_TEXIDX      (1)
+#define FIELD_COUNTDOWN_DISP        (false)
+#define FIELD_COUNTDOWN_LIGHTING    (false)
 
 //=============================================================================
 // コンストラクタ
@@ -209,8 +233,8 @@ void CFieldManager::Update(void)
 	// 地面の描画データを登録
 	SetFieldData_None();
 	SetFieldData_Ground();
-	SetFieldData_CountDown();
 	SetFieldData_Main();
+	SetFieldData_CountDown();
 }
 
 //=============================================================================
@@ -671,31 +695,31 @@ void CFieldManager::MakeFieldRender(void)
 {
 	int nNumInstance[FIELD_TYPE_MAX] =
 	{
-		MAX_FIELD,
-		MAX_FIELD,
-		1,
-		1
+		FIELD_NONE_NUMINSTANCE,
+		FIELD_GROUND_NUMINSTANCE,
+		FIELD_MAIN_NUMINSTANCE,
+		FIELD_COUNTDOWN_NUMINSTANCE
 	};
 	int nTexIdx[FIELD_TYPE_MAX] =
 	{
-		1,
-		0,
-		1,
-		0
+		FIELD_NONE_TEXIDX,
+		FIELD_GROUND_TEXIDX,
+		FIELD_MAIN_TEXIDX,
+		FIELD_COUNTDOWN_TEXIDX
 	};
 	bool bDisp[FIELD_TYPE_MAX] =
 	{
-		false,
-		false,
-		false,
-		true
+		FIELD_NONE_DISP,
+		FIELD_GROUND_DISP,
+		FIELD_MAIN_DISP,
+		FIELD_COUNTDOWN_DISP,
 	};
 	bool bLighting[FIELD_TYPE_MAX] =
 	{
-		false,
-		true,
-		false,
-		true
+		FIELD_NONE_LIGHTING,
+		FIELD_GROUND_LIGHTING,
+		FIELD_MAIN_LIGHTING,
+		FIELD_COUNTDOWN_LIGHTING
 	};
 	for (int nCntRender = 0; nCntRender < FIELD_TYPE_MAX; nCntRender++)
 	{
@@ -783,24 +807,6 @@ void CFieldManager::SetFieldData_Ground(void)
 }
 
 //=============================================================================
-//    地面の描画データを登録する処理( CountDown ver )
-//=============================================================================
-void CFieldManager::SetFieldData_CountDown(void)
-{
-	if (m_pFieldRender[FIELD_TYPE_COUNTDOWN] == NULL) { return; }
-	if (m_pFieldRender[FIELD_TYPE_COUNTDOWN]->GetDisp() == false) { return; }
-
-	// 頂点情報
-	SetFieldVertex_CountDown();
-
-	// ワールドマトリックス情報
-	SetFieldMtxWorld_CountDown();
-
-	// 頂点カラー情報
-	SetFieldColor_CountDown();
-}
-
-//=============================================================================
 //    地面の描画データを登録する処理( Main ver )
 //=============================================================================
 void CFieldManager::SetFieldData_Main(void)
@@ -816,6 +822,24 @@ void CFieldManager::SetFieldData_Main(void)
 
 	// 頂点カラー情報
 	SetFieldColor_Main();
+}
+
+//=============================================================================
+//    地面の描画データを登録する処理( CountDown ver )
+//=============================================================================
+void CFieldManager::SetFieldData_CountDown(void)
+{
+	if (m_pFieldRender[FIELD_TYPE_COUNTDOWN] == NULL) { return; }
+	if (m_pFieldRender[FIELD_TYPE_COUNTDOWN]->GetDisp() == false) { return; }
+
+	// 頂点情報
+	SetFieldVertex_CountDown();
+
+	// ワールドマトリックス情報
+	SetFieldMtxWorld_CountDown();
+
+	// 頂点カラー情報
+	SetFieldColor_CountDown();
 }
 
 //=============================================================================
@@ -1049,6 +1073,117 @@ void CFieldManager::SetFieldColor_Ground(void)
 }
 
 //=============================================================================
+//    頂点データを設定する処理
+//=============================================================================
+void CFieldManager::SetFieldVertex_Main(void)
+{
+	CFieldRender::VERTEXDATA *pVtx = NULL;
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = NULL;
+
+	// データを頂点バッファに書き込む
+	pVtxBuff = m_pFieldRender[FIELD_TYPE_MAIN]->GetVtxBuff();
+	if (pVtxBuff == NULL || m_pMainField == NULL) { return; }
+
+	// 頂点バッファをロックし、頂点データへのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点座標
+	D3DXVECTOR3 Size = m_pMainField->GetSize();
+	pVtx[0].pos = D3DXVECTOR3(-Size.x, 0.0f, Size.z);
+	pVtx[1].pos = D3DXVECTOR3(Size.x, 0.0f, Size.z);
+	pVtx[2].pos = D3DXVECTOR3(-Size.x, 0.0f, -Size.z);
+	pVtx[3].pos = D3DXVECTOR3(Size.x, 0.0f, -Size.z);
+
+	// 法線ベクトル
+	pVtx[0].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+	pVtx[1].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+	pVtx[2].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+	pVtx[3].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+
+	// テクスチャ座標
+	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2(1.0f * LINE, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f * LINE);
+	pVtx[3].tex = D3DXVECTOR2(1.0f * LINE, 1.0f * LINE);
+
+	// 頂点バッファをアンロックする
+	pVtxBuff->Unlock();
+}
+
+//=============================================================================
+//    ワールドマトリックスを設定する処理
+//=============================================================================
+void CFieldManager::SetFieldMtxWorld_Main(void)
+{
+	CFieldRender::WORLDMATRIX *pWorld = NULL;
+	LPDIRECT3DVERTEXBUFFER9 pWorldBuff = NULL;
+
+	// データを頂点バッファに書き込む
+	pWorldBuff = m_pFieldRender[FIELD_TYPE_MAIN]->GetWorldBuff();
+	if (pWorldBuff == NULL) { return; }
+
+	// ワールドマトリックスバッファをロックし、ワールドマトリックスデータへのポインタを取得
+	pWorldBuff->Lock(0, 0, (void**)&pWorld, 0);
+
+	D3DXVECTOR3 pos = INITIALIZE_VECTOR3;
+	D3DXVECTOR3 rot = INITIALIZE_VECTOR3;
+	if (m_pMainField != NULL)
+	{
+		pos = m_pMainField->GetPos();
+		rot = m_pMainField->GetRot();
+		float fSinPitch = sinf(rot.x);
+		float fCosPitch = cosf(rot.x);
+		float fSinYaw = sinf(rot.y);
+		float fCosYaw = cosf(rot.y);
+		float fSinRoll = sinf(rot.z);
+		float fCosRoll = cosf(rot.z);
+		pWorld[0].m1[0] = fSinRoll * fSinPitch * fSinYaw + fCosRoll * fCosYaw;
+		pWorld[0].m1[1] = fSinRoll * fCosPitch;
+		pWorld[0].m1[2] = fSinRoll * fSinPitch * fCosYaw - fCosRoll * fSinYaw;
+		pWorld[0].m1[3] = 0.0f;
+		pWorld[0].m2[0] = fCosRoll * fSinPitch * fSinYaw - fSinRoll * fCosYaw;
+		pWorld[0].m2[1] = fCosRoll * fCosPitch;
+		pWorld[0].m2[2] = fCosRoll * fSinPitch * fCosYaw + fSinRoll * fSinYaw;
+		pWorld[0].m2[3] = 0.0f;
+		pWorld[0].m3[0] = fCosPitch * fSinYaw;
+		pWorld[0].m3[1] = -fSinPitch;
+		pWorld[0].m3[2] = fCosPitch * fCosYaw;
+		pWorld[0].m3[3] = 0.0f;
+		pWorld[0].m4[0] = pos.x;
+		pWorld[0].m4[1] = pos.y;
+		pWorld[0].m4[2] = pos.z;
+		pWorld[0].m4[3] = 1.0f;
+	}
+
+	// ワールドマトリックスバッファをアンロックする
+	pWorldBuff->Unlock();
+}
+
+//=============================================================================
+//    頂点カラーを設定する処理
+//=============================================================================
+void CFieldManager::SetFieldColor_Main(void)
+{
+	CFieldRender::COLORDATA *pColor = NULL;
+	LPDIRECT3DVERTEXBUFFER9 pColorBuff = NULL;
+
+	// データを頂点バッファに書き込む
+	pColorBuff = m_pFieldRender[FIELD_TYPE_MAIN]->GetColorBuff();
+	if (pColorBuff == NULL) { return; }
+
+	// 頂点カラーバッファをロックし、頂点カラーデータへのポインタを取得
+	pColorBuff->Lock(0, 0, (void**)&pColor, 0);
+
+	if (m_pMainField != NULL)
+	{
+		pColor[0].col = m_pMainField->GetCol();
+	}
+
+	// 頂点カラーバッファをアンロックする
+	pColorBuff->Unlock();
+}
+
+//=============================================================================
 //    頂点情報を設定する処理
 //=============================================================================
 void CFieldManager::SetFieldVertex_CountDown(void)
@@ -1155,117 +1290,6 @@ void CFieldManager::SetFieldColor_CountDown(void)
 	{
 		col = m_pCountDownField->GetCol();
 		pColor[0].col = col;
-	}
-
-	// 頂点カラーバッファをアンロックする
-	pColorBuff->Unlock();
-}
-
-//=============================================================================
-//    頂点データを設定する処理
-//=============================================================================
-void CFieldManager::SetFieldVertex_Main(void)
-{
-	CFieldRender::VERTEXDATA *pVtx = NULL;
-	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = NULL;
-
-	// データを頂点バッファに書き込む
-	pVtxBuff = m_pFieldRender[FIELD_TYPE_MAIN]->GetVtxBuff();
-	if (pVtxBuff == NULL || m_pMainField == NULL) { return; }
-
-	// 頂点バッファをロックし、頂点データへのポインタを取得
-	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	// 頂点座標
-	D3DXVECTOR3 Size = m_pMainField->GetSize();
-	pVtx[0].pos = D3DXVECTOR3(-Size.x, 0.0f, Size.z);
-	pVtx[1].pos = D3DXVECTOR3(Size.x, 0.0f, Size.z);
-	pVtx[2].pos = D3DXVECTOR3(-Size.x, 0.0f, -Size.z);
-	pVtx[3].pos = D3DXVECTOR3(Size.x, 0.0f, -Size.z);
-
-	// 法線ベクトル
-	pVtx[0].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-	pVtx[1].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-	pVtx[2].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-	pVtx[3].nor = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
-
-	// テクスチャ座標
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f * LINE, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f * LINE);
-	pVtx[3].tex = D3DXVECTOR2(1.0f * LINE, 1.0f * LINE);
-
-	// 頂点バッファをアンロックする
-	pVtxBuff->Unlock();
-}
-
-//=============================================================================
-//    ワールドマトリックスを設定する処理
-//=============================================================================
-void CFieldManager::SetFieldMtxWorld_Main(void)
-{
-	CFieldRender::WORLDMATRIX *pWorld = NULL;
-	LPDIRECT3DVERTEXBUFFER9 pWorldBuff = NULL;
-
-	// データを頂点バッファに書き込む
-	pWorldBuff = m_pFieldRender[FIELD_TYPE_MAIN]->GetWorldBuff();
-	if (pWorldBuff == NULL) { return; }
-
-	// ワールドマトリックスバッファをロックし、ワールドマトリックスデータへのポインタを取得
-	pWorldBuff->Lock(0, 0, (void**)&pWorld, 0);
-
-	D3DXVECTOR3 pos = INITIALIZE_VECTOR3;
-	D3DXVECTOR3 rot = INITIALIZE_VECTOR3;
-	if (m_pMainField != NULL)
-	{
-		pos = m_pMainField->GetPos();
-		rot = m_pMainField->GetRot();
-		float fSinPitch = sinf(rot.x);
-		float fCosPitch = cosf(rot.x);
-		float fSinYaw = sinf(rot.y);
-		float fCosYaw = cosf(rot.y);
-		float fSinRoll = sinf(rot.z);
-		float fCosRoll = cosf(rot.z);
-		pWorld[0].m1[0] = fSinRoll * fSinPitch * fSinYaw + fCosRoll * fCosYaw;
-		pWorld[0].m1[1] = fSinRoll * fCosPitch;
-		pWorld[0].m1[2] = fSinRoll * fSinPitch * fCosYaw - fCosRoll * fSinYaw;
-		pWorld[0].m1[3] = 0.0f;
-		pWorld[0].m2[0] = fCosRoll * fSinPitch * fSinYaw - fSinRoll * fCosYaw;
-		pWorld[0].m2[1] = fCosRoll * fCosPitch;
-		pWorld[0].m2[2] = fCosRoll * fSinPitch * fCosYaw + fSinRoll * fSinYaw;
-		pWorld[0].m2[3] = 0.0f;
-		pWorld[0].m3[0] = fCosPitch * fSinYaw;
-		pWorld[0].m3[1] = -fSinPitch;
-		pWorld[0].m3[2] = fCosPitch * fCosYaw;
-		pWorld[0].m3[3] = 0.0f;
-		pWorld[0].m4[0] = pos.x;
-		pWorld[0].m4[1] = pos.y;
-		pWorld[0].m4[2] = pos.z;
-		pWorld[0].m4[3] = 1.0f;
-	}
-
-	// ワールドマトリックスバッファをアンロックする
-	pWorldBuff->Unlock();
-}
-
-//=============================================================================
-//    頂点カラーを設定する処理
-//=============================================================================
-void CFieldManager::SetFieldColor_Main(void)
-{
-	CFieldRender::COLORDATA *pColor = NULL;
-	LPDIRECT3DVERTEXBUFFER9 pColorBuff = NULL;
-
-	// データを頂点バッファに書き込む
-	pColorBuff = m_pFieldRender[FIELD_TYPE_MAIN]->GetColorBuff();
-	if (pColorBuff == NULL) { return; }
-
-	// 頂点カラーバッファをロックし、頂点カラーデータへのポインタを取得
-	pColorBuff->Lock(0, 0, (void**)&pColor, 0);
-
-	if (m_pMainField != NULL)
-	{
-		pColor[0].col = m_pMainField->GetCol();
 	}
 
 	// 頂点カラーバッファをアンロックする

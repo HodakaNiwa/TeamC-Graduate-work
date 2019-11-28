@@ -8,15 +8,16 @@
 #include "scene.h"
 #include "manager.h"
 #include "input.h"
+#include "sky.h"
 #include "debuglog.h"
+
+//=============================================================================
+// マクロ定義
+//=============================================================================
+
 //=============================================================================
 // 静的メンバ変数宣言
 //=============================================================================
-CDebugProc * CRenderer::m_pDebugLeft = NULL;
-CDebugProc * CRenderer::m_pDebugRight = NULL;
-bool CRenderer::m_bDrawDebugLeft = false;
-bool CRenderer::m_bDrawDebugRight = false;
-bool CRenderer::m_bWireFram = false;
 
 
 //=============================================================================
@@ -25,7 +26,7 @@ bool CRenderer::m_bWireFram = false;
 CRenderer::CRenderer()
 {
 	//値の初期化
-	m_pD3D = NULL;			//Direct3Dオブジェクト
+	m_pD3D = NULL;			// Direct3Dオブジェクト
 	m_pD3DDevice = NULL;	// Deviceオブジェクト(描画に必要)
 }
 
@@ -114,6 +115,7 @@ HRESULT CRenderer::Init(HWND hWnd, bool bWindow)
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
+
 	return S_OK;
 }
 
@@ -141,25 +143,7 @@ void CRenderer::Uninit(void)
 // 更新処理
 //=============================================================================
 void CRenderer::Update(void)
-{	
-	//キーボードの取得
-	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	
-
-	//ワイヤーフレームのON・OFF
-	if (m_bDrawDebugLeft == true)
-	{
-		if (pInputKeyboard->GetKeyboardTrigger(DIK_F2) == true)
-		{
-			m_bWireFram = m_bWireFram ? false : true;
-		}
-	}
-
-	if (m_bDrawDebugLeft == false)
-	{//デバック表示をOFFならすべてオフにする
-		m_bDrawDebugRight = false;	//右側の標示
-		m_bWireFram = false;		//ワイヤーフレーム
-	}
-
+{
 	//全て更新する
 	CScene::UpdateAll();
 }
@@ -178,46 +162,26 @@ void CRenderer::Draw(CModeBase * pModeBase)
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{
-		if (m_bWireFram == true)
-		{
-			//ワイヤーフレームの表示
-			m_pD3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-		}
-
-		//描画処理
+		// 描画処理
 		if(pModeBase != NULL){ pModeBase->Draw(); }
-
-		if (m_bWireFram == true)
-		{
-			//ワイヤーフレームの表示をデフォルトに戻す
-			m_pD3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-		}
 
 		// Direct3Dによる描画の終了
 		m_pD3DDevice->EndScene();
 
+		// デバッグログの描画
 		D3DVIEWPORT9 viewport;
-		viewport.X = 0; //ビューポートの左上X座標
-		viewport.Y = 0; //ビューポートの左上Y座標
-		viewport.Width = SCREEN_WIDTH;//幅
-		viewport.Height = SCREEN_HEIGHT;//高さ
-		viewport.MaxZ = 1.0f;								//ビューポートの設定
-		viewport.MinZ = 0.0f;								//ビューポートの設定
+		viewport.X = 0;
+		viewport.Y = 0;
+		viewport.Width = SCREEN_WIDTH;
+		viewport.Height = SCREEN_HEIGHT;
+		viewport.MaxZ = 1.0f;
+		viewport.MinZ = 0.0f;
 		m_pD3DDevice->SetViewport(&viewport);
-
 		CDebugProc::Draw();
 	}
 
 	// バックバッファとフロントバッファの入れ替え
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
-}
-
-//=============================================================================
-// デバック表示情報の取得
-//=============================================================================
-CDebugProc * CRenderer::GetDebugLeft(void)
-{
-	return m_pDebugLeft;
 }
 
 #if 0

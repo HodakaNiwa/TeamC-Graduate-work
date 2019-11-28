@@ -224,14 +224,8 @@ void CSceneMeshFiled::Update(void)
 	//変数宣言
 	int nCntVertex = 0;
 
-	//デバック表示の取得
-	CDebugProc * pDebugLeft = CRenderer::GetDebugLeft();
-
 	//頂点の高さ変更処理
 	//UpdatePrimitiv();
-
-	//デバック表示の取得
-	CDebugProc * pDebugRight = CRenderer::GetDebugRight();
 
 	VERTEX_3D * pVtx;		//頂点情報へのポインタ
 
@@ -278,7 +272,7 @@ void CSceneMeshFiled::Draw(void)
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
-		
+
 	// テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);
 
@@ -424,9 +418,6 @@ void CSceneMeshFiled::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
 //=============================================================================
 float CSceneMeshFiled::GetHight(D3DXVECTOR3 pos)
 {
-	//デバック表示の取得
-	CDebugProc * pDebugLeft = CRenderer::GetDebugLeft();
-
 	//変数宣言
 	D3DXVECTOR3 VecA = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 VecB = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -510,29 +501,26 @@ float CSceneMeshFiled::GetHight(D3DXVECTOR3 pos)
 void CSceneMeshFiled::UpdatePrimitiv(void)
 {
 	//編集状態か取得する
-	if (CRenderer::GetDrawDebugRight() == true)
+	CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
+
+																	//頂点の選択処理
+	if (pInputKeyboard->GetKeyboardTrigger(DIK_T) == true)
 	{
-		CInputKeyboard * pInputKeyboard = CManager::GetInputkeyboard();	//キーボードの取得
-
-		//頂点の選択処理
-		if (pInputKeyboard->GetKeyboardTrigger(DIK_T) == true)
-		{
-			m_nSelectPrimitiv = (m_nSelectPrimitiv + (m_nPrimitiv - 1)) % m_nPrimitiv;
-		}
-		else if(pInputKeyboard->GetKeyboardTrigger(DIK_G) == true)
-		{
-			m_nSelectPrimitiv = (m_nSelectPrimitiv + 1) % m_nPrimitiv;
-		}
-		else if (pInputKeyboard->GetKeyboardTrigger(DIK_RETURN) == true)
-		{//頂点情報を保存する
-			SaveData();
-			SetNor();
-			m_bUpdatePrimitiv = false;	//最新状態にする
-		}
-
-		//高さの更新処理
-		SetPosY(m_nSelectPrimitiv);
+		m_nSelectPrimitiv = (m_nSelectPrimitiv + (m_nPrimitiv - 1)) % m_nPrimitiv;
 	}
+	else if (pInputKeyboard->GetKeyboardTrigger(DIK_G) == true)
+	{
+		m_nSelectPrimitiv = (m_nSelectPrimitiv + 1) % m_nPrimitiv;
+	}
+	else if (pInputKeyboard->GetKeyboardTrigger(DIK_RETURN) == true)
+	{//頂点情報を保存する
+		SaveData();
+		SetNor();
+		m_bUpdatePrimitiv = false;	//最新状態にする
+	}
+
+	//高さの更新処理
+	SetPosY(m_nSelectPrimitiv);
 }
 
 //=============================================================================
@@ -587,11 +575,11 @@ void CSceneMeshFiled::SetNor(void)
 			//法線の設定
 			Vec0[0] = pVtx[0].pos - pVtx[0 + m_nWidth + 1].pos;		//Vec1を求める
 			Vec1[0] = pVtx[0].pos - pVtx[0 + m_nWidth + 2].pos;		//Vec0を求める
-			Vec0[1] = pVtx[0].pos - pVtx[0 + m_nWidth + 2].pos;		
-			Vec1[1] = pVtx[0].pos - pVtx[1].pos;					
+			Vec0[1] = pVtx[0].pos - pVtx[0 + m_nWidth + 2].pos;
+			Vec1[1] = pVtx[0].pos - pVtx[1].pos;
 
 			D3DXVec3Cross(&nor[nCntNor], &Vec0[0], &Vec1[0]);		//法線の設定
-			D3DXVec3Cross(&nor[nCntNor + 1], &Vec0[1], &Vec1[1]);	
+			D3DXVec3Cross(&nor[nCntNor + 1], &Vec0[1], &Vec1[1]);
 
 			//正規化する
 			D3DXVec3Normalize(&nor[nCntNor], &nor[nCntNor]);
@@ -718,7 +706,7 @@ void CSceneMeshFiled::SetHight(D3DXVECTOR3 pos, float fValue, float fRange)
 			float fHight = cosf(D3DX_PI * -0.5f * fAngle) * fValue;	//高さを求める
 
 			pVtx[0].pos.y += fHight;
-		} 
+		}
 
 		//該当の位置まで進める
 		pVtx++;

@@ -161,7 +161,6 @@ void CLightOrbit::Movement(void)
 //=============================================================================
 void CLightOrbit::CreateEffect3D(void)
 {
-	return;
 	if (m_nCounter % LIGHTORBIT_EFFECT_SPAWN != 0) { return; }
 	D3DXCOLOR col = CCharacter::m_CountryColor[m_nDestPlayerIdx];
 	CEffect3D::Create(m_Pos, col, LIGHTORBIT_EFFECT_WIDTH, LIGHTORBIT_EFFECT_HEIGHT,

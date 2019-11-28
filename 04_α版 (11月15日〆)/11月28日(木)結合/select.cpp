@@ -20,7 +20,7 @@
 #include "charSelect.h"
 #include "RawMouse.h"
 #include "collision.h"
-
+#include "sky.h"
 #include "audience.h"
 
 //*****************************************************************************
@@ -189,8 +189,11 @@ void CSelect::Init(void)
 	//国選択モードのUI生成処理
 	InitCuntrySelect();
 
-	// デバッグ用
+	// 観客の生成
 	CAudience::Create();
+
+	// 空の生成
+	CSky::Create();
 }
 
 //=============================================================================

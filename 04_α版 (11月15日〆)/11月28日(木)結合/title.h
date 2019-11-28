@@ -50,6 +50,7 @@ private:
 	//--------------------
 	void CreateTitleGear(void);
 	void CreateCamera(void);
+	void SetBarun(void);
 
 	//--------------------
 	//	ƒƒ“ƒo•Ï”

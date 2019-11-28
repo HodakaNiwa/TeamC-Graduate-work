@@ -17,6 +17,7 @@
 #include "fieldmanager.h"
 #include "score.h"
 #include "RawMouse.h"
+#include "sky.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -169,6 +170,9 @@ void CRanking::Init(void)
 
 	if (m_pLoadTextObj == NULL) { m_pLoadTextObj = CLoadTextObject::Create(LOAD_OBJ); }					//オブジェクトの生成
 	if (m_pLoadTerritory == NULL) { m_pLoadTerritory = CLoadTextTerritory::Create(LOAD_TERRITORY); }	//テリトリーの読み込み
+
+	// 空の生成
+	CSky::Create();
 
 }
 //=============================================================================

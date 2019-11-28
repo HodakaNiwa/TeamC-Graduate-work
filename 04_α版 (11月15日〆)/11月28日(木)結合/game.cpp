@@ -204,6 +204,7 @@ void CGame::Init(void)
 
 #else
 	//カウントダウン状態
+	///CGame::SetGameState(CGame::GAMESTATE_NORMAL);
 	CGame::SetGameState(CGame::GAMESTATE_FIRSTCOUNTDOWN);
 
 	//カウントダウンタイマーの生成
@@ -318,7 +319,7 @@ void CGame::CreateInitPlayer(void)
 	{//プレイ人数分回す
 #ifdef GAME_DEBUG
 	 //デバッグ用
-		m_nPlayerType[nCnt] = CCharacter::CHARCTERTYPE_SPEED;
+		m_nPlayerType[nCnt] = CCharacter::CHARCTERTYPE_POWER;
 		m_nCountry[nCnt] = CCharacter::TYPE_AMERICA;
 		m_nControllerNum[nCnt] = 0;	//コントローラーの番号を取得
 		m_nControllerType[nCnt] = 1;		//コントローラーのタイプを取得

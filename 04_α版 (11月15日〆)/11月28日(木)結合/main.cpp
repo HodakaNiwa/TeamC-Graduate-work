@@ -7,6 +7,7 @@
 #include "main.h"
 #include "manager.h"
 #include "RawMouse.h"
+#include "debuglog.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -131,10 +132,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				if ((dwCurrentTime - dwFPSLastTime) >= 500)
 				{// 0.5秒ごとに実行
 
-#ifdef _DEBUG
 				// FPSを算出
 					g_nFps = dwFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);
-#endif
+
 					dwFPSLastTime = dwCurrentTime;	// 現在の時間を保存
 					dwFrameCount = 0;
 				}
@@ -142,6 +142,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				if ((dwCurrentTime - dwExecLastTime) >= (1000 / 60))
 				{// 1/60秒経過
 					dwExecLastTime = dwCurrentTime;	// 現在の時間を保存
+					CDebugProc::Print("FPS : %d\n", g_nFps);
 
 					//　RawInputのデータを調整
 					pManager->GetRawMouse()->AdjustMouseData();

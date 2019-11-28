@@ -11,6 +11,7 @@
 #include "loadText.h"
 #include "tutorial.h"
 #include "sceneBillBorad.h"
+#include "camera.h"
 
 //==================================
 // マクロ定義
@@ -206,7 +207,35 @@ void CParticle::Uninit(void)
 //=========================================
 // 更新処理
 //=========================================
-void CParticle::Update(void){}
+void CParticle::Update(void)
+{
+	//変数宣言
+	CGame * pGame = CManager::GetGame();
+	D3DXVECTOR3 Pos = CSceneBillborad::GetPos();
+	bool bDraw[MAX_NUMPLAYER] = {};
+	bool bDrawChack = true;
+
+	//カメラごとの描画判定
+	if (pGame == NULL) { return; }
+	for (int nCnt = 0; nCnt < MAX_NUMPLAYER; nCnt++)
+	{
+		//NULLチェック
+		CGameCamera * pGameCamera = pGame->GetGameCamera(nCnt);
+		if (pGameCamera == NULL) { continue; }
+
+		bDraw[nCnt] = pGame->GetGameCamera(nCnt)->ReflectObject(Pos);
+
+		if (bDraw[nCnt])
+		{
+			bDrawChack = false;	//描画フラグ
+			SetDraw(true);
+			break;
+		}
+	}
+
+	if (!bDrawChack) { return; }
+	SetDraw(false);		//描画しない状態にする
+}
 
 //=========================================
 // 描画処理

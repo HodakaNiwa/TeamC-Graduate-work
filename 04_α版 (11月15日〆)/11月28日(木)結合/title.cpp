@@ -16,21 +16,25 @@
 #include "library.h"
 #include "camera.h"
 #include "fieldmanager.h"
-#include "RawMouse.h"
+#include "audience.h"
+#include "barun.h"
+#include "sky.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define FADE_TIME	              (60 * 10)
+#define FADE_TIME	              (60 * 8)
 #define LOAD_UI		              ("data\\TEXT\\UI\\Title.txt")
 #define LOAD_OBJECT		          ("data/TEXT/Stage.txt")
 #define LOAD_TERRITORY	          ("data/TEXT/Territory.txt")
+#define MOVE_XZ					  (0.2f);
+#define MIDLLE					  (15.0f)
 
 // 回転カメラ用
-#define ROTATIONCAMERA_POSVHEIGHT (500.0f)
-#define ROTATIONCAMERA_POSR       (D3DXVECTOR3(0.0f,0.0f,0.0f))
+#define ROTATIONCAMERA_POSVHEIGHT (700.0f)
+#define ROTATIONCAMERA_POSR       (D3DXVECTOR3(0.0f,400.0f,0.0f))
 #define ROTATIONCAMERA_ROTSPEED   (0.003f)
-#define ROTATIONCAMERA_LENGTH     (700.0f)
+#define ROTATIONCAMERA_LENGTH     (900.0f)
 
 // タイトルの歯車用
 //#define TITLE_GEAR_DRAWADDTIVE
@@ -116,6 +120,16 @@ void CTitle::Init(void)
 
 	//初期化
 	m_SoundState = SOUNDSTATE_NONE;
+
+	//観客の生成
+	CAudience::Create();
+
+	//風船の生成
+	CBarun::LoadTex();
+	SetBarun();
+
+	// 空の生成
+	CSky::Create();
 }
 
 //=============================================================================
@@ -157,6 +171,9 @@ void CTitle::Uninit(void)
 
 	//ベースの破棄
 	CModeBase::Uninit();
+
+	//風船テクスチャの破棄
+	CBarun::UnloadTex();
 }
 
 //=============================================================================
@@ -170,10 +187,6 @@ void CTitle::Update(void)
 		m_pRotationCamera->Update();
 	}
 
-
-	// 地面の更新処理
-	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
-
 	//サウンドの取得
 	CSound *pSound = CManager::GetSound();
 
@@ -184,19 +197,14 @@ void CTitle::Update(void)
 	CGamePad	*pGamePad = CManager::GetInputGamePad();
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
 	CInputXPad * pXPad = CManager::GetXPad();
-	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
 
-	for (int nCnt = 0; nCnt < 4; nCnt++)
+	if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, 0) == true)
 	{
-		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true ||
-			pRawMouse->GetTrigger(CRawMouse::RIMS_BUTTON_LEFT, nCnt) == true)
+		if (CFade::GetFadeMode() != CFade::FADE_OUT)
 		{
-			if (CFade::GetFadeMode() != CFade::FADE_OUT)
-			{
-				//決定音
-				pSound->PlaySound(CSound::SOUND_LABEL_SE007);
-				CFade::SetFade(CManager::MODE_SELECT);
-			}
+			//決定音
+			pSound->PlaySound(CSound::SOUND_LABEL_SE007);
+			CFade::SetFade(CManager::MODE_SELECT);
 		}
 	}
 	if ((m_nCounter > FADE_TIME))
@@ -284,6 +292,75 @@ void CTitle::CreateCamera(void)
 	m_pRotationCamera = CRotationCamera::Create(ROTATIONCAMERA_POSVHEIGHT, ROTATIONCAMERA_POSR,
 		ROTATIONCAMERA_ROTSPEED, ROTATIONCAMERA_LENGTH);
 	m_pRotationCamera->SetViewport(viewport);
+}
+
+//=============================================================================
+// 風船の生成処理
+//=============================================================================
+void CTitle::SetBarun(void)
+{
+	int nCntColor = 0;
+	D3DXVECTOR3 move = INITIALIZE_VECTOR3;
+
+	for (int nCnt = 0; nCnt < 120; nCnt++)
+	{
+		nCntColor = (nCntColor + 1) % 5;
+		int nRand = rand() % 30 + 10;
+		move.y = (float)nRand * 0.1f;
+		move.z += MOVE_XZ;
+		move.x += MOVE_XZ;
+		if (move.z > 5.0f) { move.z = -3.0f; }
+		if (move.x > 5.0f) { move.x = -3.0f; }
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), 300.0f, 1600.0f), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), 250.0f, 1500.0f), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), 200.0f, 1400.0f), (nCntColor + 1) % 5, move);
+
+		nCntColor = (nCntColor + 1) % 5;
+		move.z += MOVE_XZ;
+		move.x += MOVE_XZ;
+		if (move.z > 5.0f) { move.z = -6.0f; }
+		if (move.x > 5.0f) { move.x = -6.0f; }
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), 50.0f, -1600.0f), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), 0.0f, -1500.0f), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), -50.0f, -1400.0f), (nCntColor + 1) % 5, move);
+
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), -150.0f, -1600.0f), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), -250.0f, -1500.0f), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), -200.0f, -1400.0f), (nCntColor + 1) % 5, move);
+
+		nRand = rand() % 30 + 10;
+		move.y = (float)nRand * 0.1f;
+		nCntColor = (nCntColor + 1) % 5;
+		move.z += MOVE_XZ;
+		move.x += MOVE_XZ;
+		if (move.z > 5.0f) { move.z = -3.0f; }
+		if (move.x > 5.0f) { move.x = -3.0f; }
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(-1400.0f, 50.0f, -1200.0f + (nCnt * MIDLLE)), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1500.0f, 150.0f, -1200.0f + (nCnt * MIDLLE)), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1600.0f, 200.0f, -1200.0f + (nCnt * MIDLLE)), (nCntColor + 1) % 5, move);
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(-1400.0f, -50.0f, -1200.0f + (nCnt * MIDLLE)), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1500.0f, -150.0f, -1200.0f + (nCnt * MIDLLE)), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1600.0f, -200.0f, -1200.0f + (nCnt * MIDLLE)), (nCntColor + 1) % 5, move);
+
+		nCntColor = (nCntColor + 1) % 5;
+		move.z += MOVE_XZ;
+		move.x += MOVE_XZ;
+		if (move.z > 5.0f) { move.z = -6.0f; }
+		if (move.x > 5.0f) { move.x = -6.0f; }
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(1400.0f, 200.0f, 1200.0f - (nCnt * MIDLLE)), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(1500.0f, 250.0f, 1200.0f - (nCnt * MIDLLE)), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(1600.0f, 300.0f, 1200.0f - (nCnt * MIDLLE)), (nCntColor + 1) % 5, move);
+	}
 }
 
 

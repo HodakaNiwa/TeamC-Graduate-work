@@ -28,7 +28,7 @@ public:
 	void SetSize(D3DXVECTOR3 size);
 	void SetPos(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetSize(void) { return m_size; }				//ÉTÉCÉYÇÃê›íË
-
+	D3DXVECTOR3 GetPos(void) { return m_pos; }
 protected:
 	void Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);
 	void SetColor(D3DXCOLOR color);

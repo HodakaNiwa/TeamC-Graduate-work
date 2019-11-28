@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="AIController.cpp" />
     <ClCompile Include="audience.cpp" />
+    <ClCompile Include="barun.cpp" />
     <ClCompile Include="bottun.cpp" />
     <ClCompile Include="boxCollider.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -233,6 +234,7 @@
     <ClCompile Include="select.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="skilicon.cpp" />
+    <ClCompile Include="sky.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="speedplayer.cpp" />
     <ClCompile Include="sphereCollider.cpp" />
@@ -251,6 +253,7 @@
   <ItemGroup>
     <ClInclude Include="AIController.h" />
     <ClInclude Include="audience.h" />
+    <ClInclude Include="barun.h" />
     <ClInclude Include="bottun.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="character.h" />
@@ -318,6 +321,7 @@
     <ClInclude Include="select.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="skilicon.h" />
+    <ClInclude Include="sky.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="territory.h" />
     <ClInclude Include="textureManager.h" />

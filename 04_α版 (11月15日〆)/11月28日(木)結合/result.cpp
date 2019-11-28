@@ -24,6 +24,8 @@
 #include "number2D.h"
 #include "select.h"
 #include "audience.h"
+#include "barun.h"
+#include "sky.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -76,6 +78,10 @@
 
 //ズーム状態のマクロ
 #define CHANGE_TIME	(90)
+
+//風船
+#define MOVE_XZ					  (0.2f);
+#define MIDLLE					  (60.0f)
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -181,6 +187,7 @@ void CResult::Init(void)
 
 	//テクスチャの読み込み
 	LoadTex();
+	CBarun::LoadTex();
 
 	//コントローラー情報取得
 	for (int nCnt = 0; nCnt < NUMPLAYER; nCnt++)
@@ -244,8 +251,11 @@ void CResult::Init(void)
 	//キャラ表示の初期化
 	InitCharUI();
 
-	// デバッグ用
+	// 観客の生成
 	CAudience::Create();
+
+	// 空の生成
+	CSky::Create();
 }
 
 //=============================================================================
@@ -341,6 +351,7 @@ void CResult::Uninit(void)
 	//テクスチャの破棄
 	UnloadTex();
 	CNumber2D::Unload();
+	CBarun::UnloadTex();
 
 	//フェード以外を削除
 	CScene::ReleaseFade();
@@ -354,36 +365,14 @@ void CResult::Update(void)
 	//インプットの取得　
 	CGamePad	*pGamePad = CManager::GetInputGamePad();
 	CInputKeyboard * pKeyboard = CManager::GetInputkeyboard();
-	CInputXPad * pXPad = CManager::GetXPad();
-	CRawMouse *pRawMouse = CManager::GetRawMouse();					//RawMouseの取得
-
-	// 地面の更新処理
-	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
-
-	m_nCounter++;
-	if (m_nCounter % 60 == 0)
+	
+	if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true)
 	{
-		m_nTime++;
-		if (m_nTime <= 1)
+		if (CFade::FADE_OUT != CFade::GetFadeMode())
 		{
-			CSound::PlaySound(CSound::SOUND_LABEL_BGM003);
-		}
-		if (m_nTime == 5)
-		{
-			CSound::PlaySound(CSound::SOUND_LABEL_BGM002);
-		}
-	}
-	for (int nCnt = 0; nCnt < 4; nCnt++)
-	{
-		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_A, nCnt) == true ||
-			pRawMouse->GetTrigger(CRawMouse::RIMS_BUTTON_LEFT, nCnt) == true)
-		{
-			if (CFade::FADE_OUT != CFade::GetFadeMode())
-			{
-				//決定音
-				CSound::PlaySound(CSound::SOUND_LABEL_SE007);
-				CFade::SetFade(CManager::MODE_RANKING);
-			}
+			//決定音
+			CSound::PlaySound(CSound::SOUND_LABEL_SE007);
+			CFade::SetFade(CManager::MODE_RANKING);
 		}
 	}
 
@@ -455,6 +444,7 @@ void CResult::UpdateWhite(void)
 		else if (col.a < 0.5f)
 		{
 			if (m_pWinChar != NULL) { m_pWinChar->SetMotionType(CCharResult::MOTION_TYPE_WIN); }
+			CreateBarun();	//風船の破棄
 		}
 
 		//色を設定する
@@ -1175,6 +1165,48 @@ void CResult::GetScoreResult(void)
 		m_nCountRobbotedTerritory[nCnt] = CGame::GetRobbotedTerritory(nCnt);	//テリトリーの奪われた数
 
 		m_nTotalScore[nCnt] = m_nCountMakeShape[nCnt] + m_nCountGetTerritory[nCnt] - m_nCountRobbotedTerritory[nCnt];
+	}
+}
+
+//=============================================================================
+// 風船の生成
+//=============================================================================
+void CResult::CreateBarun(void)
+{
+	int nCntColor = 0;
+	D3DXVECTOR3 move = INITIALIZE_VECTOR3;
+
+	for (int nCnt = 0; nCnt < 30; nCnt++)
+	{
+		nCntColor = (nCntColor + 1) % 5;
+		int nRand = rand() % 20 + 10;
+		move.y = (float)nRand * 0.1f;
+		move.z += MOVE_XZ;
+		move.x += MOVE_XZ;
+		if (move.z > 3.0f) { move.z = -3.0f; }
+		if (move.x > 3.0f) { move.x = -3.0f; }
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * MIDLLE), 300.0f, 150.0f), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * (MIDLLE + 5.0f)), 100.0f, 1500.0f), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1200.0f + (nCnt * (MIDLLE + 10.0f)), 50.0f, 1400.0f), (nCntColor + 1) % 5, move);
+
+		nRand = rand() % 20 + 10;
+		move.y = (float)nRand * 0.1f;
+		nCntColor = (nCntColor + 1) % 5;
+		move.z += MOVE_XZ;
+		move.x += MOVE_XZ;
+		if (move.z > 3.0f) { move.z = -3.0f; }
+		if (move.x > 3.0f) { move.x = -3.0f; }
+
+		nCntColor = (nCntColor + 1) % 5;
+		CBarun::Create(D3DXVECTOR3(-1400.0f, 50.0f, -1200.0f + (nCnt * MIDLLE)), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1500.0f, 150.0f, -1200.0f + (MIDLLE + 5.0f)), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1600.0f, 200.0f, -1200.0f + (MIDLLE + 10.0f)), (nCntColor + 1) % 5, move);
+
+		CBarun::Create(D3DXVECTOR3(-1400.0f, -50.0f, -1200.0f + (nCnt * MIDLLE)), nCntColor, move);
+		CBarun::Create(D3DXVECTOR3(-1500.0f, -150.0f, -1200.0f + (MIDLLE + 5.0f)), (nCntColor + 1) % 5, move);
+		CBarun::Create(D3DXVECTOR3(-1600.0f, -200.0f, -1200.0f + (MIDLLE + 10.0f)), (nCntColor + 1) % 5, move);
 	}
 }
 

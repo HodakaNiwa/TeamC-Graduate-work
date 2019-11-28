@@ -166,6 +166,8 @@ void  CSpeedPlayer::SprintUpdate(void)
 	{
 		m_nSprintCounter++;
 		//m_PlayerState = PLAYERSTATE_ACTION;
+		m_pLoadEffectSpeed->SetPos(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
+		m_pLoadEffectSpeed->OnTimeEffect();
 
 		if (m_nSprintCounter % 60 == 0)
 		{
@@ -175,8 +177,7 @@ void  CSpeedPlayer::SprintUpdate(void)
 			{//8•bŠÔ‘¬‚³‚ğã‚°‚é
 				//m_PlayerState = PLAYERSTATE_ACTION;	//ƒXƒvƒŠƒ“ƒgó‘Ô
 				
-				m_pLoadEffectSpeed->SetPos(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
-				m_pLoadEffectSpeed->OnTimeEffect();
+				
 			}
 			else
 			{//8•b’´‚¦‚½‚ç•’Ê‚Ì‘¬‚³‚É–ß‚·

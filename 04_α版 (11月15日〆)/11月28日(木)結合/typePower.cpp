@@ -4,26 +4,17 @@
 //◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆
 #include "enemy.h"
 #include "manager.h"
-#include "camera.h"
-#include "input.h"
-#include "inputmouce.h"
-#include "loadEffect.h"
-#include "line.h"
-#include "sceneOrbit.h"
 #include "model.h"
-#include "UI.h"
-#include "skilicon.h"
-#include "RawMouse.h"
-#include "collision.h"
+#include "loadEffect.h"
 #include "effectManager.h"
+#include "line.h"
+#include "collision.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define MAX_SPRINTTIMER (8)		//	スプリント時間
-#define WAVE (1)				//	
 #define RECAST (10)				//	スプリントのリキャスト時間
-
 #define SKILL_RANGE			(150.0f)
 
 //*****************************************************************************

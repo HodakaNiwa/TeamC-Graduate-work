@@ -520,30 +520,30 @@ void CGameCamera::TypeNormal(void)
 		PlayerRot = m_pTargetPlayer->GetRot();
 	}
 
-	if (pGamePad->GetGamePadRightStickPress(CGamePad::ANALOG_STICK_UP) == true)
-	{
-		//視点更新
-		m_posV.y += 1.0f;
-		m_bHight = true;
+	//if (pGamePad->GetGamePadRightStickPress(CGamePad::ANALOG_STICK_UP) == true)
+	//{
+	//	//視点更新
+	//	m_posV.y += 1.0f;
+	//	m_bHight = true;
 
-		if (m_posV.y > (MAX_HIGHT + PlayerPos.y))
-		{
-			m_posV.y = MAX_HIGHT + PlayerPos.y;
-			m_bHight = false;
-		}
-	}
-	if (pGamePad->GetGamePadRightStickPress(CGamePad::ANALOG_STICK_DOWN) == true)
-	{
-		//視点更新
-		m_posV.y -= 1.0f;
-		m_bHight = true;
+	//	if (m_posV.y > (MAX_HIGHT + PlayerPos.y))
+	//	{
+	//		m_posV.y = MAX_HIGHT + PlayerPos.y;
+	//		m_bHight = false;
+	//	}
+	//}
+	//if (pGamePad->GetGamePadRightStickPress(CGamePad::ANALOG_STICK_DOWN) == true)
+	//{
+	//	//視点更新
+	//	m_posV.y -= 1.0f;
+	//	m_bHight = true;
 
-		if (m_posV.y < MIN_HIGHT + PlayerPos.y)
-		{
-			m_posV.y = MIN_HIGHT + PlayerPos.y;
-			m_bHight = false;
-		}
-	}
+	//	if (m_posV.y < MIN_HIGHT + PlayerPos.y)
+	//	{
+	//		m_posV.y = MIN_HIGHT + PlayerPos.y;
+	//		m_bHight = false;
+	//	}
+	//}
 
 	if (PlayerPos.y == 0.0f)
 	{
