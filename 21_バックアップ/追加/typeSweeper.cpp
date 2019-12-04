@@ -19,11 +19,10 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define RECASTTIME (10)				//リキャスト時間
-#define MAX_MINE_POINT (100)		//マインを使用できるポイント
-#define REDUCED_MINE_POINT (20)		//マインを使用した時に減るポイント
-#define RECOVERY_MINE_POINT (2)		//マイン使用ポイントの回復量
-#define RECOVERY_TIME (3)			//使用ポイント回復までの時間
+#define RECASTTIME (10)	// リキャスト時間
+#define MAX_POINT (100)	// マインを使用できるポイント
+#define COST_POINT (20)	// マインを使用した時に減るポイント
+#define RE_POINT (2)	// マイン使用ポイントの回復量
 
 //*****************************************************************************
 // コンストラクタ
@@ -46,19 +45,19 @@ CTypeSweeper::~CTypeSweeper()
 //=============================================================================
 CTypeSweeper *CTypeSweeper::Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 {
-	CTypeSweeper *pSpeedType = NULL;
-	if (pSpeedType == NULL)
+	CTypeSweeper *pSweeperType = NULL;
+	if (pSweeperType == NULL)
 	{
-		pSpeedType = new CTypeSweeper;
+		pSweeperType = new CTypeSweeper;
 
-		if (pSpeedType != NULL)
+		if (pSweeperType != NULL)
 		{
-			pSpeedType->SetType(country);
-			pSpeedType->m_CharcterType = type;
-			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt, country);
+			pSweeperType->SetType(country);
+			pSweeperType->m_CharcterType = type;
+			pSweeperType->Init(nChara, pos, ModelTxt, MotionTxt, country);
 			//佐藤追加しました
-			pSpeedType->m_CharcterTypeResult[nChara] = type;
-			pSpeedType->m_nCuntry[nChara] = country;
+			pSweeperType->m_CharcterTypeResult[nChara] = type;
+			pSweeperType->m_nCuntry[nChara] = country;
 
 		}
 		else
@@ -70,7 +69,7 @@ CTypeSweeper *CTypeSweeper::Create(int nChara, int country, CHARCTERTYPE type, D
 	{
 		MessageBox(0, "プレイヤーがNULLじゃないです", "警告", MB_OK);
 	}
-	return pSpeedType;
+	return pSweeperType;
 }
 
 //=============================================================================
@@ -122,20 +121,14 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	ResetLine();	//ラインの初期化
 
 	
-					//	各変数の初期化
+	//	各変数の初期化
 	m_fSpeed = 1.0f;
-	m_nRecastCounter = 0;
-	m_nRecastTimer = 0;
-	m_nButtonCounter = 0;
-	m_bRecast = false;
 	m_nReCounter = 0;
-	m_nReTimer = 0;
-	m_nMinePoint = MAX_MINE_POINT;
-	m_nInstallationCounter = 0;
-	m_nInstallationTimer = 0;
+	m_nMinePoint = MAX_POINT;
 	m_nLineNum = 2;
 	m_nTiming = 0;
 	m_bStop = false;
+	m_state = STATE_NONE;
 
 	return S_OK;
 }
@@ -197,14 +190,14 @@ void  CTypeSweeper::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
 
 }
 //=============================================================================
-// スプリント処理
+// スキルの発動
 //=============================================================================
 void  CTypeSweeper::ActionUpdate(void)
 {
-	if (m_nMinePoint == MAX_MINE_POINT)	//	満タン時とりあえず地雷を置く
+	//	[[設置条件]]
+	if (m_nMinePoint == MAX_POINT)	//	満タン時とりあえず地雷を置く
 	{
 		Process();
-
 	}
 
 	if (m_apTerritory[0] != NULL)
@@ -215,17 +208,18 @@ void  CTypeSweeper::ActionUpdate(void)
 	}
 	else { m_nTiming = 0; }
 
-	//	ポイントの回復
+
+	//	[[ポイントの回復]]
 	m_nReCounter++;
-	if (m_nReCounter % 180 == 0 && m_nMinePoint < MAX_MINE_POINT)
+	if (m_nReCounter % 180 == 0 && m_nMinePoint < MAX_POINT)
 	{
 		m_nReCounter = 0;
 
-		m_nMinePoint += RECOVERY_MINE_POINT;	//	回復値
+		m_nMinePoint += RE_POINT;	//	回復値
 
-		if (m_nMinePoint >= MAX_MINE_POINT)		//	上限値を越させない
+		if (m_nMinePoint >= MAX_POINT)		//	上限値を越させない
 		{
-			m_nMinePoint = MAX_MINE_POINT;
+			m_nMinePoint = MAX_POINT;
 		}
 	}
 }
@@ -240,13 +234,13 @@ void CTypeSweeper::Process()
 	//	(残りポイントがあれば)
 	if (m_state != STATE_DAMAGE)
 	{
-		if (m_nMinePoint >= REDUCED_MINE_POINT)
+		if (m_nMinePoint >= COST_POINT)
 		{
 			//	設置
 			CMine::Create(CCharacter::GetPos(), pCharacter);
 
 			//	使用可能ポイントを減らす
-			m_nMinePoint -= REDUCED_MINE_POINT;
+			m_nMinePoint -= COST_POINT;
 			if (m_nMinePoint <= 0)	//	0以下にさせない
 			{
 				m_nMinePoint = 0;

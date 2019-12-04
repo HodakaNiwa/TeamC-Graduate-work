@@ -107,7 +107,8 @@ public:
 	// マージ関連
 	void MergeSort(TERRITORY_INFO*, int, int, int); // (TERRITORY_INFO*, 0, 拠点数-1, 拠点数)
 
-
+	// ラインを繋ぐ手順
+	void LineConnect(int);
 
 protected:
 	int m_nEnemyNo;					//	割り当てられたキャラ番号
@@ -116,7 +117,6 @@ protected:
 	STATE m_state;					//	キャラクターの状態
 	CLoadEffect * m_pLoadEffect;	//	エフェクトの情報
 	bool m_bWalk;					//	移動をしてるか
-	bool m_bSprint;					//	スプリントを使用してるか
 	bool m_bSprintMotion;
 	float m_fSpeed;					//	プレイヤーの速さ
 	bool m_bStop;					//	複数回処理を実行させない用(各タイプのAIスキル処理で使用)
@@ -130,7 +130,7 @@ protected:
 	//!	---<<ラインを繋ぐ・図形の完成>>---
 	int m_nLineNum;							//	現在のライン数
 	bool m_bFinish;							//	図形を完成させるかどうか
-	int m_nCreateTime;						//	始点に帰るまでの時間
+	TERRITORY_INFO m_nTerrStart;			//	図形となるラインを繋ぐ際の始点・終点を記憶(始点・終点は同じ位置)
 
 	//!	---<<スキル使用関連>>---
 	bool m_bTarget;							//	ターゲットの切り替え
@@ -139,6 +139,8 @@ protected:
 	int m_nDamageCounter;					//	ダメージカウンター
 	bool m_bSuperArmor;						//	スーパーアーマ状態
 	D3DXVECTOR3 m_rot;						//	移動量
+
+	int m_nLevel;							// AIごとのレベル
 
 private:
 	//D3DXVECTOR3 m_pos;						//	位置
@@ -162,21 +164,17 @@ private:
 	int m_nTargetCnt;							//	拠点の通過回数を記憶
 	bool m_bBreak;								//	ループ解除用
 
-												//!	---<<テリトリー関連>>---
+	//!	---<<テリトリー関連>>---
 	CTerritory* m_pTerritory;				//	クラスポインタ
 	TERRITORY_INFO* m_TerritoryInfo;		//	構造体ポインタ
 	TERRITORY_INFO* m_AreaInfo[AREA_MAX];	//	構造体ポインタ
 	int m_nAreaTerrNum[AREA_MAX];			//	各エリアのテリトリー数
 	int m_nAreaNow;							//	現在いるエリア番号
 
-											//!	---<<ラインを繋ぐ変数>>---
-	TERRITORY_INFO m_nTerrStart;			//	図形となるラインを繋ぐ際の始点・終点を記憶(始点・終点は同じ位置)
 
-	//マージ関連変数
+	//	マージ関連変数
 	float *m_tmp[4]; // [Temporary]一時的に値を記憶する変数
 	bool m_bCheck; // 複数回newさせないため
-
-
 };
 //==============================================
 //		スピード型
@@ -187,18 +185,20 @@ public:
 	CTypeSpeed(int nPriority = 3, OBJTYPE objType = OBJTYPE_ENEMY);
 	~CTypeSpeed();
 
-	static CTypeSpeed *Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
+	static CTypeSpeed *Create(int nChara, int nLevel,int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
 	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], int country);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 	void SprintUpdate(void);	//スピード型のスキル処理
+	void Trigger(void);
 	void  Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);
 
 private:
-	int m_nSprintCounter;	//スプリント用カウンター
-	int m_nSprintTimer;		//スプリント用タイマー
+	int m_nCnt;
+	bool m_bSkillFlag;
+	int m_nTimingCnt;	// レベルごとに発動するタイミングを変える
 };
 
 //==============================================

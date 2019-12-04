@@ -45,6 +45,8 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_bSuperArmor = false;
 	m_bTarget = false;
 	m_bCheck = false;
+	m_state = STATE_NONE;
+	m_nLevel = 0;
 }
 
 //*****************************************************************************
@@ -56,80 +58,24 @@ CEnemy::~CEnemy() { }
 //=============================================================================
 CEnemy *CEnemy::Create(int nNum, TYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], CHARCTERTYPE charatype)
 {
-#if 0
-	CEnemy *pEnemy = NULL;
-
-	if (pEnemy == NULL)
-	{
-		pEnemy = new CEnemy;
-
-		if (pEnemy != NULL)
-		{
-			pEnemy->m_CharcterType = charatype;
-			pEnemy->SetType(type);
-			pEnemy->Init(nNum, pos, ModelTxt, MotionTxt, (int)type);
-		}
-		else
-		{
-			MessageBox(0, "territoryがNULLでした", "警告", MB_OK);
-		}
-	}
-	else
-	{
-		MessageBox(0, "territoryがNULLじゃないです", "警告", MB_OK);
-	}
-	return pEnemy;
-#endif
 	return NULL;	//	←使用するなら消す
 }
 
 //=============================================================================
-// 初期化処理
+// 初期化処理	＊各派生クラスの初期化処理を使っている
 //=============================================================================
 HRESULT CEnemy::Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int nType)
-{
-#if 0
-	CCharacter::Init(nNum, ModelTxt, MotionTxt, m_CharcterType,nType);
-	m_pModel = CCharacter::GetModel();
-	CCharacter::SetPos(pos);
+{ return S_OK; }
 
-	m_nLineNum = 2;	//	最低限のラインを引いたら始点に戻る(拠点を2つ繋いだら始点に戻る、始点に戻ってきたらラインは3つになりポイント加算の条件を満たせる)
-	InitSort(pos);	//	ゲーム開始時の近場のエリア・テリトリーを見つける
-
-	//	---<<ライン関連>>---
-	m_nMaxLineTime = FIRST_LINETIME;
-	m_nLineTime = m_nMaxLineTime;
-	m_bBlockStartTerritory = false;
-	m_pOldStartTerritory = NULL;
-	m_nCountTime = 0;
-	m_pOrbitLine = NULL;
-	m_bMakeShape = false;
-	m_nCntTimeCopyLine = 0;
-	m_bCheckS = false;
-	
-	for (int nCnt = 0; nCnt < MAX_TERRITORY; nCnt++)
-	{
-		m_apCopyLine[nCnt] = NULL;
-	}
-
-	ResetLine();
-#endif
-	return S_OK;
-}
-
-//=============================================================================
-// 初期化処理
-//=============================================================================
 HRESULT CEnemy::Init(void)
-{
-	return S_OK;
-}
+{ return S_OK; }
 
 //=============================================================================
 // 終了処理
 //=============================================================================
 void  CEnemy::Uninit(void)
 {
+	//　マージソート
 	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
 	{
 		if (m_tmp[nCnt] != NULL)
@@ -185,7 +131,7 @@ void  CEnemy::Update(void)
 
 	Program_Line();		//	ライン関数まとめ
 	Program_State();	//	モーション関連
-	
+
 }
 
 //=============================================================================
@@ -208,11 +154,6 @@ void  CEnemy::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) { }
 //=============================================================================
 void CEnemy::InitSort(D3DXVECTOR3 pos)
 {
-	//LARGE_INTEGER freq;
-	//QueryPerformanceFrequency(&freq);
-	//LARGE_INTEGER start, end;
-	//QueryPerformanceCounter(&start);
-
 	for (int nCntArea = 0; nCntArea < AREA_MAX; nCntArea++)
 	{
 		m_nAreaTerrNum[nCntArea] = 0;
@@ -304,29 +245,12 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		}
 	}
 
-	//	距離を短い順にソート
-	//for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
-	//{
-	//	//	ここからソート処理
-	//	for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//	エリアごとのテリトリー数分回す
-	//	{
-	//		for (int nTerrCnt02 = 0; nTerrCnt02 < m_nAreaTerrNum[nAreaCnt]; nTerrCnt02++)
-	//		{
-	//			if (m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort < m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort)
-	//			{
-	//				float fDisSort = m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort;
-	//				m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort = m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort;
-	//				m_AreaInfo[nAreaCnt][nTerrCnt02].fDisSort = fDisSort;
-	//			}
-	//		}
-	//	}
-	//}
+	//	距離を短い順にマージソート
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
 		MergeSort(m_AreaInfo[nAreaCnt], 0, m_nAreaTerrNum[nAreaCnt] - 1, nAreaCnt);
 		
 	}
-
 
 	//	ゲーム開始の際に、どこのエリアが一番近いかを決める(ソート処理)
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
@@ -359,10 +283,6 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		nAreaCnt += 1;
 	}
 
-	//QueryPerformanceCounter(&end);
-	//double time = static_cast<double>(end.QuadPart - start.QuadPart) * 1000.0 / freq.QuadPart;
-	//CDebugProc::Print("\n 処理時間time %lf[ms]\n", time);
-
 }
 
 //=============================================================================
@@ -382,19 +302,6 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 	}
 
 	//	[[短い距離順に変える]]
-	/*for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-	{
-		for (int nCnt2 = 0; nCnt2 < m_nAreaTerrNum[m_nAreaNow]; nCnt2++)
-		{
-			if (m_AreaInfo[m_nAreaNow][nCnt].fDisSort < m_AreaInfo[m_nAreaNow][nCnt2].fDisSort)
-			{
-				float fDisSort = m_AreaInfo[m_nAreaNow][nCnt].fDisSort;
-				m_AreaInfo[m_nAreaNow][nCnt].fDisSort = m_AreaInfo[m_nAreaNow][nCnt2].fDisSort;
-				m_AreaInfo[m_nAreaNow][nCnt2].fDisSort = fDisSort;
-			}
-		}
-	}*/
-
 	MergeSort(m_AreaInfo[m_nAreaNow], 0, m_nAreaTerrNum[m_nAreaNow] - 1, m_nAreaNow);
 	
 
@@ -417,7 +324,7 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 }
 
 //=============================================================================
-//　プレイヤーの移動処理
+//　共通処理
 //=============================================================================
 void  CEnemy::AIBasicAction(void)
 {
@@ -456,28 +363,31 @@ void  CEnemy::AIBasicAction(void)
 		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
 			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
 		{
-			//	[[最新の始点・終点に更新]]
-			if (m_apTerritory[0] != NULL)
+			CGame * pGame = CManager::GetGame();
+			if (pGame != NULL)
 			{
-				m_nTerrStart.pos = m_apTerritory[0]->GetPos();
-			}
-	
-			//	[[ラインを(m_nLineNum)本引いたら始点に戻る]]
-			if (m_apTerritory[m_nLineNum] != NULL)
-			{
-				if (m_nLineTime <= (12 - m_nCreateTime) * 100&& m_bFinish == false ||	// 制限時間が迫ってきたら
-					m_nLineNum == TERRITORY_MAX-1)										//	最大ライン分引いていたら
+				CCharacter *pChara = pGame->GetChara(m_nEnemyNo);
+				if (pChara != NULL)
 				{
-					m_nCreateTime = (rand() % 4);
-					m_nLineNum = 2;		//	初期最低値に戻す
-					m_bFinish = true;	//	始点に戻す
-				}
-				else//	ラインを伸ばす時間に余裕があれば
-				{
-					m_nLineNum += 1;
-				}
+					switch(pChara->GetCharcterType())
+					{
+					case CCharacter::CHARCTERTYPE_SPEED:
+						
+						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	// アクション時
+						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } // 通常時
+						break;
 
+					case CCharacter::CHARCTERTYPE_POWER:
+						LineConnect((12 - (rand() % 3)));
+						break;
+
+					case CCharacter::CHARCTERTYPE_TECHNIQUE:
+						LineConnect((12 - (rand() % 3)));
+						break;
+					}
+				}
 			}
+			
 			//	[[フラグを立てる]]
 			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
 			//	[[通過記録カウントアップ]]
@@ -549,7 +459,6 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 //=============================================================================
 void  CEnemy::Program_Line(void)
 {
-#if 1
 	//	ラインのカウントダウン処理
 	CountDownLineTime();
 
@@ -562,7 +471,34 @@ void  CEnemy::Program_Line(void)
 
 	//	図形が完成した後の処理
 	UpdateShapeComplete();
-#endif
+}
+
+//=============================================================================
+// ラインを繋ぐ手順
+//=============================================================================
+void CEnemy::LineConnect(int nRand)
+{
+	//	[[最新の始点・終点に更新]]
+	if (m_apTerritory[0] != NULL)
+	{
+		m_nTerrStart.pos = m_apTerritory[0]->GetPos();
+	}
+
+	//	[[ラインを(m_nLineNum)本引いたら始点に戻る]]
+	if (m_apTerritory[m_nLineNum] != NULL)
+	{
+		if (m_nLineTime <= nRand * 100 && m_bFinish == false ||	// 制限時間が迫ってきたら
+			m_nLineNum == TERRITORY_MAX - 1)					//	最大ライン分引いていたら
+		{
+			m_nLineNum = 2;		//	初期最低値に戻す
+			m_bFinish = true;	//	始点に戻す
+		}
+		else//	ラインを伸ばす時間に余裕があれば
+		{
+			m_nLineNum += 1;
+		}
+
+	}
 }
 //=============================================================================
 // モーション処理まとめ
@@ -576,10 +512,10 @@ void CEnemy::Program_State(void)
 
 		m_bWalk = true;
 		m_bSprintMotion = true;
+
 		break;
 
 	case STATE_WALK:		//	[[移動状態]]
-
 		break;
 
 	case STATE_ACTION:		//	[[アクション状態]]
@@ -669,7 +605,7 @@ void CEnemy::Program_Motion(void)
 	//移動状態
 	if (m_state != STATE_BLOWAWAY && m_state != STATE_DAMAGE)
 	{
-		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state != STATE_ACTION && m_bSprint != true)
+		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state != STATE_ACTION)
 		{
 			//移動状態
 			m_state = STATE_WALK;
@@ -679,21 +615,14 @@ void CEnemy::Program_Motion(void)
 		{
 			m_state = STATE_WALK;
 		}
-		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_bSprint == true)
-		{
-			//移動状態
-			m_state = STATE_ACTION;
-		}
 	}
-	if (m_bWalk == true)
-	{//移動モーション
-		if (m_state == STATE_WALK)
-		{
-			pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
-			m_pMotion->SetNumMotion(STATE_WALK);
-			m_bWalk = false;
-		}
+	if (m_bWalk == true && m_state == STATE_WALK)
+	{
+		pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
+		m_pMotion->SetNumMotion(m_state);
+		m_bWalk = false;
 	}
+
 	if (m_bSprintMotion == true)
 	{//スプリントモーション
 		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state == STATE_ACTION)
@@ -777,6 +706,7 @@ bool CEnemy::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTO
 		if (CollisionCylinderyCollider((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true)
 		{
 		}
+		// ★パワー型AI用の判定
 		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
 		{
 			CGame * pGame = CManager::GetGame();

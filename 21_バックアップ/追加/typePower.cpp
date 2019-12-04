@@ -9,13 +9,13 @@
 #include "effectManager.h"
 #include "line.h"
 #include "collision.h"
-
+#include "debuglog.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define MAX_SPRINTTIMER (8)		//	スプリント時間
 #define RECAST (10)				//	スプリントのリキャスト時間
-#define SKILL_RANGE			(150.0f)
+#define SKILL_RANGE			(150.0f)	// スキルの識別範囲
 
 //*****************************************************************************
 // コンストラクタ
@@ -32,19 +32,19 @@ CTypePower::~CTypePower() { }
 //=============================================================================
 CTypePower *CTypePower::Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 {
-	CTypePower *pSpeedType = NULL;
-	if (pSpeedType == NULL)
+	CTypePower *pPowerType = NULL;
+	if (pPowerType == NULL)
 	{
-		pSpeedType = new CTypePower;
+		pPowerType = new CTypePower;
 
-		if (pSpeedType != NULL)
+		if (pPowerType != NULL)
 		{
-			pSpeedType->SetType(country);
-			pSpeedType->m_CharcterType = type;
-			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt,country);
+			pPowerType->SetType(country);
+			pPowerType->m_CharcterType = type;
+			pPowerType->Init(nChara, pos, ModelTxt, MotionTxt,country);
 			//佐藤追加しました
-			pSpeedType->m_CharcterTypeResult[nChara] = type;
-			pSpeedType->m_nCuntry[nChara] = country;
+			pPowerType->m_CharcterTypeResult[nChara] = type;
+			pPowerType->m_nCuntry[nChara] = country;
 		}
 		else
 		{
@@ -55,7 +55,7 @@ CTypePower *CTypePower::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 	{
 		MessageBox(0, "プレイヤーがNULLじゃないです", "警告", MB_OK);
 	}
-	return pSpeedType;
+	return pPowerType;
 }
 
 //=============================================================================
@@ -108,11 +108,11 @@ HRESULT CTypePower::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 	m_nRecastCounter = 0;
 	m_bBreakTime = false;
 	m_bRecast = false;
-	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
 	m_nLineNum = 2;
 	m_bStop = false;
 	m_bTrigger = false;
 	m_bBreakTime = false;
+	m_state = STATE_NONE;
 
 	return S_OK;
 }
@@ -176,7 +176,8 @@ void  CTypePower::ActionUpdate(void)
 	if (m_bBreakTime == false && m_bTrigger == true && m_bStop == false && m_state != STATE_DAMAGE)
 	{
 		m_bStop = true;				//	更新を一時的に止める
-		m_pMotion->SetNumMotion(2);	//　攻撃モーション
+		m_pMotion->SetNumMotion(STATE_ACTION);	//　攻撃モーション
+		m_state = STATE_ACTION;
 		m_fSpeed = 0.0f;			//	アクション中は動きを止める
 		m_bTarget = true;			//	ターゲットを変更
 	}
@@ -194,12 +195,14 @@ void  CTypePower::ActionUpdate(void)
 
 		break;
 
-	case 80:
+	case 100:
 		m_fSpeed = 1.0f;		//	アクション終了時、動けるように
 		m_bBreakTime = true;	//	ブレイクタイムの発生
 		m_bTarget = false;		//	ターゲットを拠点に戻す
-		m_state = STATE_NONE;	//	モーションの初期化
 		m_bSuperArmor = false;
+		m_bWalk = true;
+		m_state = STATE_NONE;
+
 		break;
 
 	case 60 * RECAST:
@@ -246,7 +249,7 @@ bool CTypePower::CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DX
 	bool bLand = false;
 
 	// [[★スキル発動範囲]]
-	if (pCylinderCollider->Collision(&pos, &posOld, &Move, 150.0f, 50.0f, this, &bLand) == true)
+	if (pCylinderCollider->Collision(&pos, &posOld, &Move, SKILL_RANGE, 0.0f, this, &bLand) == true)
 	{
 		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
 		{

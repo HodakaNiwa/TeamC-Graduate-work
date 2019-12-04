@@ -6,19 +6,16 @@
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "inputmouce.h"
 #include "loadEffect.h"
 #include "line.h"
-#include "sceneOrbit.h"
 #include "model.h"
-#include "UI.h"
-#include "skilicon.h"
-#include "RawMouse.h"
+#include "debuglog.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define MAX_SPRINTTIMER (8)		//スプリント時間
-#define RECAST (10)				//スプリントのリキャスト時間
+#define RECAST (20)				//スプリントのリキャスト時間
 //*****************************************************************************
 // コンストラクタ
 //*****************************************************************************
@@ -38,7 +35,7 @@ CTypeSpeed::~CTypeSpeed()
 //=============================================================================
 //オブジェクトの生成処理
 //=============================================================================
-CTypeSpeed *CTypeSpeed::Create(int nChara, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
+CTypeSpeed *CTypeSpeed::Create(int nChara, int nLevel,int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40])
 {
 	CTypeSpeed *pSpeedType = NULL;
 	if (pSpeedType == NULL)
@@ -47,6 +44,7 @@ CTypeSpeed *CTypeSpeed::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 
 		if (pSpeedType != NULL)
 		{
+			pSpeedType->m_nLevel = nLevel;
 			pSpeedType->SetType(country);
 			pSpeedType->m_CharcterType = type;
 			pSpeedType->Init(nChara, pos, ModelTxt, MotionTxt,country);
@@ -71,7 +69,7 @@ CTypeSpeed *CTypeSpeed::Create(int nChara, int country, CHARCTERTYPE type, D3DXV
 //=============================================================================
 HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country)
 {
-	m_bWalk = true;
+	
 
 	m_nEnemyNo = nChara;	//	キャラ番号の記憶(生成順)
 
@@ -109,18 +107,14 @@ HRESULT CTypeSpeed::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char Mo
 
 	ResetLine();	//	ラインの初期化
 
-
-	m_fSpeed = 1.0f;				//	初期速度
-	m_nSprintCounter = 0;
-	m_nSprintTimer = 0;
-	m_nRecastCounter = 0;
-	m_nRecastTimer = 0;
-	m_bRecast = false;
-	m_bSprint = false;
-	m_nCreateTime = (rand() % 4);	//	始点に戻るまでの時間調整
-	m_nLineNum = 2;
-
-	m_bStop = false;
+	m_fSpeed = 1.0f;				// 初期速度
+	m_nCnt = 0;						// タイマー処理
+	m_bSkillFlag = false;			// スキルを発動しているか
+	m_bStop = false;				// 複数更新の阻止
+	m_nLineNum = 2;					// 最低ライン
+	m_state = STATE_NONE;
+	m_bSprintMotion = true;
+	m_nTimingCnt = 0;
 	return S_OK;
 }
 
@@ -158,66 +152,55 @@ void  CTypeSpeed::Update(void)
 
 	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
 	{
-
 		SprintUpdate();		//	スキル処理
 		CEnemy::Update();
 	}
+
+	CDebugProc::Print("エネミーステート : %d\n", m_state);
 }
 
 //=============================================================================
-// スプリント処理
+// スキルの発動
 //=============================================================================
 void  CTypeSpeed::SprintUpdate(void)
 {
-
-	if (m_bRecast == false && m_bStop == false)
+	// [[AIレベルごとにタイミングが変わる...]]
+	if (m_nLevel == 3)//レベル3だけ即スキル使用可能
 	{
-		m_bStop = true;
-		m_state = STATE_ACTION;	//スプリント状態
-		m_fSpeed = 1.5f;		//スピード型の速さを1.5倍にする
-		m_bSprint = true;		//スプリント中にする
+		Trigger();// スキルの発動
 	}
-
-	//スプリント中
-	if (m_bSprint == true)
+	else // レベル1と2
 	{
-		m_nSprintCounter++;
-
-		if (m_nSprintCounter % 60 == 0)
+		m_nTimingCnt += (m_nLevel * 2);
+		if (m_nTimingCnt >= 600)
 		{
-			m_nSprintTimer++;
-
-			if (m_nSprintTimer >= MAX_SPRINTTIMER)	//	一定時間で元の速度に
-			{
-				m_fSpeed = 1.0f;					//スピードをもとに戻す
-				m_nSprintTimer = 0;					//スプリントタイマーを初期化
-				m_bRecast = true;					//リキャスト中にする
-				m_bWalk = true;						//移動モーションができる状態にする
-				m_state = STATE_NONE;				//移動状態
-				m_bSprint = false;
-			}
+			Trigger();// スキルの発動
 		}
 	}
 
-	//リキャスト中
-	if (m_bRecast == true)
+	// [[スキル発動後...]]
+	if (m_bSkillFlag == true)
 	{
-		m_nRecastCounter++;
-		if (m_nRecastCounter % 60 == 0)
-		{
-			m_nRecastTimer++;
-			if (m_nRecastTimer <= RECAST)
-			{//10秒以下だったらスプリントが使用できない
-				m_bSprint = false;
-			}
-			else
-			{//10秒たったらスプリントを使用できるようにする
-				m_bStop = false;
-				m_bRecast = false;		//リキャスト中じゃない
-				m_nRecastTimer = 0;		//リキャストタイマーの初期化
-				m_bSprint = false;
+		m_nCnt++;
 
-			}
+		if (m_nCnt == (MAX_SPRINTTIMER * 60))	//	一定時間で元の速度に
+		{
+			m_fSpeed = 1.0f;		//	スピードをもとに戻す
+			m_nCnt = 0;				//	スプリントタイマーを初期化
+			m_bWalk = true;			//	移動モーションができる状態にする
+			m_state = STATE_NONE;	
+			m_bSkillFlag = false;
+		}
+	}
+	// [[再使用まで...]]
+	else
+	{
+		m_nCnt++;
+		if (m_nCnt == (RECAST * 60))
+		{
+			m_nCnt = 0;
+			m_bStop = false;
+			m_nTimingCnt = 0;
 		}
 	}
 }
@@ -231,10 +214,23 @@ void  CTypeSpeed::Draw(void)
 }
 
 //=============================================================================
+// スキルの発動
+//=============================================================================
+void CTypeSpeed::Trigger(void)
+{
+	if (m_bSkillFlag == false && m_bStop == false)
+	{
+		m_bStop = true;
+		m_state = STATE_ACTION;
+		m_fSpeed = 1.5f;		// スピード型の速さを1.5倍にする
+		m_bSkillFlag = true;		// スプリント状態にする
+		m_bSprintMotion = true;
+		m_nCnt = 0;
+	}
+}
+//=============================================================================
 //
 //=============================================================================
 void  CTypeSpeed::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size)
-{
-
-}
+{ }
 
