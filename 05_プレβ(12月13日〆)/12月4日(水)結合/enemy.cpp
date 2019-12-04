@@ -110,28 +110,35 @@ void  CEnemy::Uninit(void)
 //=============================================================================
 void  CEnemy::Update(void)
 {
-	CCharacter::Update();
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	{
+		CCharacter::Update();
 
-	//	ゲーム開始まで更新させない
-	int nGameState = CGame::GetGameState();
-	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
-	{
-		AIBasicAction();	//	AI共通処理
-	}
-	//	ゲーム終了時
-	else if (nGameState == CGame::GAMESTATE_END)
-	{
-		if (m_bCharaMotionState == false)
+		//	ゲーム開始まで更新させない
+		int nGameState = CGame::GetGameState();
+		if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
 		{
-			m_state = STATE_NONE;
-			m_pMotion->SetNumMotion(m_state);
-			m_bCharaMotionState = true;
+			AIBasicAction();	//	AI共通処理
 		}
+		//	ゲーム終了時
+		else if (nGameState == CGame::GAMESTATE_END)
+		{
+			if (m_bCharaMotionState == false)
+			{
+				m_state = STATE_NONE;
+				m_pMotion->SetNumMotion(m_state);
+				m_bCharaMotionState = true;
+			}
+		}
+
+		Program_Line();		//	ライン関数まとめ
+		Program_State();	//	モーション関連
+
+		// エネミーの状態を設定
+		SetCharaState(m_state);
 	}
-
-	Program_Line();		//	ライン関数まとめ
-	Program_State();	//	モーション関連
-
 }
 
 //=============================================================================
@@ -139,10 +146,15 @@ void  CEnemy::Update(void)
 //=============================================================================
 void  CEnemy::Draw(void)
 {
-	CCharacter::Draw();
-	D3DXMATRIX mtxWorld;
-	D3DXMatrixIdentity(&mtxWorld);
-	CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	{
+		CCharacter::Draw();
+		D3DXMATRIX mtxWorld;
+		D3DXMatrixIdentity(&mtxWorld);
+		CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
+	}
 }
 //=============================================================================
 //	デフォルト関数
@@ -313,8 +325,15 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 			{
 				if (m_AreaInfo[m_nAreaNow][nCnt].fDistance == m_AreaInfo[m_nAreaNow][nNextNum].fDisSort)
 				{
+					float fDis = m_AreaInfo[m_nAreaNow][nCnt].fDistance;
 					m_nTargetNum = nCnt;
 					m_bBreak = true;
+					// [[次の拠点があまりに遠い場合は始点に戻る]]
+					if (fDis >= 500.0f && m_apTerritory[2] != NULL)
+					{
+						m_nLineNum = 2;		//	初期最低値に戻す
+						m_bFinish = true;	//	始点に戻す
+					}
 					break;
 				}
 			}
@@ -640,6 +659,7 @@ void CEnemy::Program_Motion(void)
 #if 1
 void CEnemy::CreateOrbitLine(void)
 {
+	return;
 	if (m_pOrbitLine == NULL)
 	{
 		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());
@@ -724,7 +744,14 @@ bool CEnemy::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTO
 	}
 	else if (pCollider->GetType() == CCollider::TYPE_SPHERE_PLAYERATTACK)
 	{
-		if (CollisionPlayerAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true)
+		CScene *pParent = pCollider->GetParent();
+
+		if (CollisionPlayerAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true 
+			&& pParent->GetObjType() != OBJTYPE_ROBOT)
+		{
+		}
+		if (CollisionRobotAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true 
+			&& pParent->GetObjType() == OBJTYPE_ROBOT)
 		{
 		}
 	}
@@ -764,7 +791,7 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 		}
 
 		CScene *pParent = pCylinderCollider->GetParent();
-		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
+		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
 		{// 親が敵かプレイヤーだった場合自分を吹っ飛ばす
 			CCharacter *pCharacter = (CCharacter*)pParent;
 			if (pCharacter == NULL) { return true; }
@@ -867,6 +894,26 @@ void CEnemy::MergeSort(TERRITORY_INFO* pArray, int start, int end, int AreaNum)
 		}
 	}
 
+}
+
+//=============================================================================
+//　攻撃球との当たり判定処理(ロボット)←追加(よしろう)
+//=============================================================================
+bool CEnemy::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
+{
+	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
+	{// 自分以外の攻撃球が当たったら
+		CScene *pParent = pShere->GetParent();
+		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
+		{
+			//当たってる間はダメージ状態
+			m_state = STATE_DAMAGE;
+			m_pMotion->SetNumMotion(4);
+		}
+		return true;
+	}
+
+	return false;
 }
 
 

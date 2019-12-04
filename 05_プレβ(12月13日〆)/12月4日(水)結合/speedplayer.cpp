@@ -8,7 +8,6 @@
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "inputmouce.h"
 #include "loadEffect.h"
 #include "line.h"
 #include "sceneOrbit.h"
@@ -179,22 +178,19 @@ void  CSpeedPlayer::SprintUpdate(void)
 		if (m_nSprintCounter % 60 == 0)
 		{
 			m_nSprintTimer++;
-
-			if (m_nSprintTimer <= MAX_SPRINTTIMER)
-			{//8秒間速さを上げる
-				//m_PlayerState = PLAYERSTATE_ACTION;	//スプリント状態
-				
-				
-			}
-			else
+			if (m_nSprintTimer >= MAX_SPRINTTIMER)
 			{//8秒超えたら普通の速さに戻す
 				m_fSpeed = 1.0f;					//スピードをもとに戻す
 				m_nSprintTimer = 0;					//スプリントタイマーを初期化
 				m_bRecast = true;					//リキャスト中にする
 				m_bWalk = true;						//移動モーションができる状態にする
-				m_PlayerState = PLAYERSTATE_NONE;	//移動状態
 				m_bSprintMotion = false;
 				m_bSprint = false;
+
+				if (m_PlayerState != PLAYERSTATE_DAMAGE)
+				{
+					m_PlayerState = PLAYERSTATE_NONE;	//移動状態
+				}
 			}
 		}
 	}

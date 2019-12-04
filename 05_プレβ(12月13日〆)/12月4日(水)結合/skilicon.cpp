@@ -189,6 +189,27 @@ void CSkilicon::RevivalIconMask(void)
 }
 
 //=============================================================================
+//    アイコン用のマスクを元に戻す処理(地雷型用)
+//=============================================================================
+void CSkilicon::RevivalIconMask_teq(void)
+{
+	if (m_pIcon == NULL || m_pIconMask == NULL) { return; }
+	D3DXVECTOR3 IconPos = m_pIcon->GetPos();
+	float fHeight = m_pIconMask->GetHeight();
+	float fCutValue = SKILICON_POLYGON_HEIGHT * 0.3f;
+	fHeight += fCutValue;
+	fCutValue /= 2.0f;
+	if (fHeight <= 0.0f)
+	{
+		fHeight = 0.0f;
+		fCutValue = 0.0f;
+	}
+	m_pIconMask->SetPos(IconPos + D3DXVECTOR3(0.0f, -(SKILICON_POLYGON_HEIGHT / 2.0f) + fCutValue, 0.0f));
+	m_pIconMask->SetScale(SKILICON_POLYGON_WIDTH, fHeight);
+	m_pIconMask->SetVtxBuffPos();
+}
+
+//=============================================================================
 //    描画処理
 //=============================================================================
 void CSkilicon::Draw(void)

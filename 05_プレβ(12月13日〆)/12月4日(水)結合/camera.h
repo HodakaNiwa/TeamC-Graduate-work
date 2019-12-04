@@ -21,6 +21,8 @@ class CInputKeyboard;
 class CPlayer;
 class CModel;
 class CTerritory;
+class CRobot;		
+class CCharacter;	
 
 //=============================================================================
 // カメラクラス
@@ -216,5 +218,23 @@ private:
 	float m_fSpeed;
 	float m_fCountDistance;
 	float m_fMove;
+};
+
+//=============================================================================
+// イベントカメラクラス←追加(よしろう)
+//=============================================================================
+class CEventCamera : public CCamera
+{
+public:
+	CEventCamera();
+	~CEventCamera();
+	void Init(CCharacter *pChar = NULL);
+	void Uninit(void);
+	void Update(void);
+	void Set(void);
+
+private:
+	CCharacter *m_pTargetRobot;
+	int			m_nCntRobot;
 };
 #endif

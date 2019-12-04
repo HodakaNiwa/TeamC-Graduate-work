@@ -10,7 +10,6 @@
 #include "Player.h"
 #include "manager.h"
 #include "input.h"
-#include "gamepad.h"
 #include "RawMouse.h"
 
 //=============================================================================

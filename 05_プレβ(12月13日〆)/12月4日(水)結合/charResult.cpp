@@ -21,7 +21,6 @@
 #include "library.h"
 #include "line.h"
 #include "loadEffect.h"
-#include "inputmouce.h"
 #include "RawMouse.h"
 #include "select.h"
 #include "camera.h"

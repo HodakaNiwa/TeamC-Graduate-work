@@ -113,12 +113,12 @@ CGame::CGame()
 	m_pLoadObject = NULL;
 	m_pLoadTerritory = NULL;
 	m_pUI = NULL;
-	m_pRobotUI = NULL;			// ←追加(よしろう)
 	m_pRotCamera = NULL;
 	m_nEnemyNum = 0;
 	m_pRoboCharacter = NULL;	// ←追加(よしろう)
 	m_nCntRobot = 0;			// ←追加(よしろう)
 	m_bEveCam = false;			// ←追加(よしろう)
+	m_pRobotUI = NULL;			// ←追加(よしろう)
 
 	m_nNumPlay = CSelect::GetEntryPlayer();
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
@@ -752,7 +752,8 @@ void CGame::Uninit(void)
 		delete m_pEventCamera;
 		m_pEventCamera = NULL;
 	}
-
+	// ロボットUIの開放←追加(よしろう)
+	ReleaseRobotUI();
 	//テクスチャの破棄
 	CNumber2D::Unload();
 	CTimerLogo::Unload();

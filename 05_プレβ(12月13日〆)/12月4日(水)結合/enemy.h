@@ -155,6 +155,7 @@ private:
 	bool CollisionBoxCollider(CBoxCollider *pBoxCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 	bool CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld, D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 	bool CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange);
+	bool CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange); 
 
 	// ---<<モデルタイプ>>---
 	MODEL_TYPE m_modelType;
@@ -185,7 +186,7 @@ public:
 	CTypeSpeed(int nPriority = 3, OBJTYPE objType = OBJTYPE_ENEMY);
 	~CTypeSpeed();
 
-	static CTypeSpeed *Create(int nChara, int nLevel,int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
+	static CTypeSpeed *Create(int nChara, int nLevel, int country, CHARCTERTYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40]);
 	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], int country);
 	HRESULT Init(void);
 	void Uninit(void);
@@ -216,7 +217,7 @@ public:
 	HRESULT Init(void);
 	void  Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);
 	//	---<<基盤関数>>---
-	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country);
+	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], int country);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -224,7 +225,7 @@ public:
 	void ActionUpdate(void); // スキル処理
 
 
-	//!	---<<スキル発動範囲の判定>>---
+							 //!	---<<スキル発動範囲の判定>>---
 	bool CollisionSkillTiming(CCylinderCollider *pCylinderCollider, D3DXVECTOR3 &pos, D3DXVECTOR3 &posOld,
 		D3DXVECTOR3 &Move, D3DXVECTOR3 &ColRange);
 
@@ -232,7 +233,7 @@ private:
 
 	void CreateColliderSphere(void); // 衝撃波の判定
 
-	//!	---<<スキル使用関連>>---
+									 //!	---<<スキル使用関連>>---
 	bool m_bTrigger;	//	スキルの使用
 	bool m_bBreakTime;	//	使用可能か
 };
@@ -252,7 +253,7 @@ public:
 	HRESULT Init(void);
 	void  Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size);
 	//	---<<基盤関数>>---
-	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int country);
+	HRESULT Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], int country);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -260,7 +261,7 @@ public:
 	void ActionUpdate(void); // スキル処理
 
 
-	//! ---<<地雷関連>>---
+							 //! ---<<地雷関連>>---
 	void Process();	//	地雷使用時の処理
 
 private:
@@ -270,6 +271,9 @@ private:
 	int m_nInstallationCounter;	//	設置カウンター
 	int m_nInstallationTimer;	//	設置タイマー
 	int m_nTiming;				//	タイミング
+	bool m_nUse;
+	int m_nActionCnt;
 };
+
 
 #endif

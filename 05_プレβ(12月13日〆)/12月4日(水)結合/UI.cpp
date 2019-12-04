@@ -14,59 +14,63 @@
 #include "scoreChange.h"
 #include "screenEffect.h"
 #include "territory.h"
+#include "scoreGauge.h"
 #include "debuglog.h"
 
 //*****************************************************************************
 //     マクロ定義
 //*****************************************************************************
-#define UI_PRIORITY                (6)									// UIの描画優先順位
+#define UI_PRIORITY						(6)									// UIの描画優先順位
 
 // ゲームスコア用
-#define UI_GAMESCORE_POS_0         (D3DXVECTOR3(280.0f,23.0f,0.0f))		// 1Pのスコア
-#define UI_GAMESCORE_POS_1         (D3DXVECTOR3(920.0f,23.0f,0.0f))		// 2Pのスコア
-#define UI_GAMESCORE_POS_2         (D3DXVECTOR3(280.0f,380.0f,0.0f))	// 3Pのスコア
-#define UI_GAMESCORE_POS_3         (D3DXVECTOR3(920.0f,380.0f,0.0f))	// 4Pのスコア
-#define UI_GAMESCORE_POS_4         (D3DXVECTOR3(10000.0f,380.0f,0.0f))	// 敵のスコア(画面外へ配置)
-#define UI_GAMESCORE_SIZE          (D3DXVECTOR3(20.0f,40.0f,0.0f))		// スコアの数字のサイズ
+#define UI_GAMESCORE_POS_0				(D3DXVECTOR3(280.0f,23.0f,0.0f))	// 1Pのスコア
+#define UI_GAMESCORE_POS_1				(D3DXVECTOR3(920.0f,23.0f,0.0f))	// 2Pのスコア
+#define UI_GAMESCORE_POS_2				(D3DXVECTOR3(280.0f,690.0f,0.0f))	// 3Pのスコア
+#define UI_GAMESCORE_POS_3				(D3DXVECTOR3(920.0f,690.0f,0.0f))	// 4Pのスコア
+#define UI_GAMESCORE_POS_4				(D3DXVECTOR3(10000.0f,380.0f,0.0f))	// 敵のスコア(画面外へ配置)
+#define UI_GAMESCORE_SIZE				(D3DXVECTOR3(20.0f,40.0f,0.0f))		// スコアの数字のサイズ
 
 // キャラアイコン用
-#define UI_CHARAICON_WIDTH_LARGE   (50.0f)								// 1位のキャラアイコンの幅
-#define UI_CHARAICON_WIDTH_MIDDLE  (15.0f)								// 2位のキャラアイコンの幅
-#define UI_CHARAICON_WIDTH_SMALL   (10.0f)								// 3位のキャラアイコンの幅
-#define UI_CHARAICON_HEIGHT_LARGE  (50.0f)								// 1位のキャラアイコンの高さ
-#define UI_CHARAICON_HEIGHT_MIDDLE (15.0f)								// 2位のキャラアイコンの高さ
-#define UI_CHARAICON_HEIGHT_SMALL  (10.0f)								// 3位のキャラアイコンの高さ
-#define UI_CHARAICON_TEXIDX        (1)									// キャラアイコンの使用するテクスチャの番号
+#define UI_CHARAICON_WIDTH_LARGE		(50.0f)								// 1位のキャラアイコンの幅
+#define UI_CHARAICON_WIDTH_MIDDLE		(15.0f)								// 2位のキャラアイコンの幅
+#define UI_CHARAICON_WIDTH_SMALL		(10.0f)								// 3位のキャラアイコンの幅
+#define UI_CHARAICON_HEIGHT_LARGE		(50.0f)								// 1位のキャラアイコンの高さ
+#define UI_CHARAICON_HEIGHT_MIDDLE		(15.0f)								// 2位のキャラアイコンの高さ
+#define UI_CHARAICON_HEIGHT_SMALL		(10.0f)								// 3位のキャラアイコンの高さ
+#define UI_CHARAICON_TEXIDX				(1)									// キャラアイコンの使用するテクスチャの番号
 
 // プレイヤー番号アイコン用
-#define UI_PLAYERIDXICON_POS       (D3DXVECTOR3(0.0f, 120.0f, 0.0f))	// プレイヤー番号アイコンの位置
-#define UI_PLAYERIDXICON_COL       (D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// プレイヤー番号アイコンの色
-#define UI_PLAYERIDXICON_WIDTH     (25.0f)								// プレイヤー番号アイコンの幅
-#define UI_PLAYERIDXICON_HEIGHT    (15.0f)								// プレイヤー番号アイコンの高さ
-#define UI_PLAYERIDXICON_TEXIDX    (0)									// プレイヤー番号アイコンの使用するテクスチャの番号
+#define UI_PLAYERIDXICON_POS			(D3DXVECTOR3(0.0f, 120.0f, 0.0f))	// プレイヤー番号アイコンの位置
+#define UI_PLAYERIDXICON_COL			(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// プレイヤー番号アイコンの色
+#define UI_PLAYERIDXICON_WIDTH			(25.0f)								// プレイヤー番号アイコンの幅
+#define UI_PLAYERIDXICON_HEIGHT			(15.0f)								// プレイヤー番号アイコンの高さ
+#define UI_PLAYERIDXICON_TEXIDX			(0)									// プレイヤー番号アイコンの使用するテクスチャの番号
 
 // 王冠アイコン用
-#define UI_CROWNICON_POS           (D3DXVECTOR3(0.0f, 120.0f, 0.0f))	// 王冠アイコンの位置
-#define UI_CROWNICON_COL           (D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 王冠アイコンの色
-#define UI_CROWNICON_WIDTH         (20.0f)								// 王冠アイコンの幅
-#define UI_CROWNICON_HEIGHT        (17.0f)								// 王冠アイコンの高さ
-#define UI_CROWNICON_TEXIDX        (1)									// 王冠アイコンの使用するテクスチャの番号
+#define UI_CROWNICON_POS				(D3DXVECTOR3(0.0f, 120.0f, 0.0f))	// 王冠アイコンの位置
+#define UI_CROWNICON_COL				(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 王冠アイコンの色
+#define UI_CROWNICON_WIDTH				(20.0f)								// 王冠アイコンの幅
+#define UI_CROWNICON_HEIGHT				(17.0f)								// 王冠アイコンの高さ
+#define UI_CROWNICON_TEXIDX				(1)									// 王冠アイコンの使用するテクスチャの番号
 
 // スコア変動クラス用
-#define UI_SCORECHANGE_COL         (D3DXCOLOR(1.0f,0.0f,0.0f,1.0f))		// スコア変動クラスの色
-#define UI_SCORECHANGE_SIZE        (D3DXVECTOR3(25.0f,40.0f,0.0f))		// スコア変動クラスの大きさ
-#define UI_SCORECHANGE_TEXIDX      (4)									// スコア変動クラスの使用するテクスチャの番号
+#define UI_SCORECHANGE_COL				(D3DXCOLOR(1.0f,0.0f,0.0f,1.0f))	// スコア変動クラスの色
+#define UI_SCORECHANGE_SIZE				(D3DXVECTOR3(25.0f,40.0f,0.0f))		// スコア変動クラスの大きさ
+#define UI_SCORECHANGE_TEXIDX			(4)									// スコア変動クラスの使用するテクスチャの番号
 
 // 画面エフェクト用
-#define UI_SCREENEFFECT_ALPHA      (0.7f)								// 画面効果の透明度
-#define UI_SCREENEFFECT_TEXIDX     (5)									// 画面効果の使用するテクスチャの番号
+#define UI_SCREENEFFECT_ALPHA			(0.7f)								// 画面効果の透明度
+#define UI_SCREENEFFECT_TEXIDX			(5)									// 画面効果の使用するテクスチャの番号
 
 // 起点アイコン用
-#define UI_TERRITORYTOP_WIDTH      (10.0f)								// 起点アイコンの幅
-#define UI_TERRITORYTOP_HEIGHT     (10.0f)								// 起点アイコンの高さ
-#define UI_TERRITORYTOP_ADDPOSY    (80.0f)								// 起点アイコンの高さに加える値
-#define UI_TERRITORYTOP_ADDPOSZ    (5.0f)								// 起点アイコンの奥行に加える値
-#define UI_TERRITORYTOP_TEXIDX     (6)									// 起点アイコンの使用するテクスチャの番号
+#define UI_TERRITORYTOP_WIDTH			(10.0f)								// 起点アイコンの幅
+#define UI_TERRITORYTOP_HEIGHT			(10.0f)								// 起点アイコンの高さ
+#define UI_TERRITORYTOP_ADDPOSY			(80.0f)								// 起点アイコンの高さに加える値
+#define UI_TERRITORYTOP_ADDPOSZ			(5.0f)								// 起点アイコンの奥行に加える値
+#define UI_TERRITORYTOP_TEXIDX			(6)									// 起点アイコンの使用するテクスチャの番号
+
+// スコアゲージ用
+#define UI_SCOREGAUGE_PLAYERIDX_TEXIDX	(0)									// スコアゲージのプレイヤー番号が使用するテクスチャの番号
 
 //*****************************************************************************
 //     静的メンバ変数宣言
@@ -84,6 +88,7 @@ CUI::CUI()
 	m_nNumPlayer = 0;
 	m_nNumAllCharacter = 0;
 	m_pMiniMap = NULL;
+	m_pScoreGauge = NULL;
 
 	// スコア
 	for (int nCntScore = 0; nCntScore < MAX_PLAYERNUM * 2; nCntScore++)
@@ -189,6 +194,9 @@ HRESULT CUI::Init(int nNumPlayer, int nAllCharacter)
 	// 起点アイコンを生成する
 	CreateTerritoryTopicon();
 
+	// スコアゲージクラスを生成する
+	CreateScoreGauge();
+
 	// テクスチャを割り当てる処理
 	BindTextureToIcon();
 
@@ -220,6 +228,9 @@ void CUI::Uninit(void)
 
 	// 起点アイコンを開放する
 	ReleaseTerritoryTopIcon();
+
+	// スコアゲージクラスを開放する
+	ReleaseScoreGauge();
 }
 
 //=============================================================================
@@ -242,6 +253,9 @@ void CUI::Update(void)
 
 	// 王冠アイコンの更新処理
 	UpdateCrownicon(pGame);
+
+	// スコアゲージクラスの更新処理
+	UpdateScoreGauge(pGame);
 }
 
 //=============================================================================
@@ -251,6 +265,9 @@ void CUI::Draw(void)
 {
 	// スキルアイコンの描画処理
 	DrawSkilicon();
+
+	// スコアゲージの描画処理
+	DrawScoreGauge();
 }
 
 //=============================================================================
@@ -390,6 +407,15 @@ void CUI::CreateTerritoryTopicon(void)
 }
 
 //=============================================================================
+//    スコアゲージクラスを生成する処理
+//=============================================================================
+void CUI::CreateScoreGauge(void)
+{
+	if (m_pScoreGauge != NULL) { return; }
+	m_pScoreGauge = CScoreGauge::Create(m_nNumPlayer);
+}
+
+//=============================================================================
 //    スコア変動ポリゴンを生成する処理
 //=============================================================================
 void CUI::CreateScoreChange(int nIdxPlayer, int nScoreChange)
@@ -491,6 +517,9 @@ void CUI::BindTextureToIcon(void)
 
 	// 起点アイコンにテクスチャを割り当てる
 	BindTextureToIcon_TerritoryTop();
+
+	// スコアゲージにテクスチャを割り当てる
+	BindTextureToIcon_ScoreGauge();
 }
 
 //=============================================================================
@@ -564,6 +593,37 @@ void CUI::BindTextureToIcon_TerritoryTop(void)
 	{
 		// テクスチャを割り当て
 		m_pTerritoryTopIcon[nCntTop]->BindTexture(m_pTexture[UI_TERRITORYTOP_TEXIDX]);
+	}
+}
+
+//=============================================================================
+//    スコアゲージにテクスチャを割り当てる処理
+//=============================================================================
+void CUI::BindTextureToIcon_ScoreGauge(void)
+{
+	if (m_pScoreGauge == NULL) { return; }
+
+	// プレイヤー番号にテクスチャを割り当てる
+	CIcon2D *m_pPlayerIdx = NULL;
+	float fTexV = 0.0f;
+	for (int nCntIdx = 0; nCntIdx < MAX_PLAYERNUM * 2; nCntIdx++)
+	{
+		// ポインタを取得
+		m_pPlayerIdx = m_pScoreGauge->GetPlayerIdx(nCntIdx);
+		if (m_pPlayerIdx == NULL) { continue; }
+
+		// テクスチャを割り当ている
+		m_pPlayerIdx->BindTexture(m_pTexture[UI_SCOREGAUGE_PLAYERIDX_TEXIDX]);
+
+		// テクスチャV座標の設定
+		fTexV = 0.20f * nCntIdx;
+		if (nCntIdx >= m_nNumPlayer)
+		{
+			fTexV = 0.80f;
+		}
+		m_pPlayerIdx->SetTexV(fTexV);
+		m_pPlayerIdx->SetTexHeight(0.20f);
+		m_pPlayerIdx->SetVtxBuffTex();
 	}
 }
 
@@ -675,6 +735,19 @@ void CUI::ReleaseTerritoryTopIcon(void)
 			delete m_pTerritoryTopIcon[nCntTop];
 			m_pTerritoryTopIcon[nCntTop] = NULL;
 		}
+	}
+}
+
+//=============================================================================
+//    スコアゲージクラスを開放する処理
+//=============================================================================
+void CUI::ReleaseScoreGauge(void)
+{
+	if (m_pScoreGauge != NULL)
+	{
+		m_pScoreGauge->Uninit();
+		delete m_pScoreGauge;
+		m_pScoreGauge = NULL;
 	}
 }
 
@@ -821,6 +894,17 @@ void CUI::UpdateCrownicon(CGame *pGame)
 }
 
 //=============================================================================
+//    スコアゲージの更新処理
+//=============================================================================
+void CUI::UpdateScoreGauge(CGame *pGame)
+{
+	if (m_pScoreGauge != NULL)
+	{
+		m_pScoreGauge->Update();
+	}
+}
+
+//=============================================================================
 //    スキルアイコンを描画する処理
 //=============================================================================
 void CUI::DrawSkilicon(void)
@@ -908,6 +992,17 @@ void CUI::DrawTerritoryTopIcon(int nIdx)
 	{
 		m_pTerritoryTopIcon[nIdx]->SetPos(pTerritoryTop->GetPos() + D3DXVECTOR3(0.0f, UI_TERRITORYTOP_ADDPOSY, UI_TERRITORYTOP_ADDPOSZ));
 		m_pTerritoryTopIcon[nIdx]->Draw();
+	}
+}
+
+//=============================================================================
+//    スコアゲージを描画する処理
+//=============================================================================
+void CUI::DrawScoreGauge(void)
+{
+	if (m_pScoreGauge != NULL)
+	{
+		m_pScoreGauge->Draw();
 	}
 }
 

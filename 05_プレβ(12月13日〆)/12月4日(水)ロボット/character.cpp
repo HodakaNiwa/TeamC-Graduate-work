@@ -101,6 +101,7 @@ HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],in
 	m_nCountMakeShape = 0;			//図形を作った数
 	m_nCountGetTerritry = 0;		//テリトリーの取得数
 	m_nCountRobbtedTerritory = 0;	//テリトリーの奪われた数
+	m_nState = 0;
 
 	m_cModelTxt[0] = &ModelTxt[0];
 	m_cMotionTxt[0] = &MotionTxt[0];

@@ -21,6 +21,8 @@
 #include "game.h"
 #include "select.h"
 #include "lightorbit.h"
+#include "robot.h"
+#include "scoreGauge.h"
 
 //	---<<マクロ定義>>---
 #define CHARACTER_COLLISION_POS    (D3DXVECTOR3(0.0f,0.0f,0.0f))
@@ -100,7 +102,6 @@ HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],in
 	m_nCountMakeShape = 0;			//図形を作った数
 	m_nCountGetTerritry = 0;		//テリトリーの取得数
 	m_nCountRobbtedTerritory = 0;	//テリトリーの奪われた数
-
 	m_cModelTxt[0] = &ModelTxt[0];
 	m_cMotionTxt[0] = &MotionTxt[0];
 	ModelSetLode();
@@ -162,8 +163,15 @@ HRESULT CCharacter::Init(int nCharaNum, char ModelTxt[40], char MotionTxt[40],in
 
 			m_ppModel[nCnt] = CModel::Create(D3DXVECTOR3(m_aOffset[nCnt].pos.x, m_aOffset[nCnt].pos.y, m_aOffset[nCnt].pos.z), m_aPartsName[nCnt], D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 
-			//	モデルUVテクスチャを決める
-			m_ppModel[nCnt]->BindTexture(m_ppTexture[m_nTexIdx[nCnt]]);
+			//	モデルUVテクスチャを決める←追加(よしろう)
+			if (nCharaNum != ROBOT_CHARNUM)
+			{
+				m_ppModel[nCnt]->BindTexture(m_ppTexture[m_nTexIdx[nCnt]]);
+			}
+			else
+			{
+				m_ppModel[nCnt]->BindTexture(NULL);
+			}
 
 			//	各モデルパーツの親を決める
 			if (nCnt == 0)
@@ -1706,7 +1714,7 @@ void CCharacter::MakePolygon(TRAIANGLE pTraiangle)
 //=============================================================================
 void CCharacter::CutTerritoryPoint(CTerritory * pTerritory, int nOldPlayer)
 {
-	// 得点を取得
+		// 得点を取得
 	if (pTerritory == NULL) { return; }
 	int nPoint = pTerritory->GetPoint();
 
@@ -1724,6 +1732,11 @@ void CCharacter::CutTerritoryPoint(CTerritory * pTerritory, int nOldPlayer)
 
 	// スコアを減点
 	pScoreGame->AddScore(-nPoint);
+
+	// ゲージを変動させる
+	CScoreGauge *pScoreGauge = pUI->GetScoreGauge();
+	if (pScoreGauge == NULL) { return; }
+	pScoreGauge->CutGauge(nOldPlayer, nPoint);
 	if (m_nNumPlayerNo == nOldPlayer) { return; }
 
 	// スコアの変動を設定
@@ -1772,4 +1785,9 @@ void CCharacter::AddTerritoryPoint(CTerritory * pTerritory)
 
 	// 順位のソート
 	pUI->SortRankFromScore();
+
+	// ゲージを変動させる
+	CScoreGauge *pScoreGauge = pUI->GetScoreGauge();
+	if (pScoreGauge == NULL) { return; }
+	pScoreGauge->AddGauge(m_nNumPlayerNo, nPoint);
 }

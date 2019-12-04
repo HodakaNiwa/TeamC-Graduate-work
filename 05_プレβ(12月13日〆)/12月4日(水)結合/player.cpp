@@ -21,7 +21,6 @@
 #include "library.h"
 #include "line.h"
 #include "loadEffect.h"
-#include "inputmouce.h"
 #include "RawMouse.h"
 #include "UI.h"
 #include "score.h"
@@ -140,106 +139,110 @@ void  CPlayer::Update(void)
 {
 	CSound *pSound = CManager::GetSound();							//サウンドの取得
 
-	//キャラクターの更新
-	CCharacter::Update();
-
-	//プレイヤーの状態
-	switch (m_PlayerState)
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
 	{
-	case PLAYERSTATE_NONE:	//通常状態
+		//キャラクターの更新
+		CCharacter::Update();
 
-		//歩ける用にする
-		m_bWalk = true;
-
-		//スプリント使用可
-		m_bSprintMotion = true;
-		break;
-
-	case PLAYERSTATE_WALK:	//移動状態
-		break;
-
-	case PLAYERSTATE_ACTION: //アクション状態
-		break;
-
-	case PLAYERSTATE_BLOWAWAY:	//吹っ飛ばされてる状態
-								// ダメージカウント加算
-		m_nDamageCount++;
-		if (m_nDamageCount <= MAX_DAMAGECOUNT)
+		//プレイヤーの状態
+		switch (m_PlayerState)
 		{
-			m_PlayerState = PLAYERSTATE_BLOWAWAY;
-		}
-		if (m_nDamageCount >= MAX_DAMAGECOUNT)
-		{
-			m_nDamageCount = 0;
+		case PLAYERSTATE_NONE:	//通常状態
+			//歩ける用にする
 			m_bWalk = true;
+			//スプリント使用可
 			m_bSprintMotion = true;
-			m_PlayerState = PLAYERSTATE_NONE;
-		}
+			break;
 
-		// 吹っ飛ばす
-		m_fBlowLength -= BLOW_MOVING_CUT;
-		if (m_fBlowLength >= 0.0f)
-		{
-			m_move.x -= sinf(m_fBlowAngle) * m_fBlowLength;
-			m_move.z -= cosf(m_fBlowAngle) * m_fBlowLength;
-		}
+		case PLAYERSTATE_WALK:	//移動状態
+			break;
 
-		break;
+		case PLAYERSTATE_ACTION: //アクション状態
+			break;
 
-	case PLAYERSTATE_DAMAGE:
-		// ダメージカウント加算
-		m_nDownCount++;
+		case PLAYERSTATE_BLOWAWAY:	//吹っ飛ばされてる状態
+									// ダメージカウント加算
+			m_nDamageCount++;
+			if (m_nDamageCount <= MAX_DAMAGECOUNT)
+			{
+				m_PlayerState = PLAYERSTATE_BLOWAWAY;
+			}
+			if (m_nDamageCount >= MAX_DAMAGECOUNT)
+			{
+				m_nDamageCount = 0;
+				m_bWalk = true;
+				m_bSprintMotion = true;
+				m_PlayerState = PLAYERSTATE_NONE;
+			}
 
-		//if (m_nDownCount >= 70)
-		{//60秒たったら起き上がる
+			// 吹っ飛ばす
+			m_fBlowLength -= BLOW_MOVING_CUT;
+			if (m_fBlowLength >= 0.0f)
+			{
+				m_move.x -= sinf(m_fBlowAngle) * m_fBlowLength;
+				m_move.z -= cosf(m_fBlowAngle) * m_fBlowLength;
+			}
+
+			break;
+
+		case PLAYERSTATE_DAMAGE:
+			// ダメージカウント加算
+			m_nDownCount++;
+
+			//70秒たったら起き上がる
 			if (m_nDownCount == 70)
 			{
 				m_pMotion->SetNumMotion(5);
 			}
+			if (m_nDownCount >= 120)
+			{//120秒で動けるようになる
+				m_bWalk = true;
+				m_bSprintMotion = true;
+				m_nDownCount = 0;
+				m_bSuperArmor = false;
+				m_PlayerState = PLAYERSTATE_NONE;
+				m_nDamageCounter = 0;
+			}
+			break;
 		}
-		if (m_nDownCount >= 120)
-		{//110秒で動けるようになる
-			//m_bWalk = true;
-			//m_bSprintMotion = true;
-			m_nDownCount = 0;
-			m_bSuperArmor = false;
-			m_PlayerState = PLAYERSTATE_NONE;
-			m_nDamageCounter = 0;
-		}
-		break;
-	}
 
-	//	ラインのカウントダウン処理
-	CountDownLineTime();
+		//	ラインのカウントダウン処理
+		CountDownLineTime();
 
-	//	ライン引きの開始(カウントアップ)
-	if (m_bBlockStartTerritory)
-	{
-		m_nCountTime++;
-		if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
-	}
-
-	//図形が完成した後の処理
-	UpdateShapeComplete();
-	//ゲームの状態を取得
-	int nGameState = CGame::GetGameState();
-
-	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
-	{
-		//プレイヤーの移動処理
-		PlayerMove();
-	}
-	else if (nGameState == CGame::GAMESTATE_END)
-	{//ゲーム終了時にモーションをニュートラル
-		if (m_bCharaMotionState == false)
+		//	ライン引きの開始(カウントアップ)
+		if (m_bBlockStartTerritory)
 		{
-			m_PlayerState = PLAYERSTATE_NONE;
-			pSound->StopSound(CSound::SOUND_LABEL_SE018);
-			m_pMotion->SetNumMotion(0);
-			m_bCharaMotionState = true;
+			m_nCountTime++;
+			if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
 		}
+
+		//図形が完成した後の処理
+		UpdateShapeComplete();
+		//ゲームの状態を取得
+		int nGameState = CGame::GetGameState();
+
+		if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
+		{
+			//プレイヤーの移動処理
+			PlayerMove();
+		}
+		else if (nGameState == CGame::GAMESTATE_END)
+		{//ゲーム終了時にモーションをニュートラル
+			if (m_bCharaMotionState == false)
+			{
+				m_PlayerState = PLAYERSTATE_NONE;
+				pSound->StopSound(CSound::SOUND_LABEL_SE018);
+				m_pMotion->SetNumMotion(0);
+				m_bCharaMotionState = true;
+			}
+		}
+
+		// キャラクターの状態を設定
+		SetCharaState(m_PlayerState);
 	}
-	
+
 	CDebugProc::Print("\n\n\n\n\n\n\n\nスーパーarmor : %d\n", m_bSuperArmor);
 	CDebugProc::Print("ダメージ : %d\n", m_nDamageCount);
 	CDebugProc::Print("ステート : %d\n", m_PlayerState);
@@ -252,12 +255,17 @@ void  CPlayer::Update(void)
 //=============================================================================
 void  CPlayer::Draw(void)
 {
-	//キャラクターの描画
-	CCharacter::Draw();
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	{
+		//キャラクターの描画
+		CCharacter::Draw();
 
-	if (m_pLoadEffect != NULL)
-	{//エフェクトの描画
-		m_pLoadEffect->Draw();
+		if (m_pLoadEffect != NULL)
+		{//エフェクトの描画
+			m_pLoadEffect->Draw();
+		}
 	}
 }
 
@@ -457,8 +465,8 @@ void  CPlayer::PlayerMovePad(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 				m_PlayerState = PLAYERSTATE_WALK;
 			}
 			else if((m_CharcterType == CCharacter::CHARCTERTYPE_POWER || 
-				m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE) && (m_PlayerState != PLAYERSTATE_ACTION || 
-					m_PlayerState != PLAYERSTATE_BLOWAWAY || m_PlayerState != PLAYERSTATE_DAMAGE))
+				m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE) && (m_PlayerState != PLAYERSTATE_ACTION 
+					&& m_PlayerState != PLAYERSTATE_BLOWAWAY && m_PlayerState != PLAYERSTATE_DAMAGE))
 			{
 				m_PlayerState = PLAYERSTATE_WALK;
 			}
@@ -585,8 +593,9 @@ void  CPlayer::PlayerMoveMouse(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 				//移動状態
 				m_PlayerState = PLAYERSTATE_WALK;
 			}
-			else if ((m_CharcterType == CCharacter::CHARCTERTYPE_POWER || m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE) &&
-				m_PlayerState != PLAYERSTATE_ACTION)
+			else if ((m_CharcterType == CCharacter::CHARCTERTYPE_POWER ||
+				m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE) && (m_PlayerState != PLAYERSTATE_ACTION
+					&& m_PlayerState != PLAYERSTATE_BLOWAWAY && m_PlayerState != PLAYERSTATE_DAMAGE))
 			{
 				m_PlayerState = PLAYERSTATE_WALK;
 			}
@@ -705,7 +714,15 @@ bool CPlayer::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECT
 	}
 	else if (pCollider->GetType() == CCollider::TYPE_SPHERE_PLAYERATTACK)
 	{
-		if (CollisionPlayerAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true)
+		//←追加(よしろう)
+		CScene *pParent = pCollider->GetParent();
+
+		if (CollisionPlayerAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true 
+			&& pParent->GetObjType() != OBJTYPE_ROBOT)
+		{
+		}
+		if (CollisionRobotAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true 
+			&& pParent->GetObjType() == OBJTYPE_ROBOT)
 		{
 		}
 	}
@@ -744,7 +761,7 @@ bool CPlayer::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D
 		}
 
 		CScene *pParent = pCylinderCollider->GetParent();
-		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
+		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
 		{// 親が敵かプレイヤーだった場合自分を吹っ飛ばす
 			CCharacter *pCharacter = (CCharacter*)pParent;
 			if (pCharacter == NULL) { return true; }
@@ -820,6 +837,32 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 
 		}
 
+		return true;
+	}
+
+	return false;
+}
+
+//=============================================================================
+//　攻撃球との当たり判定処理(ロボット)←追加(よしろう)
+//=============================================================================
+bool CPlayer::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
+{
+	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
+	{// 自分以外の攻撃球が当たったら
+		CScene *pParent = pShere->GetParent();
+		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
+		{
+			//当たってる間はダメージ状態
+			m_PlayerState = PLAYERSTATE_DAMAGE;
+
+			if (m_nDamageCounter == 0)
+			{
+				m_bSuperArmor = true;
+				m_pMotion->SetNumMotion(4);
+				m_nDamageCounter = 1;
+			}
+		}
 		return true;
 	}
 

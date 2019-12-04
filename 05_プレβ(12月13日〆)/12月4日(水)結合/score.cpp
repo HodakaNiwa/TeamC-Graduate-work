@@ -250,11 +250,16 @@ void CScoreGame::Draw(void)
 	//変数宣言
 	int nCntNumber;
 
-	for (nCntNumber = 0; nCntNumber < MAX_NUMBER; nCntNumber++)
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
 	{
-		if (m_pNumber[nCntNumber] != NULL)
+		for (nCntNumber = 0; nCntNumber < MAX_NUMBER; nCntNumber++)
 		{
-			m_pNumber[nCntNumber]->Draw();
+			if (m_pNumber[nCntNumber] != NULL)
+			{
+				m_pNumber[nCntNumber]->Draw();
+			}
 		}
 	}
 }

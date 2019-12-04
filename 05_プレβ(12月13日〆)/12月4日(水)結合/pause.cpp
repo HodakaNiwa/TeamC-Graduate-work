@@ -8,7 +8,6 @@
 #include "scene.h"
 #include "scene2D.h"
 #include "input.h"
-#include "gamepad.h"
 #include "manager.h"
 #include "game.h"
 #include "Fade.h"
@@ -147,15 +146,15 @@ void CPause::Update(void)
 	CGamePad * pGamePad = CManager::GetInputGamePad();					//ゲームパッドの取得
 
 	//ボタンの選択
-	if (pInputKeyboard->GetKeyboardTrigger(DIK_UP) == true || pGamePad->GetGamePadLeftStickTrigger(CGamePad::ANALOG_STICK_UP) == true)
+	if (pInputKeyboard->GetKeyboardTrigger(DIK_UP) == true)
 	{
 		m_state = (STATE)((m_state + (STATE_MAX - 1)) % STATE_MAX);
 	}
-	if (pInputKeyboard->GetKeyboardTrigger(DIK_DOWN) == true || pGamePad->GetGamePadLeftStickTrigger(CGamePad::ANALOG_STICK_DOWN) == true)
+	if (pInputKeyboard->GetKeyboardTrigger(DIK_DOWN) == true)
 	{
 		m_state = (STATE)((m_state + 1) % STATE_MAX);
 	}
-	if (pInputKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pGamePad->GetGamePadTrigger(CGamePad::ELECOM_A) == true)
+	if (pInputKeyboard->GetKeyboardTrigger(DIK_RETURN) == true)
 	{
 		m_StateBottun = STATEBOTTUN_SELECT;
 	}

@@ -6,7 +6,6 @@
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "inputmouce.h"
 #include "loadEffect.h"
 #include "line.h"
 #include "sceneOrbit.h"
@@ -15,6 +14,7 @@
 #include "skilicon.h"
 #include "RawMouse.h"
 #include "mine.h"
+#include "debuglog.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -22,7 +22,7 @@
 #define RECASTTIME (10)	// リキャスト時間
 #define MAX_POINT (100)	// マインを使用できるポイント
 #define COST_POINT (20)	// マインを使用した時に減るポイント
-#define RE_POINT (2)	// マイン使用ポイントの回復量
+#define RE_POINT (10)	// マイン使用ポイントの回復量
 
 //*****************************************************************************
 // コンストラクタ
@@ -129,7 +129,8 @@ HRESULT CTypeSweeper::Init(int nChara, D3DXVECTOR3 pos, char ModelTxt[40], char 
 	m_nTiming = 0;
 	m_bStop = false;
 	m_state = STATE_NONE;
-
+	m_nUse = false;
+	m_nActionCnt = 0;
 	return S_OK;
 }
 
@@ -170,6 +171,25 @@ void  CTypeSweeper::Update(void)
 		ActionUpdate();	//	スキル処理
 		CEnemy::Update();
 	}
+
+	if (m_nUse == true)
+	{
+		m_nActionCnt++;
+		m_bSuperArmor = true; // 一時的無敵状態
+		m_bWalk = false;
+
+		if (m_nActionCnt >= 40)// モーション・ステータスの切り替え
+		{
+			m_nActionCnt = 0;
+			m_fSpeed = 1.0f;
+			m_nUse = false;
+			m_bSuperArmor = false;	// 無敵解除
+			m_bWalk = true;			// 歩ける状態に
+			m_state = STATE_NONE;	//　ステータスリセット
+		}
+	}
+
+	CDebugProc::Print("スイーパー　%d\n", m_state);
 }
 
 
@@ -204,14 +224,14 @@ void  CTypeSweeper::ActionUpdate(void)
 	{
 		m_nTiming++;
 		if (m_nTiming == 50) { Process(); }
-		if (m_nTiming == 100) { Process(); }
+		if (m_nTiming == 150) { Process(); }
 	}
 	else { m_nTiming = 0; }
 
 
 	//	[[ポイントの回復]]
 	m_nReCounter++;
-	if (m_nReCounter % 180 == 0 && m_nMinePoint < MAX_POINT)
+	if (m_nReCounter % 150 == 0 && m_nMinePoint < MAX_POINT)
 	{
 		m_nReCounter = 0;
 
@@ -237,6 +257,10 @@ void CTypeSweeper::Process()
 		if (m_nMinePoint >= COST_POINT)
 		{
 			//	設置
+			m_nUse = true;
+			m_fSpeed = 0.0f;
+			m_state = STATE_ACTION;
+			m_pMotion->SetNumMotion(STATE_ACTION);
 			CMine::Create(CCharacter::GetPos(), pCharacter);
 
 			//	使用可能ポイントを減らす

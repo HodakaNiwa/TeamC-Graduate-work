@@ -29,6 +29,9 @@ class CUI;
 class CCharacter;
 class CEffectManager;
 class CEmitter;
+class CRobot;	// ←追加(よしろう)
+class CRobotUI;	// ←追加(よしろう)
+class CEventCamera; // ←追加(よしろう)
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -64,6 +67,8 @@ public:
 
 	void CreateInitPlayer(void);		//プレイヤーの生成
 	void CreateInitCamera(void);		//カメラの生成
+	void CreateInitEventCamera(void);	// イベントカメラの生成←追加(よしろう)
+	void CreateRobot(void);				// ロボットの生成←追加(よしろう)
 	//--------------------
 	//	Set & Get
 	//--------------------
@@ -81,6 +86,8 @@ public:
 	CFieldManager * GetFieldManger(void) { return m_pFieldManager; }
 	int GetNumPlay(void) { return m_nNumPlay; }
 	CUI *GetUI(void) { return m_pUI; }
+	CRobotUI *GetRobotUI(void) { return m_pRobotUI; }					// ←追加(よしろう)
+
 	//	---<<小林が追加しました>>★	★	★	★	★	★	★	★	★	★
 	CCharacter* GetChara(int nCnt) { return m_pCharacter[nCnt]; }
 	CEnemy * GetEnemy(int nNum) { return m_pEnemy[nNum]; }
@@ -92,6 +99,14 @@ public:
 	static int GetCountMakeShape(int nIndx) { return m_nCountMakeScore[nIndx]; }
 	static int GetCountGetTerritory(int nIndx) { return m_nCountGetTerritry[nIndx]; }
 	static int GetRobbotedTerritory(int nIndx) { return m_nCountRobottedTerritory[nIndx]; }
+
+	//ロボットGet&Set関数
+	void SetRobot(CRobot *pRobot) { m_pRoboCharacter = pRobot; }	
+	CRobot *GetRobot(void) { return m_pRoboCharacter; }				
+	void SetEveCam(CEventCamera *pEventCamera) { m_pEventCamera = pEventCamera; }	
+	CEventCamera *GetEveCam(void) { return m_pEventCamera; }						
+	void SetEveCamFlag(bool EndFlag) { m_bEveCam = EndFlag; }		
+	bool GetEVeCamFlag(void) { return m_bEveCam; }		
 private:
 	//--------------------
 	//	関数
@@ -104,6 +119,10 @@ private:
 	void DrawUI_Icon(const int nIdx);
 	void GetCharInfo(void);
 
+	//ロボット関数
+	void ReleaseRobotUI(void);		   
+	void UpdateRobotUI(void);		   
+	void DrawRobotUI(void);			   
 	//--------------------
 	//	メンバ変数
 	//--------------------
@@ -126,7 +145,7 @@ private:
 	CCamera * m_pDebugCamera;						//
 	int m_nNumPlay;									//プレイヤーの総数
 	int m_nEnemyNum;								//エネミーの総数
-	static int m_nEnemyNumResult;							//リザルト用エネミーの総数
+	static int m_nEnemyNumResult;					//リザルト用エネミーの総数
 
 	int m_nPlayerType[4];							//プレイヤーのタイプ
 	int m_nCountry[4];								//国
@@ -134,8 +153,15 @@ private:
 	CUI *m_pUI;										// UIクラスへのポインタ
 	CCharacter* m_pCharacter[MAX_CHARACTER];		//キャラクターの総数
 	CRotationCamera *m_pRotCamera;					//回転カメラ
-	int m_nControllerNum[4];							//コントローラーの番号
-	int m_nControllerType[4];							//コントローラーのタイプ
+	int m_nControllerNum[4];						//コントローラーの番号
+	int m_nControllerType[4];						//コントローラーのタイプ
+
+	//ロボット変数
+	int m_nCntRobot;								
+	CRobotUI *m_pRobotUI;							
+	CRobot* m_pRoboCharacter;						
+	CEventCamera *m_pEventCamera;				
+	bool m_bEveCam;		// イベントカメラの死亡フラグ
 
 	//	エネミーのタイプ選別(プレイヤーの選ばれたタイプとなるべくかぶらないようにするため)
 	int m_nSpeedNo, m_nPowerNo, m_nSweeperNo;

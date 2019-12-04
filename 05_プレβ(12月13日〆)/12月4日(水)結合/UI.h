@@ -25,6 +25,7 @@ class CMiniMap;
 class CCharacter;
 class CSkilicon;
 class CCharaicon;
+class CScoreGauge;
 class CIcon2D;
 class CGame;
 
@@ -144,6 +145,7 @@ public:    // 誰でもアクセス可能
 	void SetPlayerIdxicon(CIconBillboard *pPlayerIdxicon, const int nIdx) { m_pPlayerIdxicon[nIdx] = pPlayerIdxicon; }
 	void SetCrownicon(CIconBillboard *pCrownicon, const int nIdx) { m_pCrownicon[nIdx] = pCrownicon; }
 	void SetTerritoryTopicon(CIconBillboard *pTerritoryTopicon, const int nIdx) { m_pTerritoryTopIcon[nIdx] = pTerritoryTopicon; }
+	void SetScoreGauge(CScoreGauge *pScoreGauge) { m_pScoreGauge = pScoreGauge; }
 	int GetNumPlayer(void) { return m_nNumPlayer; }
 	int GetNumAllCharacter(void) { return m_nNumAllCharacter; }
 	CScoreGame *GetScoreGame(const int nIdx) { return m_pScoreGame[nIdx]; }
@@ -153,6 +155,7 @@ public:    // 誰でもアクセス可能
 	CIconBillboard *GetPlayerIdxicon(const int nIdx) { return m_pPlayerIdxicon[nIdx]; }
 	CIconBillboard *GetCrownicon(const int nIdx) { return m_pCrownicon[nIdx]; }
 	CIconBillboard *GetTerritoryTopicon(const int nIdx) { return m_pTerritoryTopIcon[nIdx]; }
+	CScoreGauge *GetScoreGauge(void) { return m_pScoreGauge; }
 
 protected: // このクラスと派生クラスだけがアクセス可能
 
@@ -166,10 +169,12 @@ private:   // このクラスだけがアクセス可能
 	void CreatePlayerIdxicon(void);
 	void CreateCrownRank(void);
 	void CreateTerritoryTopicon(void);
+	void CreateScoreGauge(void);
 	void BindTextureToIcon_Chara(CGame *pGame);
 	void BindTextureToIcon_PlayerIdx(CGame *pGame);
 	void BindTextureToIcon_Crown(CGame *pGame);
 	void BindTextureToIcon_TerritoryTop(void);
+	void BindTextureToIcon_ScoreGauge(void);
 
 	void ReleaseScoreGame(void);
 	void ReleaseMiniMap(void);
@@ -178,16 +183,19 @@ private:   // このクラスだけがアクセス可能
 	void ReleasePlayerIdxicon(void);
 	void ReleaseCrownIcon(void);
 	void ReleaseTerritoryTopIcon(void);
+	void ReleaseScoreGauge(void);
 
 	void UpdateSkilicon(void);
 	void UpdateCharaicon(void);
 	void UpdatePlayerIdxicon(CGame *pGame);
 	void UpdateCrownicon(CGame *pGame);
+	void UpdateScoreGauge(CGame *pGame);
 
 	void DrawSkilicon(void);
 	void DrawPlayerIdxicon(void);
 	void DrawCrownIcon(void);
 	void DrawTerritoryTopIcon(int nIdx);
+	void DrawScoreGauge(void);
 
 	//--------------------
 	//	メンバ変数
@@ -202,6 +210,7 @@ private:   // このクラスだけがアクセス可能
 	CIconBillboard *m_pPlayerIdxicon[MAX_PLAYERNUM * 2];		// プレイヤー番号アイコン
 	CIconBillboard *m_pCrownicon[UI_RANKICON_NUM];				// 王冠アイコン
 	CIconBillboard *m_pTerritoryTopIcon[MAX_PLAYERNUM];			// 起点を指し示すアイコン
+	CScoreGauge *m_pScoreGauge;									// スコアゲージクラスへのポインタ
 	LPDIRECT3DTEXTURE9 *m_pTexture;								// ゲームクラスが保有するテクスチャへのポインタ
 };
 

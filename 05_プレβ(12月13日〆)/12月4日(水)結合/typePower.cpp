@@ -231,7 +231,9 @@ void CTypePower::CreateColliderSphere(void)
 	CPlayerAttackSphereCollider *pSphere = CPlayerAttackSphereCollider::Create(D3DXVECTOR3(pos.x, pos.y, pos.z),
 		D3DXVECTOR3(1.0f, 1.0f, 1.0f), 150.0f, 40, 1);
 
-	pEffectManager->SetEffect(D3DXVECTOR3(pos.x, pos.y - 30.0f, pos.z - 30.0f), INITIALIZE_VECTOR3, 0);
+	pEffectManager->SetEffect(D3DXVECTOR3(pos.x, pos.y - 30.0f, pos.z - 30.0f), INITIALIZE_VECTOR3, 1);
+	pEffectManager->SetEffect(D3DXVECTOR3(pos.x, pos.y - 30.0f, pos.z - 30.0f), INITIALIZE_VECTOR3, 2);
+	pEffectManager->SetEffect(D3DXVECTOR3(pos.x, pos.y - 30.0f, pos.z - 30.0f), INITIALIZE_VECTOR3, 3);
 
 	if (pSphere == NULL) { return; }
 

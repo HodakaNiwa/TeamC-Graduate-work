@@ -30,7 +30,6 @@
 #include "particle.h"
 #include "effecttool.h"
 #include "loadEffect.h"
-#include "inputmouce.h"
 #include "select.h"
 #include "fieldmanager.h"
 #include "Territory.h"
@@ -45,6 +44,8 @@
 #include "ringRender.h"
 #include "territoryRender.h"
 #include "emitter.h"
+#include "robot.h"
+#include "robotUI.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -116,8 +117,14 @@ CGame::CGame()
 	m_pUI = NULL;
 	m_pRotCamera = NULL;
 	m_nEnemyNum = 0;
+	m_pRoboCharacter = NULL;	
+	m_nCntRobot = 0;			
+	m_bEveCam = false;			
+	m_pRobotUI = NULL;	
+	m_pEventCamera = NULL; 
 
 	m_nNumPlay = CSelect::GetEntryPlayer();
+
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
 		m_nPlayerType[nCnt] = 0;	//プレイヤーのタイプ
@@ -179,6 +186,7 @@ void CGame::Init(void)
 	CTimerLogo::Load();
 	CSkilicon::Load();
 	CEffect3D::Load();
+	CRobotUI::Load();
 
 	//奇跡の読み込み
 	CSceneOrbit::Load();
@@ -371,6 +379,17 @@ void CGame::CreateInitPlayer(void)
 }
 
 //=============================================================================
+// ロボットの生成
+//=============================================================================
+void CGame::CreateRobot(void)
+{
+	m_pRoboCharacter = CRobot::Create(D3DXVECTOR3(0.0f, 1000.0f, 0.0f),
+		"data\\TEXT\\ModelLoad\\ROBOT_LOAD.txt",
+		"data\\TEXT\\MotionLoad\\ROBOT_MOTION.txt", ROBOT_CHARNUM, CCharacter::TYPE_MAX, CCharacter::CHARCTERTYPE_ROBOT);
+	m_pRoboCharacter->CreateRobotUI(0);
+}
+
+//=============================================================================
 // ゲームカメラの生成処理
 //=============================================================================
 void CGame::CreateInitCamera(void)
@@ -529,6 +548,27 @@ void CGame::CreateInitCamera(void)
 			m_pGameCamera[3]->Init((CPlayer *)m_pCharacter[3]);
 			m_pGameCamera[3]->SetViewport(viewport);
 		}
+	}
+}
+
+//=============================================================================
+// イベントカメラの生成処理
+//=============================================================================
+void CGame::CreateInitEventCamera(void)
+{
+	// イベントカメラ←追加(よしろう)
+	if (m_pEventCamera == NULL && m_pRoboCharacter != NULL)
+	{
+		D3DVIEWPORT9 viewport;
+		viewport.X = 0;							//ビューポートの左上X座標
+		viewport.Y = 0;							//ビューポートの左上Y座標
+		viewport.Width = 1280;		//幅
+		viewport.Height = 720;	//高さ
+		viewport.MaxZ = 1.0f;
+		viewport.MinZ = 0.0f;
+		m_pEventCamera = new CEventCamera;
+		m_pEventCamera->Init((CCharacter *)m_pRoboCharacter);
+		m_pEventCamera->SetViewport(viewport);
 	}
 }
 
@@ -730,6 +770,19 @@ void CGame::Uninit(void)
 		m_pEffectManager = NULL;
 	}
 
+	// ロボットの破棄
+	m_pRoboCharacter = NULL;
+	
+
+	// イベントカメラの破棄
+	if (m_pEventCamera != NULL)
+	{
+		m_pEventCamera->Uninit();
+		delete m_pEventCamera;
+		m_pEventCamera = NULL;
+	}
+
+
 	if (m_pEmitter != NULL)
 	{
 		m_pEmitter = NULL;
@@ -739,6 +792,7 @@ void CGame::Uninit(void)
 	CTimerLogo::Unload();
 	CSkilicon::UnLoad();
 	CEffect3D::UnLoad();
+	CRobotUI::UnLoad();
 
 	//アウトライン破棄
 	CModel::ShaderUnLoad();
@@ -874,13 +928,14 @@ void CGame::Update(void)
 
 	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 
-	//if (pInputMouse->GetPress(pInputMouse->BUTTON_LEFT) == true)
-	//{
-	//	CFade::SetFade(CManager::MODE_RESULT);
-	//}
+	// イベントカメラの更新←追加(よしろう)
+	if (m_pEventCamera != NULL) { m_pEventCamera->Update(); }
 
 	// UIの更新処理
 	UpdateUI();
+
+	// ロボットUIの更新処理←追加(よしろう)
+	UpdateRobotUI();
 
 	//デバックキー
 	if (pCInputKeyBoard->GetKeyboardTrigger(DIK_1) == true) { CFade::SetFade(CManager::MODE_RESULT); }
@@ -894,6 +949,29 @@ void CGame::Update(void)
 	if (pCInputKeyBoard->GetKeyboardTrigger(DIK_9) == true)
 	{
 		m_pEmitter->Uninit();
+	}
+
+	// ロボットの生成←追加(よしろう)
+	if (m_pRoboCharacter == NULL)
+	{
+		if (m_nCntRobot == 400)
+		{
+			CreateRobot();				// ロボットの生成
+			CreateInitEventCamera();	// イベントカメラの生成
+			m_nCntRobot = 0;
+		}
+		else
+		{
+			m_nCntRobot++;
+		}
+	}
+	// イベントカメラの削除←追加(よしろう)
+	if (m_bEveCam == true && m_pEventCamera != NULL)
+	{// 死亡フラグが立ったとき
+		m_pEventCamera->Uninit();
+		delete m_pEventCamera;
+		m_pEventCamera = NULL;
+		m_bEveCam = false;	// 死亡フラグを戻す
 	}
 }
 
@@ -1093,22 +1171,37 @@ void CGame::Draw(void)
 
 	for (int nCntLayer = 0; nCntLayer < MAX_LAYER; nCntLayer++)
 	{
-			//トップの位置を保存する
-			CScene * pScene = CScene::GetTop(nCntLayer);
+		//トップの位置を保存する
+		CScene * pScene = CScene::GetTop(nCntLayer);
 
-			while (pScene != NULL)
+		while (pScene != NULL)
+		{
+			CScene * pSceneNext = pScene->GetpNext();	//次のオブジェクトのポインタを保存する
+
+			if (pScene->GetObjType() == CScene2D::OBJTYPE_2DPOLYGON
+				|| pScene->GetObjType() == CScene::OBJTYPE_FADE
+				|| pScene->GetObjType() == CScene::OBJTYPE_SCORE)
 			{
-				CScene * pSceneNext = pScene->GetpNext();	//次のオブジェクトのポインタを保存する
-
-				if (pScene->GetObjType() == CScene2D::OBJTYPE_2DPOLYGON 
-					|| pScene->GetObjType() == CScene::OBJTYPE_FADE
-					|| pScene->GetObjType() == CScene::OBJTYPE_SCORE)
-				{
-					pScene->Draw();
-				}
-
-				pScene = pSceneNext;					//ポインタを進める
+				pScene->Draw();
 			}
+
+			pScene = pSceneNext;					//ポインタを進める
+		}
+	}
+
+	// イベントカメラの描画
+	if (m_pEventCamera != NULL)
+	{
+		//カメラの設定
+		if (m_pEventCamera != NULL) { m_pEventCamera->Set(); }
+		CManager::GetRenderer()->GetDevice()->Clear(0,
+			NULL,
+			(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL),
+			D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+		//すべて描画する
+		CScene::DrawAll();
+
+		DrawRobotUI();	// ロボットUIの描画
 	}
 }
 
@@ -1160,4 +1253,42 @@ void CGame::GetCharInfo(void)
 			m_nCountRobottedTerritory[nCnt] = m_pCharacter[nCnt]->GetCountRobbtedTerritory();	//テリトリーの奪われた数
 		}
 	}
+}
+
+//=============================================================================
+// ロボットUIの開放処理
+//=============================================================================
+void CGame::ReleaseRobotUI(void)
+{
+	if (m_pRobotUI != NULL)
+	{
+		m_pRobotUI->Uninit();
+		delete m_pRobotUI;
+		m_pRobotUI = NULL;
+	}
+}
+
+//=============================================================================
+// ロボットUIの更新処理
+//=============================================================================
+void CGame::UpdateRobotUI(void)
+{
+	CRobot *pRobot = GetRobot();	// ロボットの取得
+
+	if (m_pRoboCharacter != NULL)
+	{
+		m_pRobotUI = pRobot->GetRobotUI();
+
+		if (m_pRobotUI == NULL) { return; }
+		m_pRobotUI->Update();
+	}
+}
+
+//=============================================================================
+// ロボットUIの描画処理
+//=============================================================================
+void CGame::DrawRobotUI(void)
+{
+	if (m_pRobotUI == NULL) { return; }
+	m_pRobotUI->Draw();
 }

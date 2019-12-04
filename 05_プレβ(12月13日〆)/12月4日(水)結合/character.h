@@ -44,6 +44,8 @@ public:
 		CHARCTERTYPE_SPEED = 0,
 		CHARCTERTYPE_POWER,
 		CHARCTERTYPE_TECHNIQUE,
+		CHARCTERTYPE_ROBOT,		
+
 		CHARCTERTYPE_MAX
 	}CHARCTERTYPE;
 
@@ -126,6 +128,10 @@ public:
 	//キャラタイプの取得
 	CHARCTERTYPE GetCharcterType(void) { return m_CharcterType; }
 
+	//追加(よしろう)
+	void SetCharaState(int nState) { m_nState = nState; }
+	int GetCharaState(void) { return m_nState; }
+
 	//リザルト用キャラタイプと国の取得
 	static CHARCTERTYPE GetCharcterTypeResult(int nType) { return m_CharcterTypeResult[nType]; }
 	int GetCuntryResult(int nNumCuntry) { return m_nCuntry[nNumCuntry]; }
@@ -184,6 +190,10 @@ protected:
 	static CHARCTERTYPE m_CharcterTypeResult[8];		//リザルト用のキャラタイプ
 	static  int m_nCuntry[8];							//リザルト用の国タイプ
 	bool m_bCharaMotionState;							//モーション状態の管理
+
+	//
+	D3DXMATRIX &GetMtx(void) { return m_mtxWorld; }
+	int m_nState;
 private:
 	D3DXVECTOR3					m_Pos;							//位置
 	D3DXVECTOR3					m_Scale;						//移動量

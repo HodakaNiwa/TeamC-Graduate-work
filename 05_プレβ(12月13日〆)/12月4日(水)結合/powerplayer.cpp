@@ -8,7 +8,6 @@
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "inputmouce.h"
 #include "loadEffect.h"
 #include "collision.h"
 #include "model.h"
@@ -215,7 +214,10 @@ void  CPowerPlayer::ActionUpdate(void)
 //=============================================================================
 void CPowerPlayer::InitNum(void)
 {
-	m_PlayerState = PLAYERSTATE_NONE;
+	if (m_PlayerState != PLAYERSTATE_DAMAGE)
+	{
+		m_PlayerState = PLAYERSTATE_NONE;
+	}
 
 	m_nInitCnt = 0;
 	m_nColliderTimer = 0;	//タイマーを初期化

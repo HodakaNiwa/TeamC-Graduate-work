@@ -159,12 +159,6 @@
     <ClCompile Include="ranking.cpp">
       <Filter>ソース ファイル\MODE</Filter>
     </ClCompile>
-    <ClCompile Include="gamepad.cpp">
-      <Filter>ソース ファイル\INPUT</Filter>
-    </ClCompile>
-    <ClCompile Include="inputmouce.cpp">
-      <Filter>ソース ファイル\INPUT</Filter>
-    </ClCompile>
     <ClCompile Include="input.cpp">
       <Filter>ソース ファイル\INPUT</Filter>
     </ClCompile>
@@ -414,6 +408,15 @@
     <ClCompile Include="territoryRender.cpp">
       <Filter>ソース ファイル\OBJECT</Filter>
     </ClCompile>
+    <ClCompile Include="robot.cpp">
+      <Filter>ソース ファイル\CHARACTER</Filter>
+    </ClCompile>
+    <ClCompile Include="robotUI.cpp">
+      <Filter>ソース ファイル\GAMEUI</Filter>
+    </ClCompile>
+    <ClCompile Include="scoreGauge.cpp">
+      <Filter>ソース ファイル\GAMEUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bottun.h">
@@ -473,13 +476,7 @@
     <ClInclude Include="input.h">
       <Filter>ヘッダー ファイル\INPUT</Filter>
     </ClInclude>
-    <ClInclude Include="inputmouce.h">
-      <Filter>ヘッダー ファイル\INPUT</Filter>
-    </ClInclude>
     <ClInclude Include="RawMouse.h">
-      <Filter>ヘッダー ファイル\INPUT</Filter>
-    </ClInclude>
-    <ClInclude Include="gamepad.h">
       <Filter>ヘッダー ファイル\INPUT</Filter>
     </ClInclude>
     <ClInclude Include="collision.h">
@@ -658,6 +655,15 @@
     </ClInclude>
     <ClInclude Include="ringRender.h">
       <Filter>ヘッダー ファイル\OBJECT</Filter>
+    </ClInclude>
+    <ClInclude Include="robot.h">
+      <Filter>ヘッダー ファイル\CHARACTER</Filter>
+    </ClInclude>
+    <ClInclude Include="robotUI.h">
+      <Filter>ヘッダー ファイル\GAMEUI</Filter>
+    </ClInclude>
+    <ClInclude Include="scoreGauge.h">
+      <Filter>ヘッダー ファイル\GAMEUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

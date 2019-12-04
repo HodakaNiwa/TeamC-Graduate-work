@@ -111,6 +111,7 @@ public:    // 誰でもアクセス可能
 	void Update(void);
 	void Draw(void);
 	void RevivalIconMask(void);
+	void RevivalIconMask_teq(void);
 
 	//--------------------
 	//	Set & Get

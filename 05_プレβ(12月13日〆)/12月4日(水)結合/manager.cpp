@@ -20,12 +20,10 @@
 #include "tutorial.h"
 #include "Fade.h"
 #include "bottun.h"
-#include "gamepad.h"
 #include "result.h"
 #include "select.h"
 #include "modebase.h"
 #include "time.h"
-#include"inputmouce.h"
 #include "RawMouse.h"
 #include "collision.h"
 #include "debuglog.h"
@@ -179,18 +177,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		}
 	}
 
-	//入力処理(ゲームパッド)
-	if (m_pInputGamePad == NULL)
-	{
-		//インプットクラスの生成
-		m_pInputGamePad = new CGamePad;
-
-		if (FAILED(m_pInputGamePad->Init(hInstance, hWnd)))
-		{
-			return S_OK;
-		}
-	}
-
 	//入力処理(ゲームパッド(Xインプット))
 	if (m_pXPad == NULL)
 	{
@@ -198,18 +184,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, bool bWindow)
 		m_pXPad = new CInputXPad;
 
 		if (FAILED(m_pXPad->Init(hInstance, hWnd)))
-		{
-			return S_OK;
-		}
-	}
-
-	//入力処理(マウス)
-	if (m_pInputMouse == NULL)
-	{
-		//マウスクラスの生成
-		m_pInputMouse = new CInputMouse;
-
-		if (FAILED(m_pInputMouse->Init(hInstance, hWnd)))
 		{
 			return S_OK;
 		}
@@ -266,28 +240,12 @@ void CManager::Uninit(void)
 		m_pInputKeyboard = NULL;
 	}
 
-	//入力処理(ゲームパッド)の破棄
-	if (m_pInputGamePad != NULL)
-	{
-		m_pInputGamePad->Uninit();
-		delete m_pInputGamePad;
-		m_pInputGamePad = NULL;
-	}
-
 	//入力処理(ゲームパッド(Xインプット))の破棄
 	if (m_pXPad != NULL)
 	{
 		m_pXPad->Uninit();
 		delete m_pXPad;
 		m_pXPad = NULL;
-	}
-
-	//入力処理(マウス)の破棄
-	if (m_pInputMouse != NULL)
-	{
-		m_pInputMouse->Uninit();
-		delete m_pInputMouse;
-		m_pInputMouse = NULL;
 	}
 
 	//入力処理(ラウマウス)の破棄
@@ -331,14 +289,8 @@ void CManager::Update(void)
 	//入力処理(キーボード)
 	if (m_pInputKeyboard != NULL) { m_pInputKeyboard->Update(); }
 
-	//ゲームパッドの更新
-	if (m_pInputGamePad != NULL) { m_pInputGamePad->Update(); };
-
 	//ゲームパッドの更新(Xインプット)
 	if (m_pXPad != NULL) { m_pXPad->Update(); }
-
-	//マウスの更新(マウス)
-	if (m_pInputMouse != NULL) { m_pInputMouse->Update(); }
 
 	//レンダリングの更新
 	if (m_pRenderer != NULL) { m_pRenderer->Update(); }

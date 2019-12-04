@@ -200,8 +200,13 @@ void CCountDownTimer::Update(void)
 	//変数宣言
 	int nCntNumber;
 
-	//カウントダウンの更新
-	TimeCountUpdate();
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	{
+		//カウントダウンの更新
+		TimeCountUpdate();
+	}
 
 	for (nCntNumber = 0; nCntNumber < MAX_TIMENUMBER; nCntNumber++)
 	{
@@ -231,10 +236,10 @@ void CCountDownTimer::TimeCountUpdate(void)
 		{
 			m_nCountDown--;
 			CTimer::AddTime(m_nCountDown);
-			
+
 			//カウントダウン時の音（開始時）
 			pSound->PlaySound(CSound::SOUND_LABEL_SE010);
-			
+
 			if (m_nCountDown == 0)
 			{
 				//カウントダウン時の音（開始時）
@@ -467,7 +472,7 @@ void CGameTimer::TimeGameUpdate(void)
 		if (m_nDeathGameCount == 5)
 		{
 			//ゲーム終了音
-			pSound->PlaySound(CSound::CSound::SOUND_LABEL_SE014);	
+			pSound->PlaySound(CSound::CSound::SOUND_LABEL_SE014);
 
 			//フィニッシュロゴの生成
 			CTimerLogo::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(100.0f, 50.0f, 0.0f), CTimerLogo::TIMERLOGO_FIN);

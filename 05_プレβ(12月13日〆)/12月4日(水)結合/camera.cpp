@@ -6,7 +6,6 @@
 //=============================================================================
 #include "camera.h"
 #include "input.h"
-#include "gamepad.h"
 #include "renderer.h"
 #include "manager.h"
 #include "game.h"
@@ -19,6 +18,7 @@
 #include "library.h"
 #include "territory.h"
 #include "debuglog.h"
+#include "robot.h"
 
 //=============================================================================
 // マクロ定義
@@ -61,6 +61,10 @@
 #define WINDY			(0.05f)		//慣性
 #define SPEED			(0.3f)		//カメラの移動速度
 #define MOVE			(20.0f)		//移動範囲
+
+// イベントカメラ
+#define UNINIT_TIME		(200)		// ロボットが着地してからカメラが消えるまでの時間
+
 //=============================================================================
 //	コンストラクタ
 //=============================================================================
@@ -111,7 +115,7 @@ void CCamera::Update(void)
 	//デバッグキーの更新処理
 	DebugUpdate(pInputKeyboard);
 
-	if ((pInputKeyboard->GetKeyboardPress(DIK_Z) == true) || (pGamePad->GetGamePadRightStickPress(CGamePad::ANALOG_STICK_RIGHT) == true))	 //Zキー(下)が押されたかどうか
+	if ((pInputKeyboard->GetKeyboardPress(DIK_Z) == true))	 //Zキー(下)が押されたかどうか
 	{
 		//カメラの回転量
 		m_RotDest.y += 0.01f;
@@ -122,7 +126,7 @@ void CCamera::Update(void)
 		//回転している状態にする
 		m_bRot = true;
 	}
-	if ((pInputKeyboard->GetKeyboardPress(DIK_C) == true) || (pGamePad->GetGamePadRightStickPress(CGamePad::ANALOG_STICK_LEFT) == true))	 //Cキー(下)が押されたかどうか
+	if ((pInputKeyboard->GetKeyboardPress(DIK_C) == true))	 //Cキー(下)が押されたかどうか
 	{
 		//カメラの回転量
 		m_RotDest.y -= 0.01f;
@@ -1038,6 +1042,83 @@ void CRankingCamera::Update(void)
 // カメラの設定処理
 //=============================================================================
 void CRankingCamera::Set(void)
+{
+	CCamera::Set();
+}
+
+//*****************************************************************************
+//
+// イベントカメラクラス
+//
+//*****************************************************************************
+
+//=============================================================================
+//	コンストラクタ
+//=============================================================================
+CEventCamera::CEventCamera()
+{
+	m_pTargetRobot = NULL;
+	m_nCntRobot = 0;
+}
+
+//=============================================================================
+// デストラクタ
+//=============================================================================
+CEventCamera::~CEventCamera()
+{
+}
+
+//=============================================================================
+// 初期化処理
+//=============================================================================
+void CEventCamera::Init(CCharacter *pChar)
+{
+	CCamera::Init();
+
+	m_pTargetRobot = pChar;
+
+	m_posV = D3DXVECTOR3(0.0f, 100.0f, -500.0f);		// 視点
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 注視点
+}
+
+//=============================================================================
+// 終了処理
+//=============================================================================
+void CEventCamera::Uninit(void)
+{
+	CCamera::Uninit();
+}
+
+//=============================================================================
+// 更新処理
+//=============================================================================
+void CEventCamera::Update(void)
+{
+	CGame *pGame = CManager::GetGame();		// ゲームの取得
+
+	CCamera::Update();
+
+	D3DXVECTOR3 RobotPos = m_pTargetRobot->GetPos();	// ロボット座標の取得
+
+	m_posR = RobotPos + D3DXVECTOR3(0.0f, 100.0f, 0.0f);	// 注視点の更新
+
+	CRobot *pRobot = pGame->GetRobot();		// ロボットの取得
+
+	if (pRobot->GetEndGravity() == true)
+	{// ロボットが着地していたら
+		if (m_nCntRobot >= UNINIT_TIME)
+		{// 消える時間になったら
+			pGame->SetEveCamFlag(true);	// 死亡フラグ
+			m_nCntRobot = 0;
+		}
+		m_nCntRobot++;	// カウンターの加算
+	}
+}
+
+//=============================================================================
+// カメラの設定処理
+//=============================================================================
+void CEventCamera::Set(void)
 {
 	CCamera::Set();
 }

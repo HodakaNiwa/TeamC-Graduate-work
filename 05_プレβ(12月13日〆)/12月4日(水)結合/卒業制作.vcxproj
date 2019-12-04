@@ -182,9 +182,7 @@
     <ClCompile Include="fileSaver.cpp" />
     <ClCompile Include="functionlib.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="gamepad.cpp" />
     <ClCompile Include="input.cpp" />
-    <ClCompile Include="inputmouce.cpp" />
     <ClCompile Include="instancingShader.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="lightorbit.cpp" />
@@ -222,6 +220,8 @@
     <ClCompile Include="ringEffect.cpp" />
     <ClCompile Include="ringRender.cpp" />
     <ClCompile Include="ringShader.cpp" />
+    <ClCompile Include="robot.cpp" />
+    <ClCompile Include="robotUI.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene2D.cpp" />
     <ClCompile Include="scene3D.cpp" />
@@ -232,6 +232,7 @@
     <ClCompile Include="sceneX.cpp" />
     <ClCompile Include="score.cpp" />
     <ClCompile Include="scoreChange.cpp" />
+    <ClCompile Include="scoreGauge.cpp" />
     <ClCompile Include="screenEffect.cpp" />
     <ClCompile Include="select.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -277,9 +278,7 @@
     <ClInclude Include="fieldmanager.h" />
     <ClInclude Include="fieldRender.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="gamepad.h" />
     <ClInclude Include="input.h" />
-    <ClInclude Include="inputmouce.h" />
     <ClInclude Include="library.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="lightorbit.h" />
@@ -312,6 +311,8 @@
     <ClInclude Include="ring.h" />
     <ClInclude Include="ringEffect.h" />
     <ClInclude Include="ringRender.h" />
+    <ClInclude Include="robot.h" />
+    <ClInclude Include="robotUI.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="scene2D.h" />
     <ClInclude Include="scene3D.h" />
@@ -322,6 +323,7 @@
     <ClInclude Include="sceneX.h" />
     <ClInclude Include="score.h" />
     <ClInclude Include="scoreChange.h" />
+    <ClInclude Include="scoreGauge.h" />
     <ClInclude Include="screenEffect.h" />
     <ClInclude Include="select.h" />
     <ClInclude Include="shader.h" />

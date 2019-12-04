@@ -8,7 +8,6 @@
 #include "manager.h"
 #include "camera.h"
 #include "input.h"
-#include "inputmouce.h"
 #include "loadEffect.h"
 #include "collision.h"
 #include "model.h"
@@ -194,6 +193,7 @@ void  CTechniquePlayer::ActionUpdate(void)
 	{
 		m_bSuperArmor = true;
 		m_nInstallationCounter++;
+
 		if (m_nInstallationCounter % 30 == 0)
 		{
 			m_nInstallationTimer++;
@@ -220,13 +220,16 @@ void  CTechniquePlayer::ActionUpdate(void)
 			m_nInstallationTimer = 0;
 
 			m_nInitCnt = 0;
-			if (m_bMineUse == false)
+			//if (m_bMineUse == false)
 			{//地雷設置が終わったらスーパーアーマを解除
-				m_bSuperArmor = false;
-				m_bWalk = true;
+			}
+			m_bSuperArmor = false;
+			m_bWalk = true;
+			m_bInit = false;
+			if (m_PlayerState != PLAYERSTATE_DAMAGE)
+			{
 				m_PlayerState = PLAYERSTATE_NONE;
 			}
-			m_bInit = false;
 		}
 	}
 
@@ -275,7 +278,6 @@ void  CTechniquePlayer::PlayerActionPad(void)
 			if (m_nMinePoint >= REDUCED_MINE_POINT)
 			{
 				m_PlayerState = PLAYERSTATE_ACTION;
-
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
