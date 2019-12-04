@@ -65,12 +65,15 @@
 // 起点アイコン用
 #define UI_TERRITORYTOP_WIDTH			(10.0f)								// 起点アイコンの幅
 #define UI_TERRITORYTOP_HEIGHT			(10.0f)								// 起点アイコンの高さ
+#define UI_TERRITORYTOP_WIDTH_BIG		(16.0f)								// 起点アイコンの幅(3人以上が参加している場合こっち)
+#define UI_TERRITORYTOP_HEIGHT_BIG		(16.0f)								// 起点アイコンの高さ(3人以上が参加している場合こっち)
 #define UI_TERRITORYTOP_ADDPOSY			(80.0f)								// 起点アイコンの高さに加える値
-#define UI_TERRITORYTOP_ADDPOSZ			(5.0f)								// 起点アイコンの奥行に加える値
+#define UI_TERRITORYTOP_ADDPOSZ			(9.0f)								// 起点アイコンの奥行に加える値
 #define UI_TERRITORYTOP_TEXIDX			(6)									// 起点アイコンの使用するテクスチャの番号
 
 // スコアゲージ用
 #define UI_SCOREGAUGE_PLAYERIDX_TEXIDX	(0)									// スコアゲージのプレイヤー番号が使用するテクスチャの番号
+#define UI_SCOREGAUGE_CROWN_TEXIDX 		(1)									// スコアゲージの王冠が使用するテクスチャの番号
 
 //*****************************************************************************
 //     静的メンバ変数宣言
@@ -377,11 +380,13 @@ void CUI::CreateCrownRank(void)
 		INITIALIZE_VECTOR3,
 		INITIALIZE_VECTOR3,
 	};
+	float fCrownWidth = UI_CROWNICON_WIDTH;
+	float fCrownHeight = UI_CROWNICON_HEIGHT;
 	for (int nCntCrown = 0; nCntCrown < UI_RANKICON_NUM; nCntCrown++)
 	{
 		if (m_pCrownicon[nCntCrown] != NULL) { continue; }
 		m_pCrownicon[nCntCrown] = CIconBillboard::Create(pos[nCntCrown], UI_CROWNICON_COL,
-			UI_CROWNICON_WIDTH, UI_CROWNICON_HEIGHT);
+			fCrownWidth, fCrownHeight);
 	}
 }
 
@@ -397,12 +402,18 @@ void CUI::CreateTerritoryTopicon(void)
 		INITIALIZE_VECTOR3,
 		INITIALIZE_VECTOR3
 	};
-
+	float fWidth = UI_TERRITORYTOP_WIDTH;
+	float fHeight = UI_TERRITORYTOP_HEIGHT;
+	if (m_nNumPlayer >= 3)
+	{// 3人以上参加していたら大きくする
+		fWidth = UI_TERRITORYTOP_WIDTH_BIG;
+		fHeight = UI_TERRITORYTOP_WIDTH_BIG;
+	}
 	for (int nCntTop = 0; nCntTop < MAX_PLAYERNUM; nCntTop++)
 	{
 		if (m_pTerritoryTopIcon[nCntTop] != NULL) { continue; }
 		m_pTerritoryTopIcon[nCntTop] = CIconBillboard::Create(pos[nCntTop], CCharacter::m_CountryColor[nCntTop],
-			UI_TERRITORYTOP_WIDTH, UI_TERRITORYTOP_HEIGHT);
+			fWidth, fHeight);
 	}
 }
 
@@ -604,16 +615,16 @@ void CUI::BindTextureToIcon_ScoreGauge(void)
 	if (m_pScoreGauge == NULL) { return; }
 
 	// プレイヤー番号にテクスチャを割り当てる
-	CIcon2D *m_pPlayerIdx = NULL;
+	CIcon2D *pPlayerIdx = NULL;
 	float fTexV = 0.0f;
 	for (int nCntIdx = 0; nCntIdx < MAX_PLAYERNUM * 2; nCntIdx++)
 	{
 		// ポインタを取得
-		m_pPlayerIdx = m_pScoreGauge->GetPlayerIdx(nCntIdx);
-		if (m_pPlayerIdx == NULL) { continue; }
+		pPlayerIdx = m_pScoreGauge->GetPlayerIdx(nCntIdx);
+		if (pPlayerIdx == NULL) { continue; }
 
-		// テクスチャを割り当ている
-		m_pPlayerIdx->BindTexture(m_pTexture[UI_SCOREGAUGE_PLAYERIDX_TEXIDX]);
+		// テクスチャを割り当てる
+		pPlayerIdx->BindTexture(m_pTexture[UI_SCOREGAUGE_PLAYERIDX_TEXIDX]);
 
 		// テクスチャV座標の設定
 		fTexV = 0.20f * nCntIdx;
@@ -621,9 +632,18 @@ void CUI::BindTextureToIcon_ScoreGauge(void)
 		{
 			fTexV = 0.80f;
 		}
-		m_pPlayerIdx->SetTexV(fTexV);
-		m_pPlayerIdx->SetTexHeight(0.20f);
-		m_pPlayerIdx->SetVtxBuffTex();
+		pPlayerIdx->SetTexV(fTexV);
+		pPlayerIdx->SetTexHeight(0.20f);
+		pPlayerIdx->SetVtxBuffTex();
+	}
+
+	// 王冠にテクスチャを割り当てる
+	CIcon2D *pCrown = NULL;
+	for (int nCntCrown = 0; nCntCrown < MAX_CROWNNUM; nCntCrown++)
+	{
+		pCrown = m_pScoreGauge->GetCrown(nCntCrown);
+		if (pCrown == NULL) { continue; }
+		pCrown->BindTexture(m_pTexture[UI_SCOREGAUGE_CROWN_TEXIDX + nCntCrown]);
 	}
 }
 
@@ -898,9 +918,18 @@ void CUI::UpdateCrownicon(CGame *pGame)
 //=============================================================================
 void CUI::UpdateScoreGauge(CGame *pGame)
 {
-	if (m_pScoreGauge != NULL)
+	if (m_pScoreGauge == NULL) { return; }
+
+	int nRank = 0;
+	for (int nCntRank = 0; nCntRank < m_nNumAllCharacter; nCntRank++)
 	{
-		m_pScoreGauge->Update();
+		// ランクを設定
+		nRank = (m_nRank[nCntRank]);
+		if (nRank == 0 || nRank == 1 || nRank == 2)
+		{
+			// 王冠アイコンを描画するか判定
+			m_pScoreGauge->CheckDispCrown(nRank, nCntRank);
+		}
 	}
 }
 

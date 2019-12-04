@@ -27,6 +27,12 @@
 #define SCOREGAUGE_PLAYERIDX_WIDTH  (60.0f)
 #define SCOREGAUGE_PLAYERIDX_HEIGHT (40.0f)
 
+// 王冠用
+#define SCOREGAUGE_CROWN_COL        (D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))
+#define SCOREGAUGE_CROWN_WIDTH      (60.0f)
+#define SCOREGAUGE_CROWN_HEIGHT     (60.0f)
+#define SCOREGAUGE_CROWN_DISPPOINT  (10)
+
 //*****************************************************************************
 //     静的メンバ変数宣言
 //*****************************************************************************
@@ -43,6 +49,11 @@ CScoreGauge::CScoreGauge()
 	{
 		m_pGauge2D[nCnt] = NULL;
 		m_pPlayerIdx[nCnt] = NULL;
+	}
+	for (int nCntCrown = 0; nCntCrown < MAX_CROWNNUM; nCntCrown++)
+	{
+		m_pCrown[nCntCrown] = NULL;
+		m_bDispCrown[nCntCrown] = false;
 	}
 }
 
@@ -99,6 +110,9 @@ HRESULT CScoreGauge::Init(const int nNumPlayer)
 	// プレイヤー番号の生成
 	CreatePlayerIdx();
 
+	// 王冠の生成
+	CreateCrown();
+
 	// 1ポイントごとのゲージ量を計算する
 	CalcGaugeOnceFromRing();
 
@@ -118,6 +132,9 @@ void CScoreGauge::Uninit(void)
 
 	// プレイヤー番号の開放
 	ReleasePlayerIdx();
+
+	// 王冠の開放
+	ReleaseCrown();
 }
 
 //=============================================================================
@@ -141,6 +158,9 @@ void CScoreGauge::Draw(void)
 
 	// プレイヤー番号の描画
 	DrawPlayerIdx();
+
+	// 王冠の描画
+	DrawCrown();
 }
 
 //=============================================================================
@@ -149,6 +169,8 @@ void CScoreGauge::Draw(void)
 void CScoreGauge::AddGauge(const int nIdx, const int nPoint)
 {
 	if (m_pGauge2D[nIdx] == NULL) { return; }
+
+	// ゲージをずらす
 	float fWidth = m_pGauge2D[nIdx]->GetWidth();
 	D3DXVECTOR3 pos = m_pGauge2D[nIdx]->GetPos();
 	fWidth += m_fGaugeOnce * nPoint;
@@ -160,9 +182,10 @@ void CScoreGauge::AddGauge(const int nIdx, const int nPoint)
 	}
 	pos.x += fCutValue;
 	m_pGauge2D[nIdx]->SetPos(pos);
-	m_pPlayerIdx[nIdx]->SetPos(pos);
 	m_pGauge2D[nIdx]->SetScale(fWidth, m_pGauge2D[nIdx]->GetHeight());
 	m_pGauge2D[nIdx]->SetVtxBuffPos();
+
+	// プレイヤー番号をずらす
 	if (m_pPlayerIdx[nIdx] != NULL)
 	{
 		m_pPlayerIdx[nIdx]->SetPos(pos + D3DXVECTOR3(0.0f, (SCOREGAUGE_PLAYERIDX_HEIGHT * 0.5f) + (m_fGaugeHeight * 0.5f), 0.0f));
@@ -196,6 +219,8 @@ void CScoreGauge::AddGauge(const int nIdx, const int nPoint)
 void CScoreGauge::CutGauge(const int nIdx, const int nPoint)
 {
 	if (m_pGauge2D[nIdx] == NULL) { return; }
+
+	// ゲージをずらす
 	float fWidth = m_pGauge2D[nIdx]->GetWidth();
 	D3DXVECTOR3 pos = m_pGauge2D[nIdx]->GetPos();
 	fWidth -= m_fGaugeOnce * nPoint;
@@ -212,9 +237,10 @@ void CScoreGauge::CutGauge(const int nIdx, const int nPoint)
 		pos.x -= SCOREGAUGE_BG_WIDTH * 0.5f;
 	}
 	m_pGauge2D[nIdx]->SetPos(pos);
-	m_pPlayerIdx[nIdx]->SetPos(pos);
 	m_pGauge2D[nIdx]->SetScale(fWidth, m_pGauge2D[nIdx]->GetHeight());
 	m_pGauge2D[nIdx]->SetVtxBuffPos();
+
+	// プレイヤー番号をずらす
 	if (m_pPlayerIdx[nIdx] != NULL)
 	{
 		m_pPlayerIdx[nIdx]->SetPos(pos + D3DXVECTOR3(0.0f, (SCOREGAUGE_PLAYERIDX_HEIGHT * 0.5f) + (m_fGaugeHeight * 0.5f), 0.0f));
@@ -239,6 +265,26 @@ void CScoreGauge::CutGauge(const int nIdx, const int nPoint)
 		}
 		fWidth = m_pGauge2D[nCnt]->GetWidth() * 0.5f;
 		GaugePos = m_pGauge2D[nCnt]->GetPos();
+	}
+}
+
+//=============================================================================
+//    王冠を表示するか判定する処理
+//=============================================================================
+void CScoreGauge::CheckDispCrown(const int nIdx, const int nRank)
+{
+	if (m_pCrown[nIdx] == NULL) { return; }
+
+	// ゲージの幅がある程度あれば描画
+	if (m_pGauge2D[nRank]->GetWidth() >= m_fGaugeOnce * SCOREGAUGE_CROWN_DISPPOINT)
+	{
+		m_bDispCrown[nIdx] = true;
+		m_pCrown[nIdx]->SetPos(m_pGauge2D[nRank]->GetPos());
+		m_pCrown[nIdx]->SetVtxBuffPos();
+	}
+	else
+	{
+		m_bDispCrown[nIdx] = false;
 	}
 }
 
@@ -283,6 +329,19 @@ void CScoreGauge::CreatePlayerIdx(void)
 		PlayerIdxPos.y += (SCOREGAUGE_PLAYERIDX_HEIGHT * 0.5f) + (m_fGaugeHeight * 0.5f);
 		m_pPlayerIdx[nCnt] = CIcon2D::Create(PlayerIdxPos, CCharacter::m_CountryColor[nCnt],
 			SCOREGAUGE_PLAYERIDX_WIDTH, SCOREGAUGE_PLAYERIDX_HEIGHT);
+	}
+}
+
+//=============================================================================
+//    王冠の生成処理
+//=============================================================================
+void CScoreGauge::CreateCrown(void)
+{
+	for (int nCnt = 0; nCnt < MAX_CROWNNUM; nCnt++)
+	{
+		if (m_pCrown[nCnt] != NULL) { continue; }
+		m_pCrown[nCnt] = CIcon2D::Create(INITIALIZE_VECTOR3, SCOREGAUGE_CROWN_COL,
+			SCOREGAUGE_CROWN_WIDTH, SCOREGAUGE_CROWN_HEIGHT);
 	}
 }
 
@@ -356,6 +415,22 @@ void CScoreGauge::ReleasePlayerIdx(void)
 }
 
 //=============================================================================
+//    王冠の開放処理
+//=============================================================================
+void CScoreGauge::ReleaseCrown(void)
+{
+	for (int nCnt = 0; nCnt < MAX_CROWNNUM; nCnt++)
+	{
+		if (m_pCrown[nCnt] != NULL)
+		{
+			m_pCrown[nCnt]->Uninit();
+			delete m_pCrown[nCnt];
+			m_pCrown[nCnt] = NULL;
+		}
+	}
+}
+
+//=============================================================================
 //    ゲージ背景の描画処理
 //=============================================================================
 void CScoreGauge::DrawGaugeBg(void)
@@ -390,6 +465,20 @@ void CScoreGauge::DrawPlayerIdx(void)
 		if (m_pPlayerIdx[nCnt] != NULL)
 		{
 			m_pPlayerIdx[nCnt]->Draw();
+		}
+	}
+}
+
+//=============================================================================
+//    王冠の描画処理
+//=============================================================================
+void CScoreGauge::DrawCrown(void)
+{
+	for (int nCnt = 0; nCnt < MAX_CROWNNUM; nCnt++)
+	{
+		if (m_pCrown[nCnt] != NULL && m_bDispCrown[nCnt] == true)
+		{
+			m_pCrown[nCnt]->Draw();
 		}
 	}
 }
