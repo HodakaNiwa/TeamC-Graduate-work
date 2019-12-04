@@ -270,6 +270,8 @@ private:
 	int m_nInstallationCounter;	//	設置カウンター
 	int m_nInstallationTimer;	//	設置タイマー
 	int m_nTiming;				//	タイミング
+	bool m_nUse;
+	int m_nActionCnt;
 };
 
 #endif

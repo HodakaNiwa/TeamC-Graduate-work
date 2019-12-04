@@ -303,7 +303,6 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 
 	//	[[短い距離順に変える]]
 	MergeSort(m_AreaInfo[m_nAreaNow], 0, m_nAreaTerrNum[m_nAreaNow] - 1, m_nAreaNow);
-	
 
 	while (m_bBreak != true)
 	{
@@ -313,8 +312,15 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 			{
 				if (m_AreaInfo[m_nAreaNow][nCnt].fDistance == m_AreaInfo[m_nAreaNow][nNextNum].fDisSort)
 				{
+					float fDis = m_AreaInfo[m_nAreaNow][nCnt].fDistance;
 					m_nTargetNum = nCnt;
 					m_bBreak = true;
+					// [[次の拠点があまりに遠い場合は始点に戻る]]
+					if (fDis >= 500.0f && m_apTerritory[2] != NULL)	
+					{
+						m_nLineNum = 2;		//	初期最低値に戻す
+						m_bFinish = true;	//	始点に戻す
+					}
 					break;
 				}
 			}
@@ -373,16 +379,16 @@ void  CEnemy::AIBasicAction(void)
 					{
 					case CCharacter::CHARCTERTYPE_SPEED:
 						
-						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	// アクション時
+						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	// アクション時 
 						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } // 通常時
 						break;
 
 					case CCharacter::CHARCTERTYPE_POWER:
-						LineConnect((12 - (rand() % 3)));
+						LineConnect((12 - (rand() % 3))); // 10~12
 						break;
 
 					case CCharacter::CHARCTERTYPE_TECHNIQUE:
-						LineConnect((12 - (rand() % 3)));
+						LineConnect((12 - (rand() % 3))); // 10~12
 						break;
 					}
 				}
