@@ -20,6 +20,7 @@
 #include "moveUI.h"
 #include "loadEffect.h"
 #include "tutorialplayer.h"
+#include "line.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -29,7 +30,7 @@
 #define FIRST_POS	(D3DXVECTOR3(1800.0f, 360.0f, 0.0f))
 #define MIDDLE_POS	(D3DXVECTOR3(640.0f, 360.0f, 0.0f))
 #define SLIDEOUT_POS	(D3DXVECTOR3(-600.0f, 360.0f, 0.0f))
-#define MOVE		(50.0f)
+#define MOVE		(100.0f) //50
 
 #define LOGO_SIZE	(D3DXVECTOR3(400.0f, 60.0f, 0.0f))
 #define TEXT00_POS	(D3DXVECTOR3(640.0f, 180.0f, 0.0f))
@@ -41,10 +42,10 @@
 #define WINDOW_POS1	 (D3DXVECTOR3(850.0f, 340.0f, 0.0f))
 #define WINDOW_SIZE	(D3DXVECTOR3(300.0f, 170.0f, 0.0f))
 #define CHANG_COL	(0.1f) //0.025
-#define FADEOUT_TIME (120)	//240
-#define GETTERRITORY00_TIME (40) //300
-#define GETTERRITORY01_TIME (80) //600
-#define GETTERRITORY02_TIME (120) //900
+#define FADEOUT_TIME (60)	//240
+#define GETTERRITORY00_TIME (60 * 7) //300
+#define GETTERRITORY01_TIME (60 * 16) //600
+#define GETTERRITORY02_TIME (1020) //900
 
 
 //背景テクスチャのパス
@@ -105,6 +106,7 @@ void CTutorial::Init(void)
 	m_pCamera = NULL;
 	m_pFieldManager = NULL;
 	m_pLoadEffect = NULL;
+	m_pCharTutorial = NULL;
 	m_state = STATE_FIRST;
 	m_nCountTime = 0;
 	m_bMoveSlideTitle = false;
@@ -135,6 +137,7 @@ void CTutorial::Init(void)
 		CEffectTool::LoadEffect();
 	}
 
+#if _DEBUG
 	//カメラの生成
 	if (m_pCamera == NULL)
 	{
@@ -151,6 +154,7 @@ void CTutorial::Init(void)
 		m_pCamera->SetViewport(viewport);
 		m_pCamera->SetPosV(D3DXVECTOR3(0.0f, 500.0f, -180.0f));
 	}
+#endif
 
 	//フィールドの生成
 	if (m_pFieldManager == NULL)
@@ -163,8 +167,11 @@ void CTutorial::Init(void)
 	if (m_pLoadTerritory == NULL) { m_pLoadTerritory = CLoadTextTerritory::Create(LOAD_TERRITORY); }	//テリトリー
 
 	//キャラクターの生成
-	//CTutorialPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\SPEEDPLAYER_LOAD.txt", "data\\TEXT\\MotionLoad\\SPEEDPLAYER_MOTION.txt",
-		//CCharacter::CHARCTERTYPE_SPEED, 0, 0);
+	if (m_pCharTutorial == NULL)
+	{
+		m_pCharTutorial = CTutorialPlayer::Create(D3DXVECTOR3(10.0f, 0.0f, 0.0f), "data\\TEXT\\ModelLoad\\SPEEDPLAYER_LOAD.txt", "data\\TEXT\\MotionLoad\\SPEEDPLAYER_MOTION.txt",
+												  0, CCharacter::TYPE_JAPAN, CCharacter::CHARCTERTYPE_SPEED);
+	}
 }
 
 //=============================================================================
@@ -400,20 +407,71 @@ void CTutorial::UpdateGetTerritory(void)
 		//時間の加算
 		m_nCountTime++;
 
-		if (m_nCountTime > GETTERRITORY01_TIME)
+		if (m_nCountTime >= GETTERRITORY01_TIME)
 		{//ラインを切る状態にする
+			if (m_nCountTime == GETTERRITORY01_TIME)
+			{//移動していない状態にする
+				if (m_pCharTutorial != NULL)
+				{//プレイヤーを破棄
+					CTutorialPlayer * pTutorialPlayer = (CTutorialPlayer *)m_pCharTutorial;
+					pTutorialPlayer->SetMoveEnd(false);
+					pTutorialPlayer->ResetList();
+					pTutorialPlayer->SetPos(D3DXVECTOR3(-360.0f, 0.0f, 20.0f));
+					pTutorialPlayer->SetRot(INITIALIZE_VECTOR3);
+					CTerritory::ResetColorTerritory();		//テリトリーを初期化する
+
+					//ラインの生成
+					CLine::Create(D3DXVECTOR3(-220.0f, 0.0f, -20.0f), D3DXVECTOR3(-250.0f, 0.0f, 150.0f), 1, 0);
+					CLine::Create(D3DXVECTOR3(-250.0f, 0.0f, 150.0f), D3DXVECTOR3(-220.0f, 0.0f, 320.0f), 1, 0);
+					CLine::Create(D3DXVECTOR3(-220.0f, 0.0f, 320.0f), D3DXVECTOR3(100.0f, 0.0f, 320.0f), 1, 0);
+				}
+
+				if (m_pCharTutorial != NULL)
+				{//キャラクターを移動状態にする
+					CTutorialPlayer * pTutorialPlayer = (CTutorialPlayer *)m_pCharTutorial;
+					if (pTutorialPlayer->GetMoveEnd() == false) { pTutorialPlayer->SetMovePlayer(true, 2); }
+				}
+			}
+
 			m_pBG->BindTexture(m_pTextureBG[6]);
 			m_state = STATE_CUTLINE;
 			m_nCountTime = 0;
 			m_bSlideOut = false;
 		}
-		else if (m_nCountTime > GETTERRITORY00_TIME)
+		else if (m_nCountTime >= GETTERRITORY00_TIME)
 		{//BGテクスチャの入替え
+
+			if (m_nCountTime == GETTERRITORY00_TIME)
+			{//移動していない状態にする
+				if (m_pCharTutorial != NULL)
+				{//プレイヤーを破棄
+					CTutorialPlayer * pTutorialPlayer = (CTutorialPlayer *)m_pCharTutorial;
+					pTutorialPlayer->SetMoveEnd(false);
+					pTutorialPlayer->SetPos(D3DXVECTOR3(0.0f, 0.0f, -30.0f));
+					pTutorialPlayer->SetRot(INITIALIZE_VECTOR3);
+					pTutorialPlayer->ResetList();
+					CTerritory::ResetColorTerritory();		//テリトリーを初期化する
+				}
+			}
+
+			if (m_pCharTutorial != NULL)
+			{//キャラクターを移動状態にする
+				CTutorialPlayer * pTutorialPlayer = (CTutorialPlayer *)m_pCharTutorial;
+				if (pTutorialPlayer->GetMoveEnd() == false) { pTutorialPlayer->SetMovePlayer(true, 1); }
+			}
+
 			m_pBG->BindTexture(m_pTextureBG[5]);
 		}
 		else if (m_nCountTime > 0)
 		{//BGテクスチャの入替え
 			CreateMultiWindow(WINDOW_POS, WINDOW_SIZE);
+
+			if (m_pCharTutorial != NULL)
+			{//キャラクターを移動状態にする
+				CTutorialPlayer * pTutorialPlayer = (CTutorialPlayer *)m_pCharTutorial;
+				if (pTutorialPlayer->GetMoveEnd() == false){ pTutorialPlayer->SetMovePlayer(true, 0); }
+			}
+
 			m_pBG->BindTexture(m_pTextureBG[4]);
 		}
 	}

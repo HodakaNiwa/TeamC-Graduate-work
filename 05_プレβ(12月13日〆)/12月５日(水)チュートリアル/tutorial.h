@@ -26,6 +26,7 @@ class CLoadTextTerritory;
 class CCamera;
 class CFieldManager;
 class CLoadTextEffect;
+class CCharacter;
 
 //=================================
 // チュートリアルクラス
@@ -55,6 +56,7 @@ public:
 	void LoadTex(void);		//テクスチャの読み込み
 	void UnloadTex(void);	//テクスチャの破棄
 	CLoadTextEffect * GetEffectLoad(void) { return m_pLoadEffect; }
+	CCharacter * GetTutorialPlayer(void) { return m_pCharTutorial; }
 
 private:
 	void UpdateFirst(void);
@@ -102,5 +104,6 @@ private:
 	CFieldManager * m_pFieldManager;
 	CCamera * m_pCamera;
 	CLoadTextEffect * m_pLoadEffect;			//	エフェクト管轄クラスへのポインタ
+	CCharacter * m_pCharTutorial;				// チュートリアルキャラ
 };
 #endif
