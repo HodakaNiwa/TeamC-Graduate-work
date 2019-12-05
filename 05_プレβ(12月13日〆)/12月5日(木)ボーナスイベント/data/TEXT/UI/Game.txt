@@ -1,0 +1,40 @@
+#==============================================================================
+#
+# ゲームUIの読み込み [Game.txt]
+# Author : ASUMI SATO
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 13		#テクスチャの最大数
+
+TEXTURE = data/TEXTURE/game/chara_idx.png				#[0] プレイヤー番号アイコン		#順番変えない
+TEXTURE = data/TEXTURE/game/crown_gold.png				#[1] 王冠(金)アイコン			#順番変えない
+TEXTURE = data/TEXTURE/game/crown_silver.png			#[2] 王冠(銀)アイコン			#順番変えない
+TEXTURE = data/TEXTURE/game/crown_copper.png			#[3] 王冠(銅)アイコン			#順番変えない
+TEXTURE = data/TEXTURE/game/minus.png					#[4] マイナスアイコン			#順番変えない
+TEXTURE = data/TEXTURE/game/effect001.jpg				#[5] 画面効果エフェクト			#順番変えない
+TEXTURE = data/TEXTURE/game/territorytop_icon000.png	#[6] 起点アイコン				#順番変えない
+TEXTURE = data/TEXTURE/game/Event_Start.png				#[7] イベント開始ロゴ			#順番変えない
+TEXTURE = data/TEXTURE/game/Event_Area1.png				#[8] エリア1の場合				#順番変えない
+TEXTURE = data/TEXTURE/game/Event_Area2.png				#[9] エリア2の場合				#順番変えない
+TEXTURE = data/TEXTURE/game/Event_Area3.png				#[10] エリア3の場合				#順番変えない
+TEXTURE = data/TEXTURE/game/Event_Area4.png				#[11] エリア4の場合				#順番変えない
+TEXTURE = data/TEXTURE/game/Event_End.png				#[12] イベント終了ロゴ			#順番変えない
+
+#----------------------------
+# タイプ番号メモ
+#----------------------------
+#	ロゴ = 0,
+#	ボタン = 1,
+#
+
+#--------------------------------------
+# UI情報
+#--------------------------------------
+MAX_UI = 0		#UI情報の最大数
+
+END_SCRIPT		# この行は絶対消さないこと！
