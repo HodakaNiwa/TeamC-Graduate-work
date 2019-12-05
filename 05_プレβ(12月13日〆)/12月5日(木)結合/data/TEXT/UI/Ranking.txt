@@ -1,0 +1,92 @@
+#==============================================================================
+#
+# ランキングUIの読み込み [Ranking.txt]
+# Author : ASUMI SATO
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 8		#テクスチャの最大数
+
+TEXTURE = data/TEXTURE/Ranking/Ranking_BG.jpg		#[0] 背景			#順番変えない
+TEXTURE = data/TEXTURE/Ranking/Ranking_LG.png		#[1] ロゴ			#順番変えない
+TEXTURE = data/TEXTURE/Ranking/1st.png				#[2] 1st			#順番変えない
+TEXTURE = data/TEXTURE/Ranking/2nd.png				#[3] 2nd			#順番変えない
+TEXTURE = data/TEXTURE/Ranking/3rd.png				#[4] 3rd			#順番変えない
+TEXTURE = data/TEXTURE/Ranking/4th.png				#[5] 4th			#順番変えない
+TEXTURE = data/TEXTURE/Ranking/5th.png				#[6] 5th			#順番変えない
+TEXTURE = data/TEXTURE/Title/press000.png			#[3] プレスボタン			#順番変えない
+
+
+#----------------------------
+# タイプ番号メモ
+#----------------------------
+#	ロゴ = 0,
+#	ボタン = 1,
+#
+
+#--------------------------------------
+# UI情報
+#--------------------------------------
+MAX_UI = 8		#UI情報の最大数
+
+SET_UI
+	POS = 640 360.0 0.0		#位置
+	SIZE = 640.0 360.0 0.0  #サイズ
+	TEX = 0					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 300.0 70.0 0.0		#位置
+	SIZE = 300.0 70.0 0.0  #サイズ
+	TEX = 1					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 200.0 180.0 0.0		#位置
+	SIZE = 100.0 40.0 0.0  #サイズ
+	TEX = 2					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 200.0 280.0 0.0		#位置
+	SIZE = 100.0 40.0 0.0  #サイズ
+	TEX = 3					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 200.0 380.0 0.0		#位置
+	SIZE = 100.0 40.0 0.0  #サイズ
+	TEX = 4					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 200.0 480.0 0.0		#位置
+	SIZE = 100.0 40.0 0.0  #サイズ
+	TEX = 5					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 200.0 580.0 0.0		#位置
+	SIZE = 100.0 40.0 0.0  #サイズ
+	TEX = 6					#テクスチャのサイズ
+	TYPE = 0				#タイプ
+END_UI
+
+SET_UI
+	POS = 1000 670.0 0.0		#位置
+	SIZE = 250.0 30.0 0.0  	#サイズ
+	TEX = 7					#テクスチャのサイズ
+	TYPE = 1				#タイプ
+END_UI_UI
+
+END_SCRIPT		# この行は絶対消さないこと！
