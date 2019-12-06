@@ -166,6 +166,9 @@ private:
 	void CreateDivisionLogo_Start(void);
 	void CreateDivisionCollider(void);
 	void CreateDivisionWall(void);
+	void ShiftCharaPosition(void);
+	bool CheckInsideCollider(D3DXVECTOR3 pos);
+	void PushOutColliderOutSide(D3DXVECTOR3 &pos);
 	void CreateEventCamera_DivisionFinish(void);
 	void CreateDivisionBg_Finish(void);
 	void CreateDivisionLogo_Finish(void);

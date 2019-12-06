@@ -1814,6 +1814,7 @@ void CGame::StartDivisionEvent(void)
 
 	// 分断する方向をランダムで設定
 	m_nDivisionDirection = rand() % 2;
+	m_nDivisionDirection = 0;
 
 	// イベント用カメラを生成
 	CreateEventCamera_DivisionStart();
@@ -1829,6 +1830,9 @@ void CGame::StartDivisionEvent(void)
 
 	// 分断用の壁を生成
 	CreateDivisionWall();
+
+	// キャラクターの位置をずらしておく
+	ShiftCharaPosition();
 }
 
 //=============================================================================
@@ -1963,6 +1967,87 @@ void CGame::CreateDivisionWall(void)
 	// テクスチャを割り当てる
 	if (m_pDivisionWall == NULL) { return; }
 	m_pDivisionWall->BindTexture(GetTexture()[DIVISIONEVENT_WALL_TEXIDX]);
+}
+
+//=============================================================================
+// キャラクターの位置をずらす処理(コライダーの内側に入るのを防止する)
+//=============================================================================
+void CGame::ShiftCharaPosition(void)
+{
+	D3DXVECTOR3 CharaPos = INITIALIZE_VECTOR3;
+	for (int nCntChara = 0; nCntChara < m_nNumPlay + m_nEnemyNum; nCntChara++)
+	{
+		// キャラクターがコライダーの内側にいないか判定
+		if (m_pCharacter[nCntChara] == NULL) { continue; }
+		CharaPos = m_pCharacter[nCntChara]->GetPos();
+		if (CheckInsideCollider(CharaPos) == false) { return; }
+
+		// 内側にいるならコライダーの外側に押し出す
+		PushOutColliderOutSide(CharaPos);
+
+		// キャラクターの位置の設定
+		m_pCharacter[nCntChara]->SetPos(CharaPos);
+	}
+}
+
+//=============================================================================
+// コライダーの内側にいるか判定する処理
+//=============================================================================
+bool CGame::CheckInsideCollider(D3DXVECTOR3 pos)
+{
+	if (m_pDivisionCollider == NULL) { return false; }
+	D3DXVECTOR3 ColliderPos = m_pDivisionCollider->GetPos();
+	float fColliderWidth = m_pDivisionCollider->GetWidth();
+	float fColliderDepth = m_pDivisionCollider->GetDepth();
+	if (pos.x + 15.0f >= ColliderPos.x - fColliderWidth && pos.x - 15.0f <= ColliderPos.x + fColliderWidth
+		&& pos.z + 15.0f >= ColliderPos.z - fColliderDepth && pos.z - 15.0f <= ColliderPos.z + fColliderDepth)
+	{// コライダーの内側にいる
+		return true;
+	}
+
+	return false;
+}
+
+//=============================================================================
+// コライダーの外側に押し出す処理
+//=============================================================================
+void CGame::PushOutColliderOutSide(D3DXVECTOR3 &pos)
+{
+	if (m_pDivisionCollider == NULL) { return; }
+	D3DXVECTOR3 ColliderPos = m_pDivisionCollider->GetPos();
+	float fMoveX = 0.0f;
+	float fMoveZ = 0.0f;
+	switch (m_nDivisionDirection)
+	{// 分断の方向によって処理わけ
+	case DIVISIONEVENT_VERTICAL_IDX:
+		fMoveX += DIVISIONEVENT_COLLIDER_MIN + 2.0f;
+		break;
+	case DIVISIONEVENT_HORIZON_IDX:
+		fMoveZ += DIVISIONEVENT_COLLIDER_MIN + 2.0f;
+		break;
+	}
+
+	// ランダムでどちら側に押し出すか設定
+	int nRandom = rand() % 2;
+	switch (nRandom)
+	{
+	case 0:
+		break;
+	case 1:
+		fMoveX *= -1.0f;
+		fMoveZ *= -1.0f;
+		break;
+	}
+
+	switch (m_nDivisionDirection)
+	{// 分断の方向によって処理わけ
+	case DIVISIONEVENT_VERTICAL_IDX:
+		pos.x = fMoveX + ColliderPos.x;
+		break;
+	case DIVISIONEVENT_HORIZON_IDX:
+		pos.z = fMoveZ + ColliderPos.z;
+		break;
+	}
 }
 
 //=============================================================================
