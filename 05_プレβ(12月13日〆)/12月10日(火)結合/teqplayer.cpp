@@ -267,10 +267,10 @@ void  CTechniquePlayer::PlayerActionPad(void)
 	CCharacter *pCharacter = pGame->GetChara(m_nNumPlayer);
 	//ƒTƒEƒ“ƒh‚ÌŽæ“¾
 	CSound *pSound = CManager::GetSound();
-	if (pXPad->GetTrigger(XINPUT_GAMEPAD_B, m_nControllerIndx) == true)
+	/*if (pXPad->GetTrigger(XINPUT_GAMEPAD_B, m_nControllerIndx) == true)
 	{
 		m_nMinePoint = 100;
-	}
+	}*/
 	if (pXPad->GetTrigger(XINPUT_GAMEPAD_B, m_nControllerIndx) == true)
 	{
 		if (m_PlayerState != PLAYERSTATE_DAMAGE && m_PlayerState != PLAYERSTATE_ACTION
