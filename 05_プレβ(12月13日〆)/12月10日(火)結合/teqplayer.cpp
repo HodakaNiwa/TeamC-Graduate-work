@@ -282,7 +282,7 @@ void  CTechniquePlayer::PlayerActionPad(void)
 				m_PlayerState = PLAYERSTATE_ACTION;
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
-				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
+				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask_teq();	//スキルアイコン
 				m_bMineUse = true;
 				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
 				//pSound->SetVolume(CSound::SOUND_LABEL_SE024, 30.0f);
@@ -315,7 +315,7 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
-				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask();	//スキルアイコン
+				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask_teq();	//スキルアイコン
 				m_bMineUse = true;
 				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
 				//pSound->SetVolume(CSound::SOUND_LABEL_SE024, 30.0f);
@@ -345,7 +345,7 @@ void  CTechniquePlayer::PlayerActionKeyboard(void)
 
 				m_pMotion->SetNumMotion(2);
 				m_nButtonCounter = 1;	//
-				pUi->GetSkilicon(m_nControllerIndx)->RevivalIconMask();	//スキルアイコン
+				pUi->GetSkilicon(m_nControllerIndx)->RevivalIconMask_teq();	//スキルアイコン
 				m_bMineUse = true;
 				pSound->PlaySound(CSound::SOUND_LABEL_SE024);
 				pSound->SetVolume(CSound::SOUND_LABEL_SE024, 20.0f);
