@@ -284,14 +284,14 @@ void CGame::Init(void)
 
 #else
 	//カウントダウン状態
-	//CGame::SetGameState(CGame::GAMESTATE_NORMAL);
-	CGame::SetGameState(CGame::GAMESTATE_FIRSTCOUNTDOWN);
+	CGame::SetGameState(CGame::GAMESTATE_NORMAL);
+	//CGame::SetGameState(CGame::GAMESTATE_FIRSTCOUNTDOWN);
 
 	//カウントダウンタイマーの生成
-	CTimer::Create(CTimer::TYPE_COUNTER, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 80.0f, 0.0f));
+	//CTimer::Create(CTimer::TYPE_COUNTER, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 80.0f, 0.0f));
 
 	//ゲームタイマーの生成（ラスト5秒で描画される）
-	CTimer::Create(CTimer::TYPE_GAME, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 80.0f, 0.0f));
+	//CTimer::Create(CTimer::TYPE_GAME, 7, D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), D3DXVECTOR3(50.0f, 80.0f, 0.0f));
 
 	//地面の生成
 	if (m_pFieldManager == NULL)

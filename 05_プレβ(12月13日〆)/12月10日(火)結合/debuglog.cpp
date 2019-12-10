@@ -14,7 +14,7 @@
 LPD3DXFONT CDebugProc::m_pFont = NULL;                 // フォントへのポインタ
 char       CDebugProc::m_aStr[MAX_DEBUG_LOG] = "";     // 文字列格納用変数
 #ifdef _DEBUG
-bool       CDebugProc::m_bDisp = false;                 // 描画するかしないか
+bool       CDebugProc::m_bDisp = true;                 // 描画するかしないか
 #else
 bool       CDebugProc::m_bDisp = true;                // 描画するかしないか
 #endif

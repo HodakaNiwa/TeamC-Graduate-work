@@ -147,11 +147,11 @@ void  CPlayer::Update(void)
 	{
 		//キャラクターの更新
 		CCharacter::Update();
+		m_nSaveState = m_PlayerState;
 
 		//プレイヤーの状態
 		switch (m_PlayerState)
 		{
-			m_nSaveState = m_PlayerState;
 		case PLAYERSTATE_NONE:		//通常状態
 			//歩ける用にする
 			m_bWalk = true;
@@ -190,7 +190,7 @@ void  CPlayer::Update(void)
 		case PLAYERSTATE_DAMAGE:
 			// ダメージカウント加算
 			m_nDownCount++;
-			m_nDamageCount;
+
 			//70秒たったら起き上がる
 			if (m_nDownCount == 70)
 			{
@@ -234,6 +234,10 @@ void  CPlayer::Update(void)
 			{
 				m_PlayerState = PLAYERSTATE_NONE;
 				pSound->StopSound(CSound::SOUND_LABEL_SE018);
+				pSound->StopSound(CSound::SOUND_LABEL_SE030);
+				pSound->StopSound(CSound::SOUND_LABEL_SE022);
+				pSound->StopSound(CSound::SOUND_LABEL_SE024);
+
 				m_pMotion->SetNumMotion(0);
 				m_bCharaMotionState = true;
 			}
@@ -243,7 +247,7 @@ void  CPlayer::Update(void)
 		SetCharaState(m_PlayerState);
 	}
 
-	CDebugProc::Print("\n\n\n\n\n\n\n\nスーパーarmor : %d\n", m_bSuperArmor);
+	CDebugProc::Print("\n\n\n\nスーパーarmor : %d\n", m_bSuperArmor);
 	CDebugProc::Print("ダメージ : %d\n", m_nDamageCount);
 	CDebugProc::Print("ステート : %d\n", m_PlayerState);
 	CDebugProc::Print("ダメカン　: %d\n", m_nDamageCounter);
@@ -1329,7 +1333,11 @@ void CPlayer::BlowAway(D3DXVECTOR3 AnotherPos)
 
 	// 吹っ飛び状態にする
 	m_PlayerState = PLAYERSTATE_BLOWAWAY;
-	m_pMotion->SetNumMotion(m_PlayerState);
+
+	if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER && m_bSuperArmor != true)
+	{
+		m_pMotion->SetNumMotion(0);
+	}
 
 	// 向きを変える
 	float fRot = m_fBlowAngle + D3DX_PI;

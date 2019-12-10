@@ -12,6 +12,7 @@
 #include "input.h"
 #include "scene2D.h"
 #include "RawMouse.h"
+#include "fade.h"
 
 //=============================================================================
 // ƒ}ƒNƒ’è‹`
@@ -70,7 +71,10 @@ void CBottun::Update()
 		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) || pXPad->GetTrigger(XINPUT_GAMEPAD_B, nCnt) || 
 			pRawMouse->GetTrigger(nCnt,CRawMouse::RIMS_BUTTON_RIGHT))
 		{
-			m_State = STATE_ENTER;
+			if (CFade::GetFadeMode() == CFade::FADE_NONE)
+			{
+				m_State = STATE_ENTER;
+			}
 		}
 	}
 

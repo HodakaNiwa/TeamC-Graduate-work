@@ -385,11 +385,10 @@ void CResult::Update(void)
 			CSound::PlaySound(CSound::SOUND_LABEL_BGM002);
 		}
 	}
-
+#ifdef _DEBUG
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
-		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_START, nCnt) == true ||
-			pRawMouse->GetTrigger(nCnt, CRawMouse::RIMS_BUTTON_RIGHT) == true)
+		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true )
 		{
 			if (CFade::FADE_OUT != CFade::GetFadeMode())
 			{
@@ -399,6 +398,8 @@ void CResult::Update(void)
 			}
 		}
 	}
+#endif
+
 	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 
 	//ƒJƒƒ‰‚ÌXVˆ—
