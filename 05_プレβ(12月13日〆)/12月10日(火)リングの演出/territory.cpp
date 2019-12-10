@@ -244,7 +244,7 @@ void CTerritory::Draw(void)
 // リングの更新処理
 //=============================================================================
 void CTerritory::UpdateGetRing(void)
-{
+{//安
 	if (m_state != STATE_GET) { return; }
 
 	//変数宣言
@@ -255,7 +255,17 @@ void CTerritory::UpdateGetRing(void)
 	m_nCountTime++;
 
 	//リングレンダラーの取得
-	CRingRender * pRingrender = CManager::GetGame()->GetRingRender();
+	CRingRender * pRingrender = NULL;
+	CManager::MODE mode = CManager::GetMode();
+
+	if (mode == CManager::MODE_GAME)
+	{
+		pRingrender = CManager::GetGame()->GetRingRender();
+	}
+	else if (mode == CManager::MODE_TUTORIAL)
+	{
+		pRingrender = CManager::GetTutorial()->GetRingRender();
+	}
 
 	// ワールドマトリックスバッファをロックし、ワールドマトリックスデータへのポインタを取得
 	CRingRender::WORLDMATRIX *pWorld = NULL;
@@ -563,6 +573,12 @@ void CTerritory::ReleaseRing(void)
 	}
 	delete[] m_ppRing;
 	m_ppRing = NULL;
+
+	if (m_pbChangeColRing != NULL)
+	{
+		delete m_pbChangeColRing;
+		m_pbChangeColRing = NULL;
+	}
 }
 
 //=============================================================================
@@ -773,6 +789,10 @@ void CTerritory::ResetColorTerritory(void)
 			pTerritory->m_nNumPlayer = -1;								//プレイヤー番号初期化
 			pTerritory->m_nOldNumPlayer = -1;							//前回のプレイヤー番号初期化
 
+			if (CManager::GetMode() == CManager::MODE_TUTORIAL)
+			{//リングの色を変更する　安
+				CManager::GetTutorial()->GetRingRender()->ResetColorRing();
+			}
 		}
 
 		pScene = pSceneNext;		//ポインタを進める

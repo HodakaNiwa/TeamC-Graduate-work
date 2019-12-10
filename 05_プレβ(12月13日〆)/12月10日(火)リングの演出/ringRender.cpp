@@ -514,3 +514,33 @@ void CRingRender::Draw(void)
 	// 法線を正規化しない
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, false);
 }
+
+//=============================================================================
+//    色の初期化
+//=============================================================================
+void CRingRender::ResetColorRing(void)
+{//安
+	// ワールドマトリックスバッファをロックし、ワールドマトリックスデータへのポインタを取得
+	CRingRender::WORLDMATRIX *pWorld = NULL;
+	m_pWorldBuff->Lock(0, 0, (void**)&pWorld, 0);
+
+	// 頂点カラーバッファをロックし、頂点カラーデータへのポインタを取得
+	CRingRender::COLORDATA *pColor = NULL;
+	m_pColorBuff->Lock(0, 0, (void**)&pColor, 0);
+
+	// 全てのリングを探してリストに追加する
+	CScene *pScene = GetTop(RINGRENDER_RING_PRIORITY);
+	CScene *pSceneNext = NULL;
+	while (pScene != NULL)
+	{
+		pSceneNext = pScene->GetpNext();
+		if (pScene->GetObjType() == OBJTYPE_RING)
+		{// リングだったら
+			pColor->col = D3DXCOLOR(0.8f, 0.8f, 0.8f, 1.0f);
+			AddList((CRing*)pScene, pWorld, pColor);
+			pWorld++;
+			pColor++;
+		}
+		pScene = pSceneNext;
+	}
+}

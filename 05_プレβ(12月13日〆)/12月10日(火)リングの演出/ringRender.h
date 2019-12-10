@@ -88,7 +88,8 @@ public:    // 誰でもアクセス可能
 		D3DCOLOR col;
 	}COLORDATA;
 
-	void AddList(CRing *pRing, WORLDMATRIX *pWorld, COLORDATA *pCol);	//安
+	void AddList(CRing *pRing, WORLDMATRIX *pWorld, COLORDATA *pCol);	
+	void ResetColorRing(void); //安
 
 protected: // このクラスと派生クラスだけがアクセス可能
 
