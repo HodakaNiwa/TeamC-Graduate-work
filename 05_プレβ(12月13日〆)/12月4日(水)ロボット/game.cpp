@@ -44,6 +44,7 @@
 #include "model.h"
 #include "robot.h"
 #include "robotUI.h"
+#include "ring.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -259,6 +260,9 @@ void CGame::Init(void)
 		m_pDebugCamera->SetPosV(DEBUG_CAMERA);
 		//m_pDebugCamera->SetPosV(D3DXVECTOR3(14.0f, 255.0f, -204.0f));
 	}
+
+	//リングの総数を初期化
+	CRing::ResetMaxRing();
 
 	//読み込み処理
 	if (m_pLoadObject == NULL) { m_pLoadObject = CLoadTextObject::Create(LOAD_OBJECT); }				//オブジェクト
