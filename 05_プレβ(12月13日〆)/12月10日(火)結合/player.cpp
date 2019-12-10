@@ -1334,9 +1334,9 @@ void CPlayer::BlowAway(D3DXVECTOR3 AnotherPos)
 	// ‚Á”ò‚Ñó‘Ô‚É‚·‚é
 	m_PlayerState = PLAYERSTATE_BLOWAWAY;
 
-	if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER && m_bSuperArmor != true)
+	//if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER && m_bSuperArmor != true)
 	{
-		m_pMotion->SetNumMotion(0);
+		m_pMotion->SetNumMotion(m_PlayerState);
 	}
 
 	// Œü‚«‚ð•Ï‚¦‚é
