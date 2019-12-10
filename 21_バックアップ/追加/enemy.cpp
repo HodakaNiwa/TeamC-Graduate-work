@@ -14,6 +14,7 @@
 #include "territory.h"
 #include "mine.h"
 #include <windows.h>
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -26,9 +27,8 @@
 #define BLOW_MOVING_CUT    (1.5f)
 #define MAX_DAMAGECOUNT    (23)
 
-// 静的メンバ変数
-//float* CEnemy::m_tmp[4] = {};
-
+// デバック用
+#define FLAG	(false)
 
 //*****************************************************************************
 //	コンストラクタ
@@ -47,6 +47,9 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_bCheck = false;
 	m_state = STATE_NONE;
 	m_nLevel = 0;
+	m_EventCheck = false;
+	m_bReset = false;
+	m_bDebugStop = false;
 }
 
 //*****************************************************************************
@@ -110,28 +113,35 @@ void  CEnemy::Uninit(void)
 //=============================================================================
 void  CEnemy::Update(void)
 {
-	CCharacter::Update();
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	{
+		CCharacter::Update();
 
-	//	ゲーム開始まで更新させない
-	int nGameState = CGame::GetGameState();
-	if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
-	{
-		AIBasicAction();	//	AI共通処理
-	}
-	//	ゲーム終了時
-	else if (nGameState == CGame::GAMESTATE_END)
-	{
-		if (m_bCharaMotionState == false)
+		//	ゲーム開始まで更新させない
+		int nGameState = CGame::GetGameState();
+		if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
 		{
-			m_state = STATE_NONE;
-			m_pMotion->SetNumMotion(m_state);
-			m_bCharaMotionState = true;
+			AIBasicAction();	//	AI共通処理
 		}
+		//	ゲーム終了時
+		else if (nGameState == CGame::GAMESTATE_END)
+		{
+			if (m_bCharaMotionState == false)
+			{
+				m_state = STATE_NONE;
+				m_pMotion->SetNumMotion(m_state);
+				m_bCharaMotionState = true;
+			}
+		}
+
+		Program_Line();		//	ライン関数まとめ
+		Program_State();	//	モーション関連
+
+		// エネミーの状態を設定
+		SetCharaState(m_state);
 	}
-
-	Program_Line();		//	ライン関数まとめ
-	Program_State();	//	モーション関連
-
 }
 
 //=============================================================================
@@ -139,10 +149,15 @@ void  CEnemy::Update(void)
 //=============================================================================
 void  CEnemy::Draw(void)
 {
-	CCharacter::Draw();
-	D3DXMATRIX mtxWorld;
-	D3DXMatrixIdentity(&mtxWorld);
-	CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
+	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
+	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
+	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	{
+		CCharacter::Draw();
+		D3DXMATRIX mtxWorld;
+		D3DXMatrixIdentity(&mtxWorld);
+		CManager::GetRenderer()->GetDevice()->SetTransform(D3DTS_WORLD, &mtxWorld);
+	}
 }
 //=============================================================================
 //	デフォルト関数
@@ -232,7 +247,7 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 	m_bBreak = false;
 
 	//	テリトリー通過数記録 / 現在のライン数
-	m_nTargetCnt = 0;
+	m_nPassCnt = 0;
 	m_bFinish = false;
 
 	//	エネミーとテリトリー間の距離を計算
@@ -303,6 +318,7 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 
 	//	[[短い距離順に変える]]
 	MergeSort(m_AreaInfo[m_nAreaNow], 0, m_nAreaTerrNum[m_nAreaNow] - 1, m_nAreaNow);
+	
 
 	while (m_bBreak != true)
 	{
@@ -316,7 +332,7 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 					m_nTargetNum = nCnt;
 					m_bBreak = true;
 					// [[次の拠点があまりに遠い場合は始点に戻る]]
-					if (fDis >= 500.0f && m_apTerritory[2] != NULL)	
+					if (fDis >= 500.0f && m_apTerritory[2] != NULL)
 					{
 						m_nLineNum = 2;		//	初期最低値に戻す
 						m_bFinish = true;	//	始点に戻す
@@ -346,10 +362,60 @@ void  CEnemy::AIBasicAction(void)
 		if (pos.x <= m_nTerrStart.pos.x + 25.0f && pos.x >= m_nTerrStart.pos.x - 25.0f &&
 			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
 		{
-			//	距離の再計算
-			DisSort(pos);
+			CGame * pGame = CManager::GetGame();// 現在のゲームの状態を取得
 
-			//	ライン数の初期化 / 新たな始点・終点を決める
+			if (pGame->GetAreaBonusEventFlag() == true && CCharacter::GetCountGetTerritory() <= 30)// ボーナスエリアのイベントが発生している場合...
+			{
+				// [[一度すべてリセット、ボーナスエリアを目指す]]
+				int ntmpData = m_nAreaNow;
+				if (m_EventCheck == false)
+				{
+					m_nAreaNow = (pGame->GetAreaBonusIdx() + 2) % 4;
+
+
+					if (ntmpData != m_nAreaNow) // ボーナスエリア外
+					{
+						m_nPassCnt = 0;
+
+						for (int nCnt = 0; nCnt < m_nAreaTerrNum[ntmpData]; nCnt++)
+						{
+							m_AreaInfo[ntmpData][nCnt].bFlag = false;
+
+						}
+						m_bReset = true;
+					}
+				}
+				m_EventCheck = true; // ここで初めてフラグを立てる(無駄にリセットさせないため)
+			}
+			else 
+			{ 
+				m_EventCheck = false; 
+
+				if (m_bReset == true) // イベント終わり次第,各エリアに散らばせる
+				{
+					int m_nBeArea = m_nAreaNow;
+					while (m_nBeArea == m_nAreaNow)
+					{
+						m_nAreaNow = rand() % 4;
+					}
+					m_nPassCnt = 0;
+					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nBeArea]; nCnt++)
+					{
+						m_AreaInfo[m_nBeArea][nCnt].bFlag = false;
+
+					}
+					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+					{
+						m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+					}
+					m_bReset = false;
+				}
+
+			}
+
+			// [[ライン数の初期化 / 新たな始点・終点を決める]]
+			DisSort(pos);// 一番短い距離が始点となる
 			m_bFinish = false;
 			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
 		}
@@ -379,16 +445,16 @@ void  CEnemy::AIBasicAction(void)
 					{
 					case CCharacter::CHARCTERTYPE_SPEED:
 						
-						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	// アクション時 
+						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	// アクション時
 						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } // 通常時
 						break;
 
 					case CCharacter::CHARCTERTYPE_POWER:
-						LineConnect((12 - (rand() % 3))); // 10~12
+						LineConnect((12 - (rand() % 3)));
 						break;
 
 					case CCharacter::CHARCTERTYPE_TECHNIQUE:
-						LineConnect((12 - (rand() % 3))); // 10~12
+						LineConnect((12 - (rand() % 3)));
 						break;
 					}
 				}
@@ -397,11 +463,11 @@ void  CEnemy::AIBasicAction(void)
 			//	[[フラグを立てる]]
 			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
 			//	[[通過記録カウントアップ]]
-			m_nTargetCnt += 1;
+			m_nPassCnt += 1;
 
-			if (m_nTargetCnt == m_nAreaTerrNum[m_nAreaNow])	//	通過回数もフラグもリセット
+			if (m_nPassCnt == m_nAreaTerrNum[m_nAreaNow])	//	通過回数もフラグもリセット
 			{
-				m_nTargetCnt = 0;
+				m_nPassCnt = 0;
 
 				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 				{
@@ -436,10 +502,13 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 		float fSpeed = GetSpeed();	//	速さ
 
 		//	移動加算処理
-		if (m_state == STATE_WALK || m_state == STATE_ACTION)
+		if (m_bDebugStop == FLAG)
 		{
-			pos.x += (float)cos(territory.fRadian) * (fSpeed * m_fSpeed);
-			pos.z += (float)sin(territory.fRadian) * (fSpeed * m_fSpeed);
+			if (m_state == STATE_WALK || m_state == STATE_ACTION)
+			{
+				pos.x += (float)cos(territory.fRadian) * (fSpeed * m_fSpeed);
+				pos.z += (float)sin(territory.fRadian) * (fSpeed * m_fSpeed);
+			}
 		}
 		// ★拠点までの角度 / 自身の軸調整
 		float fDestAngle = atan2f(pos.x - territory.pos.x, pos.z - territory.pos.z);
@@ -494,7 +563,7 @@ void CEnemy::LineConnect(int nRand)
 	if (m_apTerritory[m_nLineNum] != NULL)
 	{
 		if (m_nLineTime <= nRand * 100 && m_bFinish == false ||	// 制限時間が迫ってきたら
-			m_nLineNum == TERRITORY_MAX - 1)					//	最大ライン分引いていたら
+			m_apTerritory[TERRITORY_MAX - 1] != NULL)					//	最大ライン分引いていたら
 		{
 			m_nLineNum = 2;		//	初期最低値に戻す
 			m_bFinish = true;	//	始点に戻す
@@ -646,6 +715,7 @@ void CEnemy::Program_Motion(void)
 #if 1
 void CEnemy::CreateOrbitLine(void)
 {
+	return;
 	if (m_pOrbitLine == NULL)
 	{
 		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());
@@ -730,7 +800,14 @@ bool CEnemy::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTO
 	}
 	else if (pCollider->GetType() == CCollider::TYPE_SPHERE_PLAYERATTACK)
 	{
-		if (CollisionPlayerAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true)
+		CScene *pParent = pCollider->GetParent();
+
+		if (CollisionPlayerAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true 
+			&& pParent->GetObjType() != OBJTYPE_ROBOT)
+		{
+		}
+		if (CollisionRobotAttackSphereCollider((CPlayerAttackSphereCollider*)pCollider, pos, ColRange) == true 
+			&& pParent->GetObjType() == OBJTYPE_ROBOT)
 		{
 		}
 	}
@@ -770,7 +847,7 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 		}
 
 		CScene *pParent = pCylinderCollider->GetParent();
-		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER)
+		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
 		{// 親が敵かプレイヤーだった場合自分を吹っ飛ばす
 			CCharacter *pCharacter = (CCharacter*)pParent;
 			if (pCharacter == NULL) { return true; }
@@ -873,6 +950,32 @@ void CEnemy::MergeSort(TERRITORY_INFO* pArray, int start, int end, int AreaNum)
 		}
 	}
 
+}
+
+//=============================================================================
+//　攻撃球との当たり判定処理(ロボット)
+//=============================================================================
+bool CEnemy::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
+{
+	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
+	{// 自分以外の攻撃球が当たったら
+		CScene *pParent = pShere->GetParent();
+		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
+		{
+			//当たってる間はダメージ状態
+			m_state = STATE_DAMAGE;
+
+			if (m_nDamageCounter == 0)
+			{
+				m_bSuperArmor = true;
+				m_pMotion->SetNumMotion(4);
+				m_nDamageCounter = 1;
+			}
+		}
+		return true;
+	}
+
+	return false;
 }
 
 
