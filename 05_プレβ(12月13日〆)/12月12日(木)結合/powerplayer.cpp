@@ -219,7 +219,6 @@ void  CPowerPlayer::ActionUpdate(void)
 			m_nRecastCounter = 0;
 		}
 	}
-
 }
 
 //=============================================================================

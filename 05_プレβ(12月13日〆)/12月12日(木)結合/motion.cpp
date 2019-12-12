@@ -167,7 +167,6 @@ CMotion::KEY * CMotion::SetKey(int nCntModel)
 
 	if (m_nKey != m_pMotionInfo[m_nNumMotion].nNumKey - 1)
 	{//最後のキーじゃなかったら
-
 		if (m_bBlend == false)
 		{//現在のモーションの次のキーを設定する
 			pNextKey = &m_pMotionInfo[m_nNumMotion].m_pKeyInfo[m_nKey + 1].aKey[nCntModel];
@@ -246,4 +245,6 @@ void CMotion::SetNumMotion(int NumMotion)
 {
 	m_nNumMotion = NumMotion;
 	m_nKey = 0;
+	m_nCountMotion = 0;
+	m_bBlend = false;
 }

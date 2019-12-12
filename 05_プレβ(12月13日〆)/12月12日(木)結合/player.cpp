@@ -35,7 +35,7 @@
 #define CYLINDER_COLHEIGHT (100.0f)
 #define BLOW_MOVING        (12.0f)
 #define BLOW_MOVING_CUT    (1.5f)
-#define MAX_DAMAGECOUNT    (23)
+#define MAX_DAMAGECOUNT    (23) //23
 
 //色
 #define COLOR_RED	 (D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))	//赤
@@ -144,23 +144,32 @@ void  CPlayer::Update(void)
 	CGame *pGame = CManager::GetGame();								// ゲームの取得
 	CEventCamera *pEveCam = pGame->GetEveCam();						// イベントカメラの取得
 	if (pEveCam == NULL)											// イベントカメラが消えていたら
-	{
+	{	
 		//キャラクターの更新
 		CCharacter::Update();
-		m_nSaveState = m_PlayerState;
+
+		//	ラインのカウントダウン処理
+		CountDownLineTime();
+
+		//	ライン引きの開始(カウントアップ)
+		if (m_bBlockStartTerritory)
+		{
+			m_nCountTime++;
+			if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
+		}
 
 		//プレイヤーの状態
 		switch (m_PlayerState)
 		{
 		case PLAYERSTATE_NONE:		//通常状態
-			//歩ける用にする
+									//歩ける用にする
 			m_bWalk = true;
 			//スプリント使用可
 			m_bSprintMotion = true;
 			break;
 
 		case PLAYERSTATE_WALK:		//移動状態
-			//移動エフェクト
+									//移動エフェクト
 			m_pLoadEffect->SetPos(D3DXVECTOR3(GetPos().x, GetPos().y + 20.0f, GetPos().z));
 			//通常の移動はこっち
 			m_pLoadEffect->Update();
@@ -171,7 +180,7 @@ void  CPlayer::Update(void)
 			break;
 
 		case PLAYERSTATE_BLOWAWAY:	//吹っ飛ばされてる状態
-			// ダメージカウント加算
+									// ダメージカウント加算
 			m_nDamageCount++;
 
 			if (m_nDamageCount >= MAX_DAMAGECOUNT)
@@ -189,7 +198,6 @@ void  CPlayer::Update(void)
 				m_move.x -= sinf(m_fBlowAngle) * m_fBlowLength;
 				m_move.z -= cosf(m_fBlowAngle) * m_fBlowLength;
 			}
-
 			break;
 
 		case PLAYERSTATE_DAMAGE:
@@ -202,7 +210,7 @@ void  CPlayer::Update(void)
 				m_pMotion->SetNumMotion(5);
 			}
 			if (m_nDownCount >= 110)
-			{//110秒で動けるようになる
+			{//115秒で動けるようになる
 				m_bWalk = true;
 				m_bSprintMotion = true;
 				m_nDownCount = 0;
@@ -211,16 +219,6 @@ void  CPlayer::Update(void)
 				m_nDamageCounter = 0;
 			}
 			break;
-		}
-
-		//	ラインのカウントダウン処理
-		CountDownLineTime();
-
-		//	ライン引きの開始(カウントアップ)
-		if (m_bBlockStartTerritory)
-		{
-			m_nCountTime++;
-			if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
 		}
 
 		//図形が完成した後の処理
@@ -234,22 +232,28 @@ void  CPlayer::Update(void)
 			PlayerMove();
 		}
 		else if (nGameState == CGame::GAMESTATE_END)
-		{//ゲーム終了時にモーションをニュートラル
+		{//ゲーム終了時にモーションをニュートラルにする
 			if (m_bCharaMotionState == false)
 			{
 				m_PlayerState = PLAYERSTATE_NONE;
+
+				//サウンドを止める
 				pSound->StopSound(CSound::SOUND_LABEL_SE018);
 				pSound->StopSound(CSound::SOUND_LABEL_SE030);
 				pSound->StopSound(CSound::SOUND_LABEL_SE022);
 				pSound->StopSound(CSound::SOUND_LABEL_SE024);
 
+				//待機モーション
 				m_pMotion->SetNumMotion(0);
 				m_bCharaMotionState = true;
 			}
 		}
 
+
 		// キャラクターの状態を設定
 		SetCharaState(m_PlayerState);
+
+		
 	}
 	else
 	{
@@ -257,11 +261,12 @@ void  CPlayer::Update(void)
 		pSound->StopSound(CSound::SOUND_LABEL_SE018);
 	}
 
-	CDebugProc::Print("\n\n\n\nスーパーarmor : %d\n", m_bSuperArmor);
-	CDebugProc::Print("ダメージ : %d\n", m_nDamageCount);
+	CDebugProc::Print("ぶっ飛びダメージ : %d\n", m_nDamageCount);
 	CDebugProc::Print("ステート : %d\n", m_PlayerState);
 	CDebugProc::Print("ダメカン　: %d\n", m_nDamageCounter);
-	CDebugProc::Print("ダウン : %d\n", m_nDownCount);
+	CDebugProc::Print("ダメージダウン : %d\n", m_nDownCount);
+	CDebugProc::Print("\n現在のモーション : %d\n", m_pMotion->GetNumMotion());
+
 }
 
 //=============================================================================
@@ -597,8 +602,9 @@ void CPlayer::PlayerMoveKeyboard(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 		}
 		else
 		{
-			if (m_PlayerState == PLAYERSTATE_WALK || (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_PlayerState == PLAYERSTATE_ACTION)
-				&& (m_move.x <= 0.1f || m_move.x >= -0.1f || m_move.z <= 0.1f || m_move.z >= -0.1f)
+			if (m_PlayerState == PLAYERSTATE_WALK || (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && 
+				m_PlayerState == PLAYERSTATE_ACTION) && 
+				(m_move.x <= 0.1f || m_move.x >= -0.1f || m_move.z <= 0.1f || m_move.z >= -0.1f)
 				&& m_PlayerState != PLAYERSTATE_BLOWAWAY)
 			{
 				pSound->StopSound(CSound::SOUND_LABEL_SE018);
@@ -614,7 +620,7 @@ void CPlayer::PlayerMoveKeyboard(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 		if (m_PlayerState == PLAYERSTATE_WALK)
 		{
 			pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
-			m_pMotion->SetNumMotion(m_PlayerState);
+			m_pMotion->SetNumMotion(PLAYERSTATE_WALK);
 			m_bWalk = false;
 		}
 	}
@@ -910,7 +916,6 @@ void  CPlayer::PlayerMovePad(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 			//ニュートラル状態にする
 			m_PlayerState = PLAYERSTATE_NONE;
 			m_pMotion->SetNumMotion(PLAYERSTATE_NONE);
-			m_bWalk = true;
 		}
 	}
 
@@ -925,7 +930,7 @@ void  CPlayer::PlayerMovePad(D3DXVECTOR3 &CameraRot, D3DXVECTOR3 &pos)
 		if (m_PlayerState == PLAYERSTATE_WALK)
 		{
 			pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
-			m_pMotion->SetNumMotion(m_PlayerState);
+			m_pMotion->SetNumMotion(PLAYERSTATE_WALK);
 			m_bWalk = false;
 		}
 	}
@@ -1199,7 +1204,7 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 		{// 地雷だったら
 			CMine *pMine = (CMine*)pParent;
 			if (pMine->GetParentChara() != this)
-			{// 自分以外が出した地雷ならダメージ
+			{// 自分以外が出した地雷ならダメージf
 
 				//当たってる間はダメージ状態
 				m_PlayerState = PLAYERSTATE_DAMAGE;
@@ -1208,8 +1213,6 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 				{
 					pSound->PlaySound(CSound::SOUND_LABEL_SE025);	//地雷音
 					pSound->PlaySound(CSound::SOUND_LABEL_SE019);	//ダウン音
-					/*pSound->SetVolume(CSound::SOUND_LABEL_SE025, 20.0f);
-					pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);*/
 					m_bSuperArmor = true;
 					m_pMotion->SetNumMotion(4);
 					m_nDamageCounter = 1;
@@ -1223,15 +1226,14 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 			m_PlayerState = PLAYERSTATE_DAMAGE;
 			if (m_nDamageCounter == 0)
 			{
+				m_nDamageCount = 0;
+				m_nDownCount = 0;
 				pSound->PlaySound(CSound::SOUND_LABEL_SE023);	//衝撃波音
 				pSound->PlaySound(CSound::SOUND_LABEL_SE019);	//ダウン音
-				/*pSound->SetVolume(CSound::SOUND_LABEL_SE023, 20.0f);
-				pSound->SetVolume(CSound::SOUND_LABEL_SE019, 20.0f);*/
 				m_bSuperArmor = true;
 				m_pMotion->SetNumMotion(4);
 				m_nDamageCounter = 1;
 			}
-
 		}
 
 		return true;
@@ -1248,7 +1250,7 @@ bool CPlayer::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pS
 	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
 	{// 自分以外の攻撃球が当たったら
 		CScene *pParent = pShere->GetParent();
-		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
+		if (pParent->GetObjType() == OBJTYPE_ROBOT)
 		{
 			//当たってる間はダメージ状態
 			m_PlayerState = PLAYERSTATE_DAMAGE;
@@ -1262,7 +1264,6 @@ bool CPlayer::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pS
 		}
 		return true;
 	}
-
 	return false;
 }
 
@@ -1285,7 +1286,7 @@ void CPlayer::BlowAway(D3DXVECTOR3 AnotherPos)
 
 	//if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER && m_bSuperArmor != true)
 	{
-		m_pMotion->SetNumMotion(m_PlayerState);
+		m_pMotion->SetNumMotion(PLAYERSTATE_BLOWAWAY);
 	}
 
 	// 向きを変える

@@ -129,6 +129,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				//RawInputにデバイスを登録
 				CRawMouse::RegisterRawInput(hWnd);
 
+				if (WINDOW_MODE == false)
+				{//マウスカーソルを消す
+					ShowCursor(FALSE);
+				}
 				dwCurrentTime = timeGetTime();	// 現在の時間を取得
 				if ((dwCurrentTime - dwFPSLastTime) >= 500)
 				{// 0.5秒ごとに実行

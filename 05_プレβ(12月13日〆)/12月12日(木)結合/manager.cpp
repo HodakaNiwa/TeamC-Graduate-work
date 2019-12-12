@@ -75,7 +75,7 @@ int CManager::m_nRankCuntry[RANK] = {};
 int CManager::m_nRankCharType[RANK] = {};
 
 //モード
-CManager::MODE CManager::m_mode = CManager::MODE_TITLE;
+CManager::MODE CManager::m_mode = CManager::MODE_SELECT;
 
 //=============================================================================
 // コンストラクタ

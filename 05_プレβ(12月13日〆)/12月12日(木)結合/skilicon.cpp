@@ -502,7 +502,6 @@ void CSkilicon::RecastIcon(void)
 				m_pGrowIcon->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 				m_pGrowIcon->SetVtxBuffCol();
 				m_pGrowIcon->SetUpdateFlag(false);
-				m_pRightEffect->SetEffectFlag(false);
 			}
 		}
 		if (m_pRightEffect != NULL)
@@ -807,7 +806,7 @@ void CIcon2D::UpdateGrow(void)
 //=============================================================================
 void CIcon2D::UpdateRight(void)
 {
-	if (!m_bEffect || m_bOneTime) { return; }
+	if (!m_bEffect) { return; }
 
 	if (m_nLife > 0)
 	{

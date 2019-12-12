@@ -71,8 +71,6 @@ public:
 	int GetNumMotion(void) { return m_nNumMotion; };								//現在のモーションを取得
 	void SetNumMotion(int NumMotion);												//モーションの設定
 
-
-
 private:
 	KEY * SetKey(int nCntModel);
 	void SetMotionDifference(KEY * pNextKey, KEY * pKey, int nCntModel);

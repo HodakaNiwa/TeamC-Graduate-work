@@ -134,13 +134,14 @@ int g_nCntGame = 0;
 #define DIVISIONEVENT_COLLIDER_MIN			(30.0f)
 #define DIVISIONEVENT_WALL_WIDTH			(2500.0f)
 #define DIVISIONEVENT_WALL_HEIGHT			(1000.0f)
+#define DIVISIONEVENT_WALL_MOVEHEIGHT		(14.0f)
 #define DIVISIONEVENT_WALL_TEXWIDTH			(4.0f)
 #define DIVISIONEVENT_WALL_TEXHEIGHT		(2.0f)
 #define DIVISIONEVENT_WALL_COL				(D3DXCOLOR(1.0f,1.0f,1.0f,0.0f))
 #define DIVISIONEVENT_WALL_PRIORITY			(9)
 #define DIVISIONEVENT_WALL_TEXIDX			(17)
-#define DIVISIONEVENT_WALL_ALPHA_MAX		(0.6f)
-#define DIVISIONEVENT_WALL_ALPHA_ADD		(0.005f)
+#define DIVISIONEVENT_WALL_ALPHA_MAX		(0.7f)
+#define DIVISIONEVENT_WALL_ALPHA_ADD		(0.01f)
 
 //*****************************************************************************
 // 静的メンバ変数
@@ -1937,10 +1938,11 @@ void CGame::CreateDivisionWall(void)
 		pos.z += 31.25f;
 		break;
 	}
+	pos.y -= DIVISIONEVENT_WALL_HEIGHT * 0.5f;
 
 	// 壁を生成
 	m_pDivisionWall = CDivisionWall::Create(pos, rot, DIVISIONEVENT_WALL_COL,
-		DIVISIONEVENT_WALL_WIDTH, DIVISIONEVENT_WALL_HEIGHT, DIVISIONEVENT_WALL_PRIORITY, 0.0f, 0.0f,
+		DIVISIONEVENT_WALL_WIDTH, DIVISIONEVENT_WALL_HEIGHT, DIVISIONEVENT_WALL_MOVEHEIGHT, DIVISIONEVENT_WALL_PRIORITY, 0.0f, 0.0f,
 		DIVISIONEVENT_WALL_TEXWIDTH, DIVISIONEVENT_WALL_TEXHEIGHT);
 
 	// テクスチャを割り当てる
@@ -2135,6 +2137,12 @@ void CGame::FinishDivisionEvent(void)
 
 	// コライダーを破棄
 	ReleaseDivisionCollider();
+
+	// 移動量を反転させる
+	if (m_pDivisionWall != NULL)
+	{
+		m_pDivisionWall->SetMoveHeight(m_pDivisionWall->GetMoveHeight() * -1);
+	}
 
 	//スプリントサウンドのフラグ
 	SprintFlag();

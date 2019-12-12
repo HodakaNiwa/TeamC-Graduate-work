@@ -21,7 +21,7 @@ public:    // 誰でもアクセス可能
 	CDivisionWall(int nPriority = 3, OBJTYPE objType = OBJTYPE_DIVISIONWALL);
 	~CDivisionWall();
 
-	static CDivisionWall *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col, float fWidth, float fHeight, int nPriority = 3, float fTexU = 0.0f, float fTexV = 0.0f, float fTexWidth = 1.0f, float fTexHeight = 1.0f);
+	static CDivisionWall *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col, float fWidth, float fHeight, float fMoveHeight, int nPriority = 3, float fTexU = 0.0f, float fTexV = 0.0f, float fTexWidth = 1.0f, float fTexHeight = 1.0f);
 
 	HRESULT Init(void);
 	void Uninit(void);
@@ -49,6 +49,7 @@ public:    // 誰でもアクセス可能
 	void SetTexV(const float fTexV) { m_fTexV = fTexV; }
 	void SetTexWidth(const float fTexWidth) { m_fTexWidth = fTexWidth; }
 	void SetTexHeight(const float fTexHeight) { m_fTexHeight = fTexHeight; }
+	void SetMoveHeight(const float fMoveHeight) { m_fMoveHeight = fMoveHeight; }
 
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }
 	LPDIRECT3DTEXTURE9 GetTexture(void) { return m_pTexture; }
@@ -64,6 +65,7 @@ public:    // 誰でもアクセス可能
 	float GetTexV(void) { return m_fTexV; }
 	float GetTexWidth(void) { return m_fTexWidth; }
 	float GetTexHeight(void) { return m_fTexHeight; }
+	float GetMoveHeight(void) { return m_fMoveHeight; }
 
 protected: // このクラスと派生クラスだけがアクセス可能
 
@@ -85,6 +87,7 @@ private:   // このクラスだけがアクセス可能
 	float					m_fTexV;		// ポリゴンの左上テクスチャV座標
 	float					m_fTexWidth;	// ポリゴンのテクスチャ座標の横幅
 	float					m_fTexHeight;	// ポリゴンのテクスチャ座標の縦幅
+	float					m_fMoveHeight;	// 高さの移動量
 };
 
 #endif

@@ -11,7 +11,7 @@
 //*****************************************************************************
 //     マクロ定義
 //*****************************************************************************
-
+#define DIVISIONWALL_MAXHEIGHT (500.0f)
 
 //*****************************************************************************
 //    静的メンバ変数宣言
@@ -37,6 +37,7 @@ CDivisionWall::CDivisionWall(int nPriority, OBJTYPE objType) : CScene(nPriority,
 	m_fTexV = 0.0f;								// 左上テクスチャV座標
 	m_fTexWidth = 0.0f;							// テクスチャ座標の横幅
 	m_fTexHeight = 0.0f;						// テクスチャ座標の縦幅
+	m_fMoveHeight = 0.0f;						// 高さの移動量
 }
 
 //=============================================================================
@@ -50,7 +51,8 @@ CDivisionWall::~CDivisionWall()
 //=============================================================================
 //    生成処理
 //=============================================================================
-CDivisionWall *CDivisionWall::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col, float fWidth, float fHeight, int nPriority, float fTexU, float fTexV, float fTexWidth, float fTexHeight)
+CDivisionWall *CDivisionWall::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col, float fWidth,
+	float fHeight, float fMoveHeight, int nPriority, float fTexU, float fTexV, float fTexWidth, float fTexHeight)
 {
 	CDivisionWall *pScene3D = NULL;             // 3Dポリゴンクラス型のポインタ
 	if (pScene3D == NULL)
@@ -59,15 +61,16 @@ CDivisionWall *CDivisionWall::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR
 		if (pScene3D != NULL)
 		{// インスタンスを生成できた
 		 // 各種値の代入
-			pScene3D->SetPos(pos);				// ポリゴンの座標
-			pScene3D->SetRot(rot);				// ポリゴンの向き
-			pScene3D->SetCol(col);				// ポリゴンの色
-			pScene3D->SetWidth(fWidth);			// ポリゴンの幅
-			pScene3D->SetHeight(fHeight);		// ポリゴンの高さ
-			pScene3D->SetTexU(fTexU);			// ポリゴンの左上テクスチャU座標
-			pScene3D->SetTexV(fTexV);			// ポリゴンの左上テクスチャV座標
-			pScene3D->SetTexWidth(fTexWidth);	// ポリゴンのテクスチャ座標の横幅
-			pScene3D->SetTexHeight(fTexHeight);	// ポリゴンのテクスチャ座標の縦幅
+			pScene3D->SetPos(pos);					// ポリゴンの座標
+			pScene3D->SetRot(rot);					// ポリゴンの向き
+			pScene3D->SetCol(col);					// ポリゴンの色
+			pScene3D->SetWidth(fWidth);				// ポリゴンの幅
+			pScene3D->SetHeight(fHeight);			// ポリゴンの高さ
+			pScene3D->SetTexU(fTexU);				// ポリゴンの左上テクスチャU座標
+			pScene3D->SetTexV(fTexV);				// ポリゴンの左上テクスチャV座標
+			pScene3D->SetTexWidth(fTexWidth);		// ポリゴンのテクスチャ座標の横幅
+			pScene3D->SetTexHeight(fTexHeight);		// ポリゴンのテクスチャ座標の縦幅
+			pScene3D->SetMoveHeight(fMoveHeight);	// 高さの移動量
 
 			if (FAILED(pScene3D->Init()))
 			{// 初期化に失敗した
@@ -115,7 +118,16 @@ void CDivisionWall::Uninit(void)
 //=============================================================================
 void CDivisionWall::Update(void)
 {
-
+	// 座標をずらす
+	m_Pos.y += m_fMoveHeight;
+	if (m_Pos.y <= 0.0f - (m_fHeight * 0.5f))
+	{
+		m_Pos.y = -(m_fHeight * 0.5f);
+	}
+	else if (m_Pos.y >= DIVISIONWALL_MAXHEIGHT)
+	{
+		m_Pos.y = DIVISIONWALL_MAXHEIGHT;
+	}
 }
 
 //=============================================================================

@@ -46,12 +46,12 @@
 #define WINDOW_POS	 (D3DXVECTOR3(640.0f, 350.0f, 0.0f))
 #define WINDOW_POS1	 (D3DXVECTOR3(850.0f, 340.0f, 0.0f))
 #define WINDOW_SIZE	(D3DXVECTOR3(300.0f, 170.0f, 0.0f))
-#define CHANG_COL	(0.1f)			//0.025
+#define CHANG_COL	(0.25f)			//0.025
 #define FADEOUT_TIME (100)				//240
 #define GETTERRITORY00_TIME (60 * 7)	//7
 #define GETTERRITORY01_TIME (60 * 16)	//16
 #define GETTERRITORY02_TIME (60 * 20)	//20
-#define DEFFOLT_TIME		(60 * 2)	//5
+#define DEFFOLT_TIME		(60 * 5)	//5
 #define CHAR_TIME		(60 * 6)		//6
 #define CHAR_TIME1		(60 * 11)		//11
 #define CHAR_TIME2		(60 * 18)		//18

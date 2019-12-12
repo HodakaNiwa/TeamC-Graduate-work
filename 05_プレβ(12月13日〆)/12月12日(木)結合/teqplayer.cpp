@@ -286,7 +286,7 @@ void  CTechniquePlayer::PlayerActionPad(void)
 			if (m_nMinePoint >= REDUCED_MINE_POINT)
 			{
 				m_PlayerState = PLAYERSTATE_ACTION;
-				m_pMotion->SetNumMotion(2);
+				m_pMotion->SetNumMotion(PLAYERSTATE_ACTION);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask_teq();	//スキルアイコン
 				m_bMineUse = true;
@@ -319,7 +319,7 @@ void  CTechniquePlayer::PlayerActionMouse(void)
 			{
 				m_PlayerState = PLAYERSTATE_ACTION;
 
-				m_pMotion->SetNumMotion(2);
+				m_pMotion->SetNumMotion(PLAYERSTATE_ACTION);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nNumPlayer)->RevivalIconMask_teq();	//スキルアイコン
 				m_bMineUse = true;
@@ -349,7 +349,7 @@ void  CTechniquePlayer::PlayerActionKeyboard(void)
 			{
 				m_PlayerState = PLAYERSTATE_ACTION;
 
-				m_pMotion->SetNumMotion(2);
+				m_pMotion->SetNumMotion(PLAYERSTATE_ACTION);
 				m_nButtonCounter = 1;	//
 				pUi->GetSkilicon(m_nControllerIndx)->RevivalIconMask_teq();	//スキルアイコン
 				m_bMineUse = true;
