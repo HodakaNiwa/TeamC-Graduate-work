@@ -1,6 +1,6 @@
 //◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆
-//					エネミー処理 [enemy.cpp]
-//			Author : Kobayashi_Sho-hei / 小林 将兵
+//				エネミー処理 [enemy.cpp]
+//		Author : Kobayashi_Sho-hei / 小林 将兵
 //◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆　◆
 #include "enemy.h"
 #include "manager.h"
@@ -16,26 +16,25 @@
 #include <windows.h>
 
 //*****************************************************************************
-// マクロ定義
+//マクロ定義
 //*****************************************************************************
 #define SPEED (1.0f)
 
-//	当たり判定・ダメージ関連
+//当たり判定・ダメージ関連
 #define CYLINDER_COLRADIUS (20.0f)
 #define CYLINDER_COLHEIGHT (100.0f)
 #define BLOW_MOVING        (12.0f)
 #define BLOW_MOVING_CUT    (1.5f)
 #define MAX_DAMAGECOUNT    (23)
 
-// デバック用
-#define FLAG	(false)
+//デバック用
+#define FLAG	(true)
 
 //*****************************************************************************
-//	コンストラクタ
+//コンストラクタ
 //*****************************************************************************
 CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 {
-	m_move = INITIALIZE_VECTOR3;
 	m_nDamageCount = 0;
 	m_fBlowAngle = 0.0f;
 	m_fBlowLength = 0.0f;
@@ -44,7 +43,6 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_nDamageCounter = 0;
 	m_bSuperArmor = false;
 	m_bTarget = false;
-	m_bCheck = false;
 	m_state = STATE_NONE;
 	m_nLevel = 0;
 	m_EventCheck = false;
@@ -53,19 +51,19 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 }
 
 //*****************************************************************************
-//	デストラクタ
+//デストラクタ
 //*****************************************************************************
 CEnemy::~CEnemy() { }
 //=============================================================================
-//	生成処理
+//生成処理
 //=============================================================================
 CEnemy *CEnemy::Create(int nNum, TYPE type, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40], CHARCTERTYPE charatype)
 {
-	return NULL;	//	←使用するなら消す
+	return NULL;	//←使用するなら消す
 }
 
 //=============================================================================
-// 初期化処理	＊各派生クラスの初期化処理を使っている
+//初期化処理	＊各派生クラスの初期化処理を使っている
 //=============================================================================
 HRESULT CEnemy::Init(int nNum, D3DXVECTOR3 pos, char ModelTxt[40], char MotionTxt[40],int nType)
 { return S_OK; }
@@ -74,11 +72,11 @@ HRESULT CEnemy::Init(void)
 { return S_OK; }
 
 //=============================================================================
-// 終了処理
+//終了処理
 //=============================================================================
 void  CEnemy::Uninit(void)
 {
-	//　マージソート
+	//マージソートの解放
 	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
 	{
 		if (m_tmp[nCnt] != NULL)
@@ -87,7 +85,7 @@ void  CEnemy::Uninit(void)
 			m_tmp[nCnt] = NULL;
 		}
 	}
-	//	各エリアのテリトリー情報の解放
+	//各エリアのテリトリー情報の解放
 	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
 	{
 		if (m_AreaInfo[nCnt] != NULL)
@@ -97,35 +95,34 @@ void  CEnemy::Uninit(void)
 		}
 	}
 
-	//	個々のテリトリー情報の解放
+	//個々のテリトリー情報の解放
 	if (m_TerritoryInfo != NULL)
 	{
 		delete[] m_TerritoryInfo;
 		m_TerritoryInfo = NULL;
 	}
-
-	//	親に責任をもって消させる
+	
 	CCharacter::Uninit();
 }
 
 //=============================================================================
-// 更新処理
+//更新処理
 //=============================================================================
 void  CEnemy::Update(void)
 {
-	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
-	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
-	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	CGame *pGame = CManager::GetGame();			
+	CEventCamera *pEveCam = pGame->GetEveCam();
+	if (pEveCam == NULL)
 	{
 		CCharacter::Update();
 
-		//	ゲーム開始まで更新させない
 		int nGameState = CGame::GetGameState();
+		//---[[ゲームの開始]]---
 		if (nGameState != CGame::GAMESTATE_FIRSTCOUNTDOWN && nGameState != CGame::GAMESTATE_END)
 		{
-			AIBasicAction();	//	AI共通処理
+			AIBasicAction();//AI共通処理
 		}
-		//	ゲーム終了時
+		//---[[ゲームの終了]]---
 		else if (nGameState == CGame::GAMESTATE_END)
 		{
 			if (m_bCharaMotionState == false)
@@ -136,22 +133,22 @@ void  CEnemy::Update(void)
 			}
 		}
 
-		Program_Line();		//	ライン関数まとめ
-		Program_State();	//	モーション関連
+		Program_Line();		//ライン関連
+		Program_State();	//モーション関連
 
-		// エネミーの状態を設定
-		SetCharaState(m_state);
+		SetCharaState(m_state);//現在のステータスを反映
 	}
 }
 
 //=============================================================================
-// 描画処理
+//描画処理
 //=============================================================================
 void  CEnemy::Draw(void)
 {
-	CGame *pGame = CManager::GetGame();				// ゲームの取得←追加(よしろう)
-	CEventCamera *pEveCam = pGame->GetEveCam();		// イベントカメラの取得←追加(よしろう)
-	if (pEveCam == NULL)	// イベントカメラが消えていたら←追加(よしろう)
+	CGame *pGame = CManager::GetGame();			
+	CEventCamera *pEveCam = pGame->GetEveCam();
+
+	if (pEveCam == NULL)
 	{
 		CCharacter::Draw();
 		D3DXMATRIX mtxWorld;
@@ -160,12 +157,12 @@ void  CEnemy::Draw(void)
 	}
 }
 //=============================================================================
-//	デフォルト関数
+//デフォルト関数
 //=============================================================================
 void  CEnemy::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size) { }
 
 //=============================================================================
-//	初期距離ソート処理
+//初期距離ソート処理
 //=============================================================================
 void CEnemy::InitSort(D3DXVECTOR3 pos)
 {
@@ -176,49 +173,50 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		m_tmp[nCntArea] = NULL;
 	}
 	
-	//	[[★テリトリー情報の取得 / 確保]]
-	int nMax = 0;		//	テリトリー最大数の記憶
-	int nCnt01 = 0;
+	//++ ===[[テリトリー情報の取得 / 確保]]===  
+	int nMax = 0;		//テリトリーの最大数が入る
+	int nCnt01 = 0;		//個々の拠点を見るのに必要
+
 	CScene* pSceneTop = CScene::GetTop(TERRITORY_PRIORITY);
 	CScene* pScene = pSceneTop;
 	while (pScene != NULL)
 	{
-		if (CScene::OBJTYPE_TERRITORY == pScene->GetObjType())
+		if (CScene::OBJTYPE_TERRITORY == pScene->GetObjType())//テリトリーかを判別
 		{
 			m_pTerritory = (CTerritory*)pScene;
 
-			if (nMax == 0)//	テリトリーの最大数分newする
+			if (nMax == 0)
 			{
 				nMax = m_pTerritory->GetMaxObj();
-				m_TerritoryInfo = new CEnemy::TERRITORY_INFO[nMax];
+				m_TerritoryInfo = new CEnemy::TERRITORY_INFO[nMax];//テリトリーの最大数分newする
 			}
 
-			//	各テリトリーの情報を取得
-			m_TerritoryInfo[nCnt01].pos = m_pTerritory->GetPos();			//	位置情報
-			m_TerritoryInfo[nCnt01].nAreaNum = m_pTerritory->GetErea();		//	割り振られたエリア番号
+			//各テリトリーの情報を取得
+			m_TerritoryInfo[nCnt01].pos = m_pTerritory->GetPos();			//位置情報
+			m_TerritoryInfo[nCnt01].nAreaNum = m_pTerritory->GetErea();		//割り振られたエリア番号
 
-			//	各エリア事のテリトリーの数をカウントアップ(m_TerritoryInfo[割り振られたエリア番号]の数)
+			//各エリアのテリトリー数をカウントアップ
 			m_nAreaTerrNum[m_TerritoryInfo[nCnt01].nAreaNum] += 1;
 
-			nCnt01 += 1;
+			nCnt01 += 1;//次のテリトリーを見る
 		}
 
-		pScene = pScene->GetpNext();	//	次のテリトリー情報へ
+		pScene = pScene->GetpNext();
 	}
 
-	//	エリアごとの情報が欲しいのでエリアの数分newする
+	//エリアごとの拠点数newする
 	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
 	{
 		m_AreaInfo[nCnt] = new CEnemy::TERRITORY_INFO[m_nAreaTerrNum[nCnt]];
 	}
 
-	//	エリアごとにテリトリーの情報を振り分ける
+	//エリアごとにテリトリーの情報を分ける
 	for (int nCntA = 0; nCntA < AREA_MAX; nCntA++)
 	{
-		int nTerrCnt = 0;		//	テリトリー番号
-		int nAllTerrCnt = 0;	//	全てのテリトリーを見るため
+		int nTerrCnt = 0;		//テリトリー番号
+		int nAllTerrCnt = 0;	//全てのテリトリーを見るため
 
-		while (nAllTerrCnt != nMax)// 全てのテリトリーをエリア分けするまで続く
+		while (nAllTerrCnt != nMax)//全てのテリトリーをエリア分けするまで続く
 		{
 			if (nCntA == m_TerritoryInfo[nAllTerrCnt].nAreaNum)
 			{
@@ -229,45 +227,45 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		}
 	}
 
-	//	各エリアのテリトリーのフラグを初期化
+	//各エリアのテリトリーのフラグを初期化
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
-		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//	エリアごとのテリトリー数分回す
+		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//エリアごとのテリトリー数分回す
 		{
 			m_AreaInfo[nAreaCnt][nTerrCnt].bFlag = false;
 		}
 	}
 
-	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)	//	エリアごとのテリトリー数分回す
+	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)	//エリアごとのテリトリー数分回す
 	{
 		m_tmp[nCnt] = new float[m_nAreaTerrNum[nCnt]];
 	}
 
-	//	ループ解除用
+	//ループ解除用
 	m_bBreak = false;
 
-	//	テリトリー通過数記録 / 現在のライン数
+	//テリトリー通過数記録 / 現在のライン数
 	m_nPassCnt = 0;
 	m_bFinish = false;
 
-	//	エネミーとテリトリー間の距離を計算
+	//エネミーとテリトリー間の距離を計算
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
-		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//	エリアごとのテリトリー数分回す
+		for (int nTerrCnt = 0; nTerrCnt < m_nAreaTerrNum[nAreaCnt]; nTerrCnt++)	//エリアごとのテリトリー数分回す
 		{
 			m_AreaInfo[nAreaCnt][nTerrCnt].fDistance = CAIController::dist(m_AreaInfo[nAreaCnt][nTerrCnt].pos, pos);
 			m_AreaInfo[nAreaCnt][nTerrCnt].fDisSort = CAIController::dist(m_AreaInfo[nAreaCnt][nTerrCnt].pos, pos);
 		}
 	}
 
-	//	距離を短い順にマージソート
+	//距離を短い順にマージソート
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
 		MergeSort(m_AreaInfo[nAreaCnt], 0, m_nAreaTerrNum[nAreaCnt] - 1, nAreaCnt);
 		
 	}
 
-	//	ゲーム開始の際に、どこのエリアが一番近いかを決める(ソート処理)
+	//ゲーム開始の際に、どこのエリアが一番近いかを決める(ソート処理)
 	for (int nAreaCnt = 0; nAreaCnt < AREA_MAX; nAreaCnt++)
 	{
 		for (int nAreaCnt02 = 0; nAreaCnt02 < AREA_MAX; nAreaCnt02++)
@@ -281,17 +279,17 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		}
 	}
 
-	//	一番近いエリア、テリトリーが決まる
+	//一番近いエリア、テリトリーが決まる
 	int nAreaCnt = 0;
 	while (m_bBreak != true)
 	{
-		for (int nInitTarget = 0; nInitTarget < m_nAreaTerrNum[nAreaCnt]; nInitTarget++)//	エリアごとのテリトリー数分回す
+		for (int nInitTarget = 0; nInitTarget < m_nAreaTerrNum[nAreaCnt]; nInitTarget++)//エリアごとのテリトリー数分回す
 		{
 			if (m_AreaInfo[0][0].fDisSort == m_AreaInfo[nAreaCnt][nInitTarget].fDistance)
 			{
 				m_nTargetNum = nInitTarget;
-				m_nAreaNow = nAreaCnt;	//	一番最初に所属するエリアが決まる
-				m_bBreak = true;		//	決まった瞬間ループを抜ける
+				m_nAreaNow = nAreaCnt;	//一番最初に所属するエリアが決まる
+				m_bBreak = true;		//決まった瞬間ループを抜ける
 				break;
 			}
 		}
@@ -305,18 +303,18 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 //=============================================================================
 void CEnemy::DisSort(D3DXVECTOR3 pos)
 {
-	// [[現地点から近い距離を探す]]
+	//[[現地点から近い距離を探す]]
 	m_bBreak = false;
-	int nNextNum = 0;//	次の近いターゲット拠点番号(0は現在自分がいる場所)
+	int nNextNum = 0;//次の近いターゲット拠点番号(0は現在自分がいる場所)
 
-	//	[[再度距離を計算]]
+	//[[再度距離を計算]]
 	for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 	{
 		m_AreaInfo[m_nAreaNow][nCnt].fDistance = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
 		m_AreaInfo[m_nAreaNow][nCnt].fDisSort = CAIController::dist(m_AreaInfo[m_nAreaNow][nCnt].pos, pos);
 	}
 
-	//	[[短い距離順に変える]]
+	//[[短い距離順に変える]]
 	MergeSort(m_AreaInfo[m_nAreaNow], 0, m_nAreaTerrNum[m_nAreaNow] - 1, m_nAreaNow);
 	
 
@@ -331,17 +329,17 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 					float fDis = m_AreaInfo[m_nAreaNow][nCnt].fDistance;
 					m_nTargetNum = nCnt;
 					m_bBreak = true;
-					// [[次の拠点があまりに遠い場合は始点に戻る]]
+					//[[次の拠点があまりに遠い場合は始点に戻る]]
 					if (fDis >= 500.0f && m_apTerritory[2] != NULL)
 					{
-						m_nLineNum = 2;		//	初期最低値に戻す
-						m_bFinish = true;	//	始点に戻す
+						m_nLineNum = 2;		//初期最低値に戻す
+						m_bFinish = true;	//始点に戻す
 					}
 					break;
 				}
 			}
 		}
-		nNextNum += 1;	//	すでにフラグが立っている場合は次の近場へ
+		nNextNum += 1;	//すでにフラグが立っている場合は次の近場へ
 	}
 }
 
@@ -351,89 +349,39 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 void  CEnemy::AIBasicAction(void)
 {
 	D3DXVECTOR3 pos = CCharacter::GetPos();
-	m_posOld = pos;				//	ワンフレーム前の位置
+	m_posOld = pos;				//ワンフレーム前の位置
 
 	if (m_bFinish == true)	//!	[[始点への移動処理 / その後、進む拠点を決める]]
 	{
-		//	★角度計算
+		//★角度計算
 		m_nTerrStart.fRadian = (float)atan2(m_nTerrStart.pos.z - pos.z, m_nTerrStart.pos.x - pos.x);
 
-		//	★目的地範囲内に入った
-		if (pos.x <= m_nTerrStart.pos.x + 25.0f && pos.x >= m_nTerrStart.pos.x - 25.0f &&
-			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
+		//★目的地範囲内に入った
+		if (pos.x <= m_nTerrStart.pos.x + 35.0f && pos.x >= m_nTerrStart.pos.x - 35.0f &&
+			pos.z <= m_nTerrStart.pos.z + 35.0f && pos.z >= m_nTerrStart.pos.z - 35.0f)
 		{
-			CGame * pGame = CManager::GetGame();// 現在のゲームの状態を取得
-
-			if (pGame->GetAreaBonusEventFlag() == true && CCharacter::GetCountGetTerritory() <= 30)// ボーナスエリアのイベントが発生している場合...
-			{
-				// [[一度すべてリセット、ボーナスエリアを目指す]]
-				int ntmpData = m_nAreaNow;
-				if (m_EventCheck == false)
-				{
-					m_nAreaNow = (pGame->GetAreaBonusIdx() + 2) % 4;
-
-
-					if (ntmpData != m_nAreaNow) // ボーナスエリア外
-					{
-						m_nPassCnt = 0;
-
-						for (int nCnt = 0; nCnt < m_nAreaTerrNum[ntmpData]; nCnt++)
-						{
-							m_AreaInfo[ntmpData][nCnt].bFlag = false;
-
-						}
-						m_bReset = true;
-					}
-				}
-				m_EventCheck = true; // ここで初めてフラグを立てる(無駄にリセットさせないため)
-			}
-			else 
-			{ 
-				m_EventCheck = false; 
-
-				if (m_bReset == true) // イベント終わり次第,各エリアに散らばせる
-				{
-					int m_nBeArea = m_nAreaNow;
-					while (m_nBeArea == m_nAreaNow)
-					{
-						m_nAreaNow = rand() % 4;
-					}
-					m_nPassCnt = 0;
-					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nBeArea]; nCnt++)
-					{
-						m_AreaInfo[m_nBeArea][nCnt].bFlag = false;
-
-					}
-					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-					{
-						m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
-
-					}
-					m_bReset = false;
-				}
-
-			}
-
-			// [[ライン数の初期化 / 新たな始点・終点を決める]]
-			DisSort(pos);// 一番短い距離が始点となる
+			Event_Bonus();
+			
+			//[[ライン数の初期化 / 新たな始点・終点を決める]]
+			DisSort(pos);//一番短い距離が始点となる
 			m_bFinish = false;
 			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
 		}
 
-		Program_Motion();	//	モーションアクション(キャラ同士のぶつかり等)
-		Program_Move(pos,m_nTerrStart);	//	移動処理
+		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
+		Program_Move(pos,m_nTerrStart);	//移動処理
 	}
 	else //! [[始点を除く拠点の計算]]
 	{
-		//	★角度計算
+		//★角度計算
 		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 		{
 			m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
 		}
 
-		//	★目的地範囲内に入った
-		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
-			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
+		//★目的地範囲内に入った
+		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 35.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 35.0f &&
+			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 35.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 35.0f)
 		{
 			CGame * pGame = CManager::GetGame();
 			if (pGame != NULL)
@@ -445,8 +393,8 @@ void  CEnemy::AIBasicAction(void)
 					{
 					case CCharacter::CHARCTERTYPE_SPEED:
 						
-						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	// アクション時
-						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } // 通常時
+						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	//アクション時
+						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } //通常時
 						break;
 
 					case CCharacter::CHARCTERTYPE_POWER:
@@ -460,34 +408,54 @@ void  CEnemy::AIBasicAction(void)
 				}
 			}
 			
-			//	[[フラグを立てる]]
+			//[[フラグを立てる]]
 			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
-			//	[[通過記録カウントアップ]]
+			//[[通過記録カウントアップ]]
 			m_nPassCnt += 1;
+			
 
-			if (m_nPassCnt == m_nAreaTerrNum[m_nAreaNow])	//	通過回数もフラグもリセット
+			//イベント時
+			if (pGame->GetDivisionEventFlag() == true)//分断エリアのイベントが発生している場合...
 			{
-				m_nPassCnt = 0;
-
-				for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
-				{
-					m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
-
-				}
-				
-				m_nAreaNow += 1;
-
-				if (m_nAreaNow == AREA_MAX)
-				{
-					m_nAreaNow = 0;
+				int nType = pGame->GetDivisionType();//分割方向(縦,横)
+				switch (nType)
+				{//分断の方向によって処理わけ
+				case 0://縦
+					Event_Division(nType, m_nAreaNow, m_nAreaNow + 2);
+					break;
+				case 1://横
+					Event_Division(nType, m_nAreaNow, m_nAreaNow + 1);
+					break;
 				}
 			}
+			else
+			{
+				//通常時
+				if (m_nPassCnt == m_nAreaTerrNum[m_nAreaNow])	//通過回数もフラグもリセット
+				{
+					m_nPassCnt = 0;
 
-			DisSort(pos);	//	距離の再計算
+					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+					{
+						m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+					}
+
+					m_nAreaNow += 1;
+
+					if (m_nAreaNow == AREA_MAX)
+					{
+						m_nAreaNow = 0;
+					}
+				}
+			}
+			
+
+			DisSort(pos);	//距離の再計算
 		}
 
-		Program_Motion();	//	モーションアクション(キャラ同士のぶつかり等)
-		Program_Move(pos,m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//	移動処理
+		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
+		Program_Move(pos,m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//移動処理
 	}
 }
 
@@ -499,10 +467,10 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 #if 1
 	if (m_bTarget == false)
 	{
-		float fSpeed = GetSpeed();	//	速さ
+		float fSpeed = GetSpeed();	//速さ
 
-		//	移動加算処理
-		if (m_bDebugStop == FLAG)
+		//移動加算処理
+		if (m_bDebugStop == FLAG || m_nEnemyNo == 2)
 		{
 			if (m_state == STATE_WALK || m_state == STATE_ACTION)
 			{
@@ -510,65 +478,65 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 				pos.z += (float)sin(territory.fRadian) * (fSpeed * m_fSpeed);
 			}
 		}
-		// ★拠点までの角度 / 自身の軸調整
+		//★拠点までの角度 / 自身の軸調整
 		float fDestAngle = atan2f(pos.x - territory.pos.x, pos.z - territory.pos.z);
 		float fAngle = fDestAngle - m_rot.y;
 
 		if (fAngle > D3DX_PI) { fAngle -= D3DX_PI * 2; }
 		if (fAngle < -D3DX_PI) { fAngle += D3DX_PI * 2; }
 
-		//	移動方向に角度調整
+		//移動方向に角度調整
 		m_rot.y += fAngle * 0.1f;
 
 		if (m_rot.y > D3DX_PI) { m_rot.y -= D3DX_PI * 2; }
 		if (m_rot.y < -D3DX_PI) { m_rot.y += D3DX_PI * 2; }
 
-		//	位置・回転情報の反映
+		//位置・回転情報の反映
 		CCharacter::SetPos(pos);
 		CCharacter::SetRot(m_rot);
 	}
 #endif
 }
 //=============================================================================
-// ライン関数まとめ
+//ライン関数まとめ
 //=============================================================================
 void  CEnemy::Program_Line(void)
 {
-	//	ラインのカウントダウン処理
+	//ラインのカウントダウン処理
 	CountDownLineTime();
 
-	//	ライン引きの開始(カウントアップ)
+	//ライン引きの開始(カウントアップ)
 	if (m_bBlockStartTerritory)
 	{
 		m_nCountTime++;
 		if ((m_nCountTime % NOT_GETTIME) == 0) { m_bBlockStartTerritory = false; }
 	}
 
-	//	図形が完成した後の処理
+	//図形が完成した後の処理
 	UpdateShapeComplete();
 }
 
 //=============================================================================
-// ラインを繋ぐ手順
+//ラインを繋ぐ手順
 //=============================================================================
 void CEnemy::LineConnect(int nRand)
 {
-	//	[[最新の始点・終点に更新]]
+	//[[最新の始点・終点に更新]]
 	if (m_apTerritory[0] != NULL)
 	{
 		m_nTerrStart.pos = m_apTerritory[0]->GetPos();
 	}
 
-	//	[[ラインを(m_nLineNum)本引いたら始点に戻る]]
+	//[[ラインを(m_nLineNum)本引いたら始点に戻る]]
 	if (m_apTerritory[m_nLineNum] != NULL)
 	{
-		if (m_nLineTime <= nRand * 100 && m_bFinish == false ||	// 制限時間が迫ってきたら
-			m_apTerritory[TERRITORY_MAX - 1] != NULL)					//	最大ライン分引いていたら
+		if (m_nLineTime <= nRand * 100 && m_bFinish == false ||	//制限時間が迫ってきたら
+			m_apTerritory[TERRITORY_MAX - 1] != NULL)					//最大ライン分引いていたら
 		{
-			m_nLineNum = 2;		//	初期最低値に戻す
-			m_bFinish = true;	//	始点に戻す
+			m_nLineNum = 2;		//初期最低値に戻す
+			m_bFinish = true;	//始点に戻す
 		}
-		else//	ラインを伸ばす時間に余裕があれば
+		else//ラインを伸ばす時間に余裕があれば
 		{
 			m_nLineNum += 1;
 		}
@@ -576,28 +544,28 @@ void CEnemy::LineConnect(int nRand)
 	}
 }
 //=============================================================================
-// モーション処理まとめ
+//モーション処理まとめ
 //=============================================================================
 void CEnemy::Program_State(void)
 {
 #if 1
 	switch (m_state)
 	{
-	case STATE_NONE:		//	[[通常]]
+	case STATE_NONE:		//[[通常]]
 
 		m_bWalk = true;
 		m_bSprintMotion = true;
 
 		break;
 
-	case STATE_WALK:		//	[[移動状態]]
+	case STATE_WALK:		//[[移動状態]]
 		break;
 
-	case STATE_ACTION:		//	[[アクション状態]]
+	case STATE_ACTION:		//[[アクション状態]]
 
 		break;
 
-	case STATE_BLOWAWAY:	//	[[吹っ飛ばされてる状態]]
+	case STATE_BLOWAWAY:	//[[吹っ飛ばされてる状態]]
 		m_nDamageCount++;
 
 		if (m_nDamageCount <= MAX_DAMAGECOUNT)
@@ -613,7 +581,7 @@ void CEnemy::Program_State(void)
 			m_state = STATE_NONE;
 		}
 
-		// 吹っ飛ばす
+		//吹っ飛ばす
 		m_fBlowLength -= BLOW_MOVING_CUT;
 		if (m_fBlowLength >= 0.0f)
 		{
@@ -625,14 +593,14 @@ void CEnemy::Program_State(void)
 
 		break;
 
-	case STATE_DAMAGE:		//	[[ダメージ状態]]
+	case STATE_DAMAGE:		//[[ダメージ状態]]
 
 		m_nDamageCount++;
 		if (m_nDamageCount == 70)
 		{//60秒たったら起き上がる
 			m_pMotion->SetNumMotion(5);
 		}
-		if (m_nDamageCount == 120)
+		if (m_nDamageCount == 110)
 		{//110秒で動けるようになる
 			m_nDamageCount = 0;
 			m_bWalk = true;
@@ -651,20 +619,20 @@ void CEnemy::Program_State(void)
 //=============================================================================
 void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
 {
-	// 座標を取得
+	//座標を取得
 	D3DXVECTOR3 pos = GetPos();
 
-	// 吹っ飛ぶ向きを計算
+	//吹っ飛ぶ向きを計算
 	m_fBlowAngle = CFunctionLib::CalcAngleToDest(pos.x, pos.z, AnotherPos.x, AnotherPos.z);
 
-	// 吹っ飛ぶ距離を設定
+	//吹っ飛ぶ距離を設定
 	m_fBlowLength = BLOW_MOVING;
 
-	// 吹っ飛び状態にする
+	//吹っ飛び状態にする
 	m_state = STATE_BLOWAWAY;
 	m_pMotion->SetNumMotion(STATE_BLOWAWAY);
 
-	// 向きを変える
+	//向きを変える
 	float fRot = m_fBlowAngle + D3DX_PI;
 	fRot = CFunctionLib::CheckRotationOverPiX(fRot);
 	m_rot.y = fRot;
@@ -675,8 +643,6 @@ void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
 //=============================================================================
 void CEnemy::Program_Motion(void)
 {
-	CSound *pSound = CManager::GetSound();	//	サウンドの取得
-
 	//移動状態
 	if (m_state != STATE_BLOWAWAY && m_state != STATE_DAMAGE)
 	{
@@ -693,7 +659,6 @@ void CEnemy::Program_Motion(void)
 	}
 	if (m_bWalk == true && m_state == STATE_WALK)
 	{
-		pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
 		m_pMotion->SetNumMotion(m_state);
 		m_bWalk = false;
 	}
@@ -702,7 +667,6 @@ void CEnemy::Program_Motion(void)
 	{//スプリントモーション
 		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state == STATE_ACTION)
 		{
-			pSound->PlaySound(CSound::SOUND_LABEL_SE018);//足音
 			m_pMotion->SetNumMotion(STATE_ACTION);
 			m_bSprintMotion = false;
 		}
@@ -710,7 +674,7 @@ void CEnemy::Program_Motion(void)
 }
 
 //=============================================================================
-// ラインの生成 / 破棄
+//ラインの生成 / 破棄
 //=============================================================================
 #if 1
 void CEnemy::CreateOrbitLine(void)
@@ -733,8 +697,111 @@ void CEnemy::UninitOrtbitLine(void)
 	}
 }
 #endif
+
 //=============================================================================
-// 判定関連
+//イベント
+//=============================================================================
+void CEnemy::Event_Bonus(void)
+{
+	CGame * pGame = CManager::GetGame();//現在のゲームの状態を取得
+
+	if (pGame->GetAreaBonusEventFlag() == true && CCharacter::GetCountGetTerritory() <= 30)//ボーナスエリアのイベントが発生している場合...
+	{
+		//[[一度すべてリセット、ボーナスエリアを目指す]]
+		int ntmpData = m_nAreaNow;
+		if (m_EventCheck == false)
+		{
+			m_nAreaNow = (pGame->GetAreaBonusIdx() + 2) % 4;
+
+
+			if (ntmpData != m_nAreaNow) //ボーナスエリア外
+			{
+				m_nPassCnt = 0;
+
+				for (int nCnt = 0; nCnt < m_nAreaTerrNum[ntmpData]; nCnt++)
+				{
+					m_AreaInfo[ntmpData][nCnt].bFlag = false;
+
+				}
+				m_bReset = true;
+			}
+		}
+		m_EventCheck = true; //ここで初めてフラグを立てる(無駄にリセットさせないため)
+	}
+	else
+	{
+		m_EventCheck = false;
+
+		if (m_bReset == true) //イベント終わり次第,各エリアに散らばせる
+		{
+			int m_nBeArea = m_nAreaNow;
+			while (m_nBeArea == m_nAreaNow)
+			{
+				m_nAreaNow = rand() % 4;
+			}
+			m_nPassCnt = 0;
+			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nBeArea]; nCnt++)
+			{
+				m_AreaInfo[m_nBeArea][nCnt].bFlag = false;
+
+			}
+			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+			{
+				m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+			}
+			m_bReset = false;
+		}
+
+	}
+
+}
+
+void CEnemy::Event_Division(int nType, int nArea01, int nArea02)
+{
+	//縦
+	if (nType == 0)
+	{
+		if (nArea02 > AREA_MAX - 1)
+		{
+			nArea02 = nArea02 - AREA_MAX;
+		}
+	}
+	//横
+	else
+	{
+		if ((nArea02 + 2) % 2 == 0)
+		{
+			nArea02 = nArea02 - 2;
+		}
+	}
+	if (m_nAreaNow == nArea01 || m_nAreaNow == nArea02)
+	{
+		if (m_nPassCnt == m_nAreaTerrNum[m_nAreaNow])	//通過回数もフラグもリセット
+		{
+			m_nPassCnt = 0;
+
+			for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+			{
+				m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+			}
+
+			if (m_nAreaNow == nArea01)
+			{
+				m_nAreaNow = nArea02;
+			}
+			else
+			{
+				m_nAreaNow = nArea01;
+			}
+		}
+	}
+
+	
+}
+//=============================================================================
+//判定関連
 //=============================================================================
 #if 1
 //=============================================================================
@@ -758,7 +825,7 @@ void CEnemy::Collision(void)
 		while (pCol != NULL)
 		{
 			pColNext = pCol->GetNext();
-			CollisionCollider(pCol, pos, posOld, m_move, D3DXVECTOR3(15.0f, 15.0f, 15.0f));
+			CollisionCollider(pCol, pos, posOld, INITIALIZE_VECTOR3, D3DXVECTOR3(15.0f, 15.0f, 15.0f));
 			pCol = pColNext;
 		}
 	}
@@ -782,7 +849,7 @@ bool CEnemy::CollisionCollider(CCollider *pCollider, D3DXVECTOR3 &pos, D3DXVECTO
 		if (CollisionCylinderyCollider((CCylinderCollider*)pCollider, pos, posOld, Move, ColRange) == true)
 		{
 		}
-		// ★パワー型AI用の判定
+		//★パワー型AI用の判定
 		if (m_CharcterType == CCharacter::CHARCTERTYPE_POWER)
 		{
 			CGame * pGame = CManager::GetGame();
@@ -848,7 +915,7 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 
 		CScene *pParent = pCylinderCollider->GetParent();
 		if (pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
-		{// 親が敵かプレイヤーだった場合自分を吹っ飛ばす
+		{//親が敵かプレイヤーだった場合自分を吹っ飛ばす
 			CCharacter *pCharacter = (CCharacter*)pParent;
 			if (pCharacter == NULL) { return true; }
 			D3DXVECTOR3 AnotherPos = pCharacter->GetPos();
@@ -859,10 +926,10 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 			}
 		}
 		else if (pParent->GetObjType() == OBJTYPE_MINE)
-		{// 地雷だったら
+		{//地雷だったら
 			CMine *pMine = (CMine*)pParent;
 			if (pMine->GetParentChara() != this && pMine->GetType() == CMine::TYPE_NONE)
-			{// 自分以外が出した地雷なら起動
+			{//自分以外が出した地雷なら起動
 				pMine->SetType(CMine::TYPE_STARTUP);
 			}
 		}
@@ -878,13 +945,13 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
 {
 	if (pShere->Collision(&pos, CYLINDER_COLRADIUS, this) == true && pShere->GetParent() != this)
-	{// 自分以外の攻撃球が当たったら
+	{//自分以外の攻撃球が当たったら
 		CScene *pParent = pShere->GetParent();
 		if (pParent->GetObjType() == OBJTYPE_MINE)
-		{// 地雷だったら
+		{//地雷だったら
 			CMine *pMine = (CMine*)pParent;
 			if (pMine->GetParentChara() != this)
-			{// 自分以外が出した地雷ならダメージ
+			{//自分以外が出した地雷ならダメージ
 				m_state = STATE_DAMAGE;
 				if (m_nDamageCounter == 0)
 				{
@@ -915,19 +982,19 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 
 void CEnemy::MergeSort(TERRITORY_INFO* pArray, int start, int end, int AreaNum)
 {
-	//  作業用のデータ
+	// 作業用のデータ
 	int middle, i, j, k;
 	if (start >= end) {
 		return;
 	}
-	//  startとendの中間地点を分割点とする
+	// startとendの中間地点を分割点とする
 	middle = (start + end) / 2;
-	//  前半部分を再帰的に整列
+	// 前半部分を再帰的に整列
 	MergeSort(pArray, start, middle, AreaNum);
-	//  後半部分を再帰的に整列
+	// 後半部分を再帰的に整列
 	MergeSort(pArray, middle + 1, end, AreaNum);
 	k = 0;
-	//  仮想領域のデータをマージしながらコピーする。
+	// 仮想領域のデータをマージしながらコピーする。
 	for (i = start; i <= middle; i++) {
 		m_tmp[AreaNum][k] = pArray[i].fDisSort;
 		k++;
@@ -936,7 +1003,7 @@ void CEnemy::MergeSort(TERRITORY_INFO* pArray, int start, int end, int AreaNum)
 		m_tmp[AreaNum][k] = pArray[j].fDisSort;
 		k++;
 	}
-	//  末端からデータを取得して、マージしていく。
+	// 末端からデータを取得して、マージしていく。
 	i = 0;
 	j = end - start;
 	for (k = start; k <= end; k++) {
@@ -958,7 +1025,7 @@ void CEnemy::MergeSort(TERRITORY_INFO* pArray, int start, int end, int AreaNum)
 bool CEnemy::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
 {
 	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
-	{// 自分以外の攻撃球が当たったら
+	{//自分以外の攻撃球が当たったら
 		CScene *pParent = pShere->GetParent();
 		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
 		{
