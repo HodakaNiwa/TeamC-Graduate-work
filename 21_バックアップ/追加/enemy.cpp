@@ -28,7 +28,7 @@
 #define MAX_DAMAGECOUNT    (23)
 
 //デバック用
-#define FLAG	(true)
+#define FLAG	(false)
 
 //*****************************************************************************
 //コンストラクタ
@@ -48,6 +48,9 @@ CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 	m_EventCheck = false;
 	m_bReset = false;
 	m_bDebugStop = false;
+	m_EveCheckDivi = false;
+	m_nRandNum = 0;
+	m_nRandStop = false;
 }
 
 //*****************************************************************************
@@ -330,10 +333,13 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 					m_nTargetNum = nCnt;
 					m_bBreak = true;
 					//[[次の拠点があまりに遠い場合は始点に戻る]]
-					if (fDis >= 500.0f && m_apTerritory[2] != NULL)
+					if (m_nLineNum >= 2)
 					{
-						m_nLineNum = 2;		//初期最低値に戻す
-						m_bFinish = true;	//始点に戻す
+						if (fDis >= 340.0f-(m_nLineNum*20.0f) && m_apTerritory[m_nLineNum] != NULL)
+						{
+							m_bFinish = true;	//始点に戻す
+							m_nLineNum = 2;		//初期最低値に戻す
+						}
 					}
 					break;
 				}
@@ -357,8 +363,8 @@ void  CEnemy::AIBasicAction(void)
 		m_nTerrStart.fRadian = (float)atan2(m_nTerrStart.pos.z - pos.z, m_nTerrStart.pos.x - pos.x);
 
 		//★目的地範囲内に入った
-		if (pos.x <= m_nTerrStart.pos.x + 35.0f && pos.x >= m_nTerrStart.pos.x - 35.0f &&
-			pos.z <= m_nTerrStart.pos.z + 35.0f && pos.z >= m_nTerrStart.pos.z - 35.0f)
+		if (pos.x <= m_nTerrStart.pos.x + 25.0f && pos.x >= m_nTerrStart.pos.x - 25.0f &&
+			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
 		{
 			Event_Bonus();
 			
@@ -366,6 +372,8 @@ void  CEnemy::AIBasicAction(void)
 			DisSort(pos);//一番短い距離が始点となる
 			m_bFinish = false;
 			m_nTerrStart.pos = m_AreaInfo[m_nAreaNow][m_nTargetNum].pos;
+			m_nLineNum = 2;		//初期最低値に戻す
+			m_nRandStop = false;
 		}
 
 		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
@@ -380,8 +388,8 @@ void  CEnemy::AIBasicAction(void)
 		}
 
 		//★目的地範囲内に入った
-		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 35.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 35.0f &&
-			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 35.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 35.0f)
+		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
+			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
 		{
 			CGame * pGame = CManager::GetGame();
 			if (pGame != NULL)
@@ -417,6 +425,13 @@ void  CEnemy::AIBasicAction(void)
 			//イベント時
 			if (pGame->GetDivisionEventFlag() == true)//分断エリアのイベントが発生している場合...
 			{
+				//発生ごとに更新一回のみ
+				if (m_EveCheckDivi == false)
+				{
+					Interruption();//引いているラインを一度リセット
+				}
+				m_EveCheckDivi = true;
+
 				int nType = pGame->GetDivisionType();//分割方向(縦,横)
 				switch (nType)
 				{//分断の方向によって処理わけ
@@ -430,6 +445,7 @@ void  CEnemy::AIBasicAction(void)
 			}
 			else
 			{
+				m_EveCheckDivi = false;
 				//通常時
 				if (m_nPassCnt == m_nAreaTerrNum[m_nAreaNow])	//通過回数もフラグもリセット
 				{
@@ -470,7 +486,7 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 		float fSpeed = GetSpeed();	//速さ
 
 		//移動加算処理
-		if (m_bDebugStop == FLAG || m_nEnemyNo == 2)
+		if (m_bDebugStop == FLAG)
 		{
 			if (m_state == STATE_WALK || m_state == STATE_ACTION)
 			{
@@ -521,6 +537,11 @@ void  CEnemy::Program_Line(void)
 //=============================================================================
 void CEnemy::LineConnect(int nRand)
 {
+	if (m_nRandStop == false)
+	{
+		m_nRandNum = nRand;
+	}
+	m_nRandStop = true;
 	//[[最新の始点・終点に更新]]
 	if (m_apTerritory[0] != NULL)
 	{
@@ -530,10 +551,9 @@ void CEnemy::LineConnect(int nRand)
 	//[[ラインを(m_nLineNum)本引いたら始点に戻る]]
 	if (m_apTerritory[m_nLineNum] != NULL)
 	{
-		if (m_nLineTime <= nRand * 100 && m_bFinish == false ||	//制限時間が迫ってきたら
+		if (m_nLineTime <= m_nRandNum * 100 && m_bFinish == false ||	//制限時間が迫ってきたら
 			m_apTerritory[TERRITORY_MAX - 1] != NULL)					//最大ライン分引いていたら
 		{
-			m_nLineNum = 2;		//初期最低値に戻す
 			m_bFinish = true;	//始点に戻す
 		}
 		else//ラインを伸ばす時間に余裕があれば

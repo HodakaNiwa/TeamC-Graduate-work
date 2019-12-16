@@ -157,10 +157,13 @@ private:
 	TERRITORY_INFO* m_AreaInfo[AREA_MAX];		//エリアごとの拠点情報
 	int m_nAreaTerrNum[AREA_MAX];				//各エリアのテリトリー数
 	int m_nAreaNow;								//拠点のエリア番号
+	int m_nRandNum;
+	bool m_nRandStop;
 
 	//イベント関連
 	bool m_EventCheck;
 	bool m_bReset;
+	bool m_EveCheckDivi;
 
 	//マージソート
 	float *m_tmp[4];							// [Temporary]一時的に値を記憶する変数
