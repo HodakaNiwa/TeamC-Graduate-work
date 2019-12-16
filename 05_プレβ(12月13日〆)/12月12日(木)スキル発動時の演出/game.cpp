@@ -871,7 +871,7 @@ void CGame::Uninit(void)
 	CEffect3D::UnLoad();
 	CRobotUI::UnLoad();
 	CExprosionTrace::UnloadTex(); //安
-	CCrack::UnloadTex();		  //安
+	CCrack::UnloadTex();		  //安.
 	CRipples::UnloadTex();		  //安
 
 	//アウトライン破棄
