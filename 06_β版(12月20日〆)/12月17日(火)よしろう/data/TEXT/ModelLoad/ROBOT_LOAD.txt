@@ -1,0 +1,154 @@
+
+#モデルの読み込み
+MODEL_LOAD
+
+#読み込むUVテクスチャの数
+NUM_UV = 0
+
+#読み込むモデルの数
+NUM_MODEL = 13
+
+#読み込むモデル
+MODEL_NAME data/MODEL/ROBOT/00_bodyD.x	# [0]腹
+MODEL_NAME data/MODEL/ROBOT/01_bodyU.x	# [1]胸
+MODEL_NAME data/MODEL/ROBOT/02_head.x		# [2]頭
+MODEL_NAME data/MODEL/ROBOT/03_armUR.x	# [3]右上腕
+MODEL_NAME data/MODEL/ROBOT/04_armDR.x	# [4]右前腕
+MODEL_NAME data/MODEL/ROBOT/05_handR.x	# [5]右手
+MODEL_NAME data/MODEL/ROBOT/06_armUL.x	# [6]左上腕
+MODEL_NAME data/MODEL/ROBOT/07_armDL.x	# [7]左前腕
+MODEL_NAME data/MODEL/ROBOT/08_handL.x	# [8]左手
+MODEL_NAME data/MODEL/ROBOT/09_legUR.x	# [9]右腿
+MODEL_NAME data/MODEL/ROBOT/10_legDR.x	# [10]右脛
+MODEL_NAME data/MODEL/ROBOT/11_legUL.x	# [11]左腿
+MODEL_NAME data/MODEL/ROBOT/12_legDL.x	# [12]左脛
+
+#モデルの読み込み終了
+END_MODEL_LOAD
+
+#########################################################
+
+
+#キャラクターのパラメーター設定
+
+PARAMETERSET
+		STATUSSET
+			ATTACK = 100			#攻撃力
+			ATTACKSPEED = 10.0		#攻撃速度
+			RANGE = 10.0			#射程
+			SPEED = 4.0				#移動量
+			INERTIA = 0.85			#慣性
+			LINETIME = 5.0			#線を描ける時間
+		END_STATUSSET
+END_PARAMETERSET
+
+#########################################################
+
+#各パーツの設定
+CHARACTERSET
+	PARTSSET
+		INDEX = 0					# 腹
+		TEX_INDEX = 0
+		PARENT = -1					# (親)NULL
+		POS = 0.0 180.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 1					# 胸
+		TEX_INDEX = 0
+		PARENT = 0					# 腹
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 2					# 頭
+		TEX_INDEX = 0
+		PARENT = 1					# (親)胸
+		POS = 0.0 45.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 3					# 右上腕
+		TEX_INDEX = 0
+		PARENT = 1					# (親)胸
+		POS = -40.0 35.0 10.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 4					# 右前腕
+		TEX_INDEX = 0
+		PARENT = 3					# (親)右上腕
+		POS = -15.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 5					# 右手
+		TEX_INDEX = 0
+		PARENT = 4					# (親)右前腕
+		POS = -30.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 6					# 左上腕
+		TEX_INDEX = 0
+		PARENT = 1					# (親)胸
+		POS = 40.0 35.0 10.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 7					# 左前腕
+		TEX_INDEX = 0
+		PARENT = 6					# (親)左上腕
+		POS = 15.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 8					# 左手
+		TEX_INDEX = 0
+		PARENT = 7					# (親)左前腕
+		POS = 30.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 9					# 右腿
+		TEX_INDEX = 0
+		PARENT = 0					# (親)腹
+		POS = -10.0 -30.0 -1.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 10					# 右脛
+		TEX_INDEX = 0
+		PARENT = 9					# (親)右腿
+		POS = -8.0 -50.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 11					# 左腿
+		TEX_INDEX = 0
+		PARENT = 0					# (親)腹
+		POS = 10.0 -30.0 -1.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 12					# 左脛
+		TEX_INDEX = 0
+		PARENT = 11					# (親)左腿
+		POS = 8.0 -50.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+END_CHARACTERSET
+
+#########################################################
