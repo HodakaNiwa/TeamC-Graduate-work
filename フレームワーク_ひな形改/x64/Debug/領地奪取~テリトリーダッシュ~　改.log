@@ -1,0 +1,47 @@
+﻿sphereCollider.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+meshCollider.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+meshSphere.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+scene3D.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+sceneMeshfiled.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+boxCollider.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+cylinderCollider.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+functionlib.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+light.obj : error LNK2001: 外部シンボル "D3DXVec3Normalize" は未解決です。
+camera.obj : error LNK2019: 未解決の外部シンボル D3DXMatrixLookAtLH が関数 "public: void __cdecl CCamera::Set(void)" (?Set@CCamera@@QEAAXXZ) で参照されました。
+camera.obj : error LNK2019: 未解決の外部シンボル D3DXMatrixPerspectiveFovLH が関数 "public: void __cdecl CCamera::Set(void)" (?Set@CCamera@@QEAAXXZ) で参照されました。
+collider.obj : error LNK2019: 未解決の外部シンボル D3DXMatrixMultiply が関数 "public: void __cdecl CCollider::CalcNotScaleTransform(void)" (?CalcNotScaleTransform@CCollider@@QEAAXXZ) で参照されました。
+scene3D.obj : error LNK2001: 外部シンボル "D3DXMatrixMultiply" は未解決です。
+sceneBillBorad.obj : error LNK2001: 外部シンボル "D3DXMatrixMultiply" は未解決です。
+sceneMeshfiled.obj : error LNK2001: 外部シンボル "D3DXMatrixMultiply" は未解決です。
+gamepad.obj : error LNK2001: 外部シンボル "c_dfDIJoystick2" は未解決です。
+imgui_impl_win32.obj : error LNK2019: 未解決の外部シンボル XInputGetState が関数 "void __cdecl ImGui_ImplWin32_UpdateGameControllers(void)" (?ImGui_ImplWin32_UpdateGameControllers@@YAXXZ) で参照されました。
+imgui_impl_win32.obj : error LNK2019: 未解決の外部シンボル XInputGetCapabilities が関数 "void __cdecl ImGui_ImplWin32_UpdateGameControllers(void)" (?ImGui_ImplWin32_UpdateGameControllers@@YAXXZ) で参照されました。
+input.obj : error LNK2019: 未解決の外部シンボル DirectInput8Create が関数 "public: virtual long __cdecl CInput::Init(struct HINSTANCE__ *,struct HWND__ *)" (?Init@CInput@@UEAAJPEAUHINSTANCE__@@PEAUHWND__@@@Z) で参照されました。
+input.obj : error LNK2001: 外部シンボル "IID_IDirectInput8A" は未解決です。
+input.obj : error LNK2001: 外部シンボル "GUID_SysKeyboard" は未解決です。
+input.obj : error LNK2001: 外部シンボル "c_dfDIKeyboard" は未解決です。
+meshCollider.obj : error LNK2019: 未解決の外部シンボル D3DXVec3TransformCoord が関数 "public: void __cdecl CMeshCollider::SetWorldVertexPos(void)" (?SetWorldVertexPos@CMeshCollider@@QEAAXXZ) で参照されました。
+Territory.obj : error LNK2001: 外部シンボル "D3DXCreateTextureFromFileA" は未解決です。
+modebase.obj : error LNK2001: 外部シンボル "D3DXCreateTextureFromFileA" は未解決です。
+number2D.obj : error LNK2001: 外部シンボル "D3DXCreateTextureFromFileA" は未解決です。
+objbase.obj : error LNK2001: 外部シンボル "D3DXCreateTextureFromFileA" は未解決です。
+sceneMeshfiled.obj : error LNK2001: 外部シンボル "D3DXCreateTextureFromFileA" は未解決です。
+objbase.obj : error LNK2019: 未解決の外部シンボル D3DXLoadMeshFromXA が関数 "public: static void __cdecl CObjBase::LoadModel(struct CLoadTextObject::OBJ_INFO)" (?LoadModel@CObjBase@@SAXUOBJ_INFO@CLoadTextObject@@@Z) で参照されました。
+sceneX.obj : error LNK2001: 外部シンボル "D3DXLoadMeshFromXA" は未解決です。
+Territory.obj : error LNK2001: 外部シンボル "D3DXLoadMeshFromXA" は未解決です。
+objbase.obj : error LNK2019: 未解決の外部シンボル D3DXGetFVFVertexSize が関数 "public: static void __cdecl CObjBase::LoadModel(struct CLoadTextObject::OBJ_INFO)" (?LoadModel@CObjBase@@SAXUOBJ_INFO@CLoadTextObject@@@Z) で参照されました。
+sceneX.obj : error LNK2001: 外部シンボル "D3DXGetFVFVertexSize" は未解決です。
+Territory.obj : error LNK2001: 外部シンボル "D3DXGetFVFVertexSize" は未解決です。
+renderer.obj : error LNK2019: 未解決の外部シンボル Direct3DCreate9 が関数 "public: long __cdecl CRenderer::Init(struct HWND__ *,bool)" (?Init@CRenderer@@QEAAJPEAUHWND__@@_N@Z) で参照されました。
+scene3D.obj : error LNK2019: 未解決の外部シンボル D3DXMatrixTranslation が関数 "public: virtual void __cdecl CScene3D::Draw(void)" (?Draw@CScene3D@@UEAAXXZ) で参照されました。
+sceneBillBorad.obj : error LNK2001: 外部シンボル "D3DXMatrixTranslation" は未解決です。
+sceneMeshfiled.obj : error LNK2001: 外部シンボル "D3DXMatrixTranslation" は未解決です。
+scene3D.obj : error LNK2019: 未解決の外部シンボル D3DXMatrixRotationYawPitchRoll が関数 "public: virtual void __cdecl CScene3D::Draw(void)" (?Draw@CScene3D@@UEAAXXZ) で参照されました。
+sceneBillBorad.obj : error LNK2001: 外部シンボル "D3DXMatrixRotationYawPitchRoll" は未解決です。
+sceneMeshfiled.obj : error LNK2001: 外部シンボル "D3DXMatrixRotationYawPitchRoll" は未解決です。
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\d3d9.lib : warning LNK4272: ライブラリのコンピューターの種類 'X86' がターゲットのコンピューターの種類' x64' と競合しています
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\d3dx9.lib : warning LNK4272: ライブラリのコンピューターの種類 'X86' がターゲットのコンピューターの種類' x64' と競合しています
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\dxguid.lib : warning LNK4272: ライブラリのコンピューターの種類 'X86' がターゲットのコンピューターの種類' x64' と競合しています
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\dinput8.lib : warning LNK4272: ライブラリのコンピューターの種類 'X86' がターゲットのコンピューターの種類' x64' と競合しています
+C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86\xinput.lib : warning LNK4272: ライブラリのコンピューターの種類 'X86' がターゲットのコンピューターの種類' x64' と競合しています
+C:\Users\game117\Documents\GitHub\TeamC-Graduate-work\フレームワーク_ひな形改\x64\\領地奪取~テリトリーダッシュ~　改.exe : fatal error LNK1120: 18 件の未解決の外部参照
