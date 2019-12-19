@@ -13,7 +13,7 @@
 #include "model.h"
 #include "territory.h"
 #include "mine.h"
-#include <windows.h>
+#include "bullet.h"
 
 //*****************************************************************************
 //マクロ定義
@@ -23,6 +23,8 @@
 //当たり判定・ダメージ関連
 #define CYLINDER_COLRADIUS (20.0f)
 #define CYLINDER_COLHEIGHT (100.0f)
+#define BLOW_ENEMYMOVING   (12.0f)	
+#define BLOW_ROBOTMOVING   (30.0f)	
 #define BLOW_MOVING        (12.0f)
 #define BLOW_MOVING_CUT    (1.5f)
 #define MAX_DAMAGECOUNT    (23)
@@ -36,21 +38,54 @@
 CEnemy::CEnemy(int nPriority, OBJTYPE objType) : CCharacter(nPriority, objType)
 {
 	m_nDamageCount = 0;
+	m_nDamageCounter = 0;
+	m_nLevel = 0;
+	m_nDownCount = 0;
+	m_nRandNum = 0;
+	m_nCountTime = 0;
+	m_nTargetNum = 0;
+	m_nPassCnt = 0;
+	m_nAreaNow = 0;
+	m_nRandNum = 0;
+	m_nLineNum = 2;
+	m_nEnemyNo = -1;
 	m_fBlowAngle = 0.0f;
 	m_fBlowLength = 0.0f;
+	m_fSpeed = 0.0f;
 	m_rot = INITIALIZE_VECTOR3;
 	m_posOld = INITIALIZE_VECTOR3;
-	m_nDamageCounter = 0;
 	m_bSuperArmor = false;
 	m_bTarget = false;
-	m_state = STATE_NONE;
-	m_nLevel = 0;
 	m_EventCheck = false;
 	m_bReset = false;
 	m_bDebugStop = false;
 	m_EveCheckDivi = false;
-	m_nRandNum = 0;
 	m_nRandStop = false;
+	m_bWalk = false;
+	m_bSprintMotion = false;
+	m_bStop = false;
+	m_bFinish = false;
+	m_bBreak = false;
+	m_pModel = NULL;
+	m_pMotion = NULL;
+	m_pLoadEffect = NULL;
+	m_pTerritory = NULL;
+	m_state = STATE_NONE;
+
+	//視点終点の記憶
+	m_nTerrStart.bFlag = false;
+	m_nTerrStart.fDisSort = 0.0f;
+	m_nTerrStart.fDistance = 0.0f;
+	m_nTerrStart.fRadian = 0.0f;
+	m_nTerrStart.nAreaNum = 0;
+	m_nTerrStart.pos = INITIALIZE_VECTOR3;
+
+	for (int nCnt = 0; nCnt < AREA_MAX; nCnt++)
+	{
+		m_AreaInfo[nCnt] = NULL;
+		m_nAreaTerrNum[nCnt] = 0;
+		m_tmp[nCnt] = NULL;
+	}
 }
 
 //*****************************************************************************
@@ -140,7 +175,24 @@ void  CEnemy::Update(void)
 		Program_State();	//モーション関連
 
 		SetCharaState(m_state);//現在のステータスを反映
+
+		D3DXVECTOR3 pos = GetPos();
+		if (pos.x >= 1400.0f || pos.x <= -1400.0f || pos.z >= 1600.0f || pos.z <= -1200.0f)
+		{
+			pos.x = 0.0f;
+			pos.z = 0.0f;
+			SetPos(pos);
+			CDebugProc::Print("\nげろ\n");
+
+		}
 	}
+	/*CDebugProc::Print("\nタイプ : %d", m_CharcterType);
+	CDebugProc::Print("\nステート : %d", m_state);
+	CDebugProc::Print("\n現在のモーション : %d", m_pMotion->GetNumMotion());
+	CDebugProc::Print("\nぶっ飛びダメージ : %d", m_nDamageCount);
+	CDebugProc::Print("\nダメージダウン : %d\n", m_nDownCount);*/
+	CDebugProc::Print("\n現在の位置 : %.1f %.1f %.1f\n", GetPos().x, GetPos().y, GetPos().z);
+	CDebugProc::Print("\nm_bFinish : %d\n", m_bFinish);
 }
 
 //=============================================================================
@@ -298,7 +350,6 @@ void CEnemy::InitSort(D3DXVECTOR3 pos)
 		}
 		nAreaCnt += 1;
 	}
-
 }
 
 //=============================================================================
@@ -319,7 +370,7 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 
 	//[[短い距離順に変える]]
 	MergeSort(m_AreaInfo[m_nAreaNow], 0, m_nAreaTerrNum[m_nAreaNow] - 1, m_nAreaNow);
-	
+
 
 	while (m_bBreak != true)
 	{
@@ -335,7 +386,7 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 					//[[次の拠点があまりに遠い場合は始点に戻る]]
 					if (m_nLineNum >= 2)
 					{
-						if (fDis >= 340.0f-(m_nLineNum*20.0f) && m_apTerritory[m_nLineNum] != NULL)
+						if (fDis >= 340.0f - (m_nLineNum*20.0f) && m_apTerritory[m_nLineNum] != NULL)
 						{
 							m_bFinish = true;	//始点に戻す
 							m_nLineNum = 2;		//初期最低値に戻す
@@ -354,8 +405,25 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 //=============================================================================
 void  CEnemy::AIBasicAction(void)
 {
+	CGame * pGame = CManager::GetGame();
 	D3DXVECTOR3 pos = CCharacter::GetPos();
 	m_posOld = pos;				//ワンフレーム前の位置
+
+
+	if (m_nAreaNow != CTerritory::RequestErea(GetPos()))
+	{
+		Interruption();
+	}
+	if (pGame->GetDivisionEventFlag() == true && m_EveCheckDivi == false)//分断エリアのイベントが発生している場合...
+	{
+		m_nPassCnt = 0;
+		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+		{
+			m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+		}
+		m_nAreaNow = CTerritory::RequestErea(GetPos());
+	}
 
 	if (m_bFinish == true)	//!	[[始点への移動処理 / その後、進む拠点を決める]]
 	{
@@ -367,7 +435,7 @@ void  CEnemy::AIBasicAction(void)
 			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
 		{
 			Event_Bonus();
-			
+
 			//[[ライン数の初期化 / 新たな始点・終点を決める]]
 			DisSort(pos);//一番短い距離が始点となる
 			m_bFinish = false;
@@ -377,9 +445,9 @@ void  CEnemy::AIBasicAction(void)
 		}
 
 		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
-		Program_Move(pos,m_nTerrStart);	//移動処理
+		Program_Move(pos, m_nTerrStart);	//移動処理
 	}
-	else //! [[始点を除く拠点の計算]]
+	else if (m_bFinish == false) //! [[始点を除く拠点の計算]]
 	{
 		//★角度計算
 		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
@@ -391,16 +459,16 @@ void  CEnemy::AIBasicAction(void)
 		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
 			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
 		{
-			CGame * pGame = CManager::GetGame();
+
 			if (pGame != NULL)
 			{
 				CCharacter *pChara = pGame->GetChara(m_nEnemyNo);
 				if (pChara != NULL)
 				{
-					switch(pChara->GetCharcterType())
+					switch (pChara->GetCharcterType())
 					{
 					case CCharacter::CHARCTERTYPE_SPEED:
-						
+
 						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	//アクション時
 						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } //通常時
 						break;
@@ -415,12 +483,12 @@ void  CEnemy::AIBasicAction(void)
 					}
 				}
 			}
-			
+
 			//[[フラグを立てる]]
 			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
 			//[[通過記録カウントアップ]]
 			m_nPassCnt += 1;
-			
+
 
 			//イベント時
 			if (pGame->GetDivisionEventFlag() == true)//分断エリアのイベントが発生している場合...
@@ -428,6 +496,7 @@ void  CEnemy::AIBasicAction(void)
 				//発生ごとに更新一回のみ
 				if (m_EveCheckDivi == false)
 				{
+					//InitSort(GetPos());
 					Interruption();//引いているラインを一度リセット
 				}
 				m_EveCheckDivi = true;
@@ -446,6 +515,7 @@ void  CEnemy::AIBasicAction(void)
 			else
 			{
 				m_EveCheckDivi = false;
+
 				//通常時
 				if (m_nPassCnt == m_nAreaTerrNum[m_nAreaNow])	//通過回数もフラグもリセット
 				{
@@ -463,15 +533,20 @@ void  CEnemy::AIBasicAction(void)
 					{
 						m_nAreaNow = 0;
 					}
+
+					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+					{
+						m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
+					}
 				}
 			}
-			
 
 			DisSort(pos);	//距離の再計算
+
 		}
 
 		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
-		Program_Move(pos,m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//移動処理
+		Program_Move(pos, m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//移動処理
 	}
 }
 
@@ -490,6 +565,8 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 		{
 			if (m_state == STATE_WALK || m_state == STATE_ACTION)
 			{
+				//CDebugProc::Print("\nfSpeed : %.1f  fSpeed : %.1f\n", fSpeed, m_fSpeed);
+
 				pos.x += (float)cos(territory.fRadian) * (fSpeed * m_fSpeed);
 				pos.z += (float)sin(territory.fRadian) * (fSpeed * m_fSpeed);
 			}
@@ -510,6 +587,14 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 		//位置・回転情報の反映
 		CCharacter::SetPos(pos);
 		CCharacter::SetRot(m_rot);
+		//CDebugProc::Print("\n角度 : %.1f", territory.fRadian);
+		/*CDebugProc::Print("\n角度A : %.1f", m_nTerrStart.fRadian);
+		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+		{
+			CDebugProc::Print("角度B : %.1f", m_AreaInfo[m_nAreaNow][nCnt].fRadian);
+
+		}*/
+
 	}
 #endif
 }
@@ -542,6 +627,7 @@ void CEnemy::LineConnect(int nRand)
 		m_nRandNum = nRand;
 	}
 	m_nRandStop = true;
+
 	//[[最新の始点・終点に更新]]
 	if (m_apTerritory[0] != NULL)
 	{
@@ -569,6 +655,8 @@ void CEnemy::LineConnect(int nRand)
 void CEnemy::Program_State(void)
 {
 #if 1
+	int nData = 0;
+
 	switch (m_state)
 	{
 	case STATE_NONE:		//[[通常]]
@@ -579,6 +667,8 @@ void CEnemy::Program_State(void)
 		break;
 
 	case STATE_WALK:		//[[移動状態]]
+		nData = 0;
+
 		break;
 
 	case STATE_ACTION:		//[[アクション状態]]
@@ -588,16 +678,11 @@ void CEnemy::Program_State(void)
 	case STATE_BLOWAWAY:	//[[吹っ飛ばされてる状態]]
 		m_nDamageCount++;
 
-		if (m_nDamageCount <= MAX_DAMAGECOUNT)
-		{
-			m_state = STATE_BLOWAWAY;
-		}
 		if (m_nDamageCount >= MAX_DAMAGECOUNT)
 		{
 			m_nDamageCount = 0;
 			m_bWalk = true;
 			m_bSprintMotion = true;
-
 			m_state = STATE_NONE;
 		}
 
@@ -615,6 +700,32 @@ void CEnemy::Program_State(void)
 
 	case STATE_DAMAGE:		//[[ダメージ状態]]
 
+		m_nDownCount++;
+		if (m_nDownCount == 70)
+		{//70秒たったら起き上がる
+			m_pMotion->SetNumMotion(5);
+		}
+		if (m_nDownCount == 110)
+		{//110秒で動けるようになる
+			m_nDownCount = 0;
+			m_bWalk = true;
+			m_bSprintMotion = true;
+			m_nDamageCounter = 0;
+			m_bSuperArmor = false;
+			m_state = STATE_NONE;
+		}
+		break;
+	case STATE_ROBOTDAMAGE:		// ←追加(よしろう)
+								//吹っ飛ばす
+		m_fBlowLength -= BLOW_MOVING_CUT;
+		if (m_fBlowLength >= 0.0f)
+		{
+			D3DXVECTOR3 pos = CCharacter::GetPos();
+			pos.x -= sinf(m_fBlowAngle) * m_fBlowLength;
+			pos.z -= cosf(m_fBlowAngle) * m_fBlowLength;
+			CCharacter::SetPos(pos);
+		}
+
 		m_nDamageCount++;
 		if (m_nDamageCount == 70)
 		{//60秒たったら起き上がる
@@ -629,6 +740,7 @@ void CEnemy::Program_State(void)
 			m_bSuperArmor = false;
 			m_state = STATE_NONE;
 		}
+
 		break;
 	}
 #endif
@@ -637,7 +749,7 @@ void CEnemy::Program_State(void)
 //=============================================================================
 //　吹っ飛び処理
 //=============================================================================
-void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
+void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos,int Num)
 {
 	//座標を取得
 	D3DXVECTOR3 pos = GetPos();
@@ -646,11 +758,21 @@ void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
 	m_fBlowAngle = CFunctionLib::CalcAngleToDest(pos.x, pos.z, AnotherPos.x, AnotherPos.z);
 
 	//吹っ飛ぶ距離を設定
-	m_fBlowLength = BLOW_MOVING;
+	if (Num == 1)
+	{// ロボットの攻撃のとき
+		m_fBlowLength = BLOW_ROBOTMOVING;
+	}
+	else
+	{// その他
+		m_fBlowLength = BLOW_ENEMYMOVING;
+	}
 
 	//吹っ飛び状態にする
-	m_state = STATE_BLOWAWAY;
-	m_pMotion->SetNumMotion(STATE_BLOWAWAY);
+	if (Num != 1)
+	{
+		m_state = STATE_BLOWAWAY;
+		m_pMotion->SetNumMotion(STATE_BLOWAWAY);
+	}
 
 	//向きを変える
 	float fRot = m_fBlowAngle + D3DX_PI;
@@ -664,15 +786,15 @@ void CEnemy::BlowAway(D3DXVECTOR3 AnotherPos)
 void CEnemy::Program_Motion(void)
 {
 	//移動状態
-	if (m_state != STATE_BLOWAWAY && m_state != STATE_DAMAGE)
+	if (m_state != STATE_BLOWAWAY && m_state != STATE_DAMAGE && m_state != STATE_ROBOTDAMAGE)
 	{
 		if (m_CharcterType == CCharacter::CHARCTERTYPE_SPEED && m_state != STATE_ACTION)
 		{
 			//移動状態
 			m_state = STATE_WALK;
 		}
-		else if ((m_CharcterType == CCharacter::CHARCTERTYPE_POWER || m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE) &&
-			m_state != STATE_ACTION)
+		else if ((m_CharcterType == CCharacter::CHARCTERTYPE_POWER || m_CharcterType == CCharacter::CHARCTERTYPE_TECHNIQUE)
+			&& (m_state != STATE_ACTION && m_state != STATE_BLOWAWAY && m_state != STATE_DAMAGE))
 		{
 			m_state = STATE_WALK;
 		}
@@ -692,31 +814,6 @@ void CEnemy::Program_Motion(void)
 		}
 	}
 }
-
-//=============================================================================
-//ラインの生成 / 破棄
-//=============================================================================
-#if 1
-void CEnemy::CreateOrbitLine(void)
-{
-	return;
-	if (m_pOrbitLine == NULL)
-	{
-		m_pOrbitLine = CSceneOrbit::Create(CSceneOrbit::TYPE_PLAYER, CCharacter::GetPos());
-		m_pOrbitLine->SetMtxParent(&m_pModel[5]->GetMtxWorld());
-		m_pOrbitLine->SetMtxParentEnd(&m_pModel[1]->GetMtxWorld());
-	}
-}
-
-void CEnemy::UninitOrtbitLine(void)
-{
-	if (m_pOrbitLine != NULL)
-	{
-		m_pOrbitLine->Uninit();
-		m_pOrbitLine = NULL;
-	}
-}
-#endif
 
 //=============================================================================
 //イベント
@@ -747,6 +844,8 @@ void CEnemy::Event_Bonus(void)
 			}
 		}
 		m_EventCheck = true; //ここで初めてフラグを立てる(無駄にリセットさせないため)
+
+		
 	}
 	else
 	{
@@ -939,10 +1038,13 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 			CCharacter *pCharacter = (CCharacter*)pParent;
 			if (pCharacter == NULL) { return true; }
 			D3DXVECTOR3 AnotherPos = pCharacter->GetPos();
-
+			if (m_nDamageCount >= 1)
+			{
+				m_nDamageCount = 0;
+			}
 			if (m_bSuperArmor != true)
 			{//スーパーアーマ状態じゃないなら
-				BlowAway(AnotherPos);
+				BlowAway(AnotherPos, 0);
 			}
 		}
 		else if (pParent->GetObjType() == OBJTYPE_MINE)
@@ -951,6 +1053,14 @@ bool CEnemy::CollisionCylinderyCollider(CCylinderCollider *pCylinderCollider, D3
 			if (pMine->GetParentChara() != this && pMine->GetType() == CMine::TYPE_NONE)
 			{//自分以外が出した地雷なら起動
 				pMine->SetType(CMine::TYPE_STARTUP);
+			}
+		}
+		else if (pParent->GetObjType() == OBJTYPE_ROBOTBULLET)	// ←追加(よしろう)
+		{// ミサイルだったら
+			CBullet *pBullet = (CBullet*)pParent;
+			if (pBullet->GetType() == CBullet::TYPE_MOVE)
+			{// 爆発
+				pBullet->SetType(CBullet::TYPE_EXPLOSION);
 			}
 		}
 
@@ -978,10 +1088,14 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 					m_bSuperArmor = true;
 					m_pMotion->SetNumMotion(4);
 					m_nDamageCounter = 1;
+					if (m_nDownCount >= 1)
+					{
+						m_nDownCount = 0;
+					}
 				}
 			}
 		}
-		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ENEMY)
+		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ENEMY || pParent->GetObjType() == OBJTYPE_ROBOTBULLET)
 		{
 			//当たってる間はダメージ状態
 			m_state = STATE_DAMAGE;
@@ -991,8 +1105,11 @@ bool CEnemy::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *pS
 				m_bSuperArmor = true;
 				m_pMotion->SetNumMotion(4);
 				m_nDamageCounter = 1;
+				if (m_nDownCount >= 1)
+				{
+					m_nDownCount = 0;
+				}
 			}
-
 		}
 		return true;
 	}
@@ -1047,16 +1164,25 @@ bool CEnemy::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pSh
 	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
 	{//自分以外の攻撃球が当たったら
 		CScene *pParent = pShere->GetParent();
-		if (pParent->GetObjType() == OBJTYPE_PLAYER || pParent->GetObjType() == OBJTYPE_ROBOT)
+		if (pParent->GetObjType() == OBJTYPE_ROBOT)
 		{
 			//当たってる間はダメージ状態
-			m_state = STATE_DAMAGE;
+			m_state = STATE_ROBOTDAMAGE;		// ←追加(よしろう)
 
 			if (m_nDamageCounter == 0)
 			{
 				m_bSuperArmor = true;
 				m_pMotion->SetNumMotion(4);
 				m_nDamageCounter = 1;
+				if (m_nDownCount >= 1)
+				{
+					m_nDownCount = 0;
+				}
+				// ←新規追加(よしろう)
+				CCharacter *pCharacter = (CCharacter*)pParent;
+				if (pCharacter == NULL) { return true; }
+				D3DXVECTOR3 AnotherPos = pCharacter->GetPos();
+				BlowAway(AnotherPos, 1);
 			}
 		}
 		return true;
