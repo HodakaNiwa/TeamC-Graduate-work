@@ -304,7 +304,7 @@ void CTutorial::Update(void)
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
 		if (pKeyboard->GetKeyboardTrigger(DIK_RETURN) == true || pXPad->GetTrigger(XINPUT_GAMEPAD_B, nCnt) == true ||
-			pRawMouse->GetTrigger(nCnt, CRawMouse::RIMS_BUTTON_LEFT) == true)
+			pRawMouse->GetTrigger(nCnt, CRawMouse::RIMS_BUTTON_RIGHT) == true)
 		{
 			if (CFade::GetFadeMode() == CFade::FADE_NONE) { CFade::SetFade(CManager::MODE_TITLE); }
 		}
