@@ -191,7 +191,8 @@ void  CEnemy::Update(void)
 	CDebugProc::Print("\n現在のモーション : %d", m_pMotion->GetNumMotion());
 	CDebugProc::Print("\nぶっ飛びダメージ : %d", m_nDamageCount);
 	CDebugProc::Print("\nダメージダウン : %d\n", m_nDownCount);*/
-	CDebugProc::Print("\n現在の位置 : %.1f %.1f %.1f",GetPos().x,GetPos().y,GetPos().z); 
+	CDebugProc::Print("\n現在の位置 : %.1f %.1f %.1f\n", GetPos().x, GetPos().y, GetPos().z);
+	CDebugProc::Print("\nm_bFinish : %d\n", m_bFinish);
 }
 
 //=============================================================================
@@ -404,8 +405,25 @@ void CEnemy::DisSort(D3DXVECTOR3 pos)
 //=============================================================================
 void  CEnemy::AIBasicAction(void)
 {
+	CGame * pGame = CManager::GetGame();
 	D3DXVECTOR3 pos = CCharacter::GetPos();
 	m_posOld = pos;				//ワンフレーム前の位置
+
+
+	if (m_nAreaNow != CTerritory::RequestErea(GetPos()))
+	{
+		Interruption();
+	}
+	if (pGame->GetDivisionEventFlag() == true && m_EveCheckDivi == false)//分断エリアのイベントが発生している場合...
+	{
+		m_nPassCnt = 0;
+		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
+		{
+			m_AreaInfo[m_nAreaNow][nCnt].bFlag = false;
+
+		}
+		m_nAreaNow = CTerritory::RequestErea(GetPos());
+	}
 
 	if (m_bFinish == true)	//!	[[始点への移動処理 / その後、進む拠点を決める]]
 	{
@@ -417,7 +435,7 @@ void  CEnemy::AIBasicAction(void)
 			pos.z <= m_nTerrStart.pos.z + 25.0f && pos.z >= m_nTerrStart.pos.z - 25.0f)
 		{
 			Event_Bonus();
-			
+
 			//[[ライン数の初期化 / 新たな始点・終点を決める]]
 			DisSort(pos);//一番短い距離が始点となる
 			m_bFinish = false;
@@ -427,9 +445,9 @@ void  CEnemy::AIBasicAction(void)
 		}
 
 		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
-		Program_Move(pos,m_nTerrStart);	//移動処理
+		Program_Move(pos, m_nTerrStart);	//移動処理
 	}
-	else //! [[始点を除く拠点の計算]]
+	else if (m_bFinish == false) //! [[始点を除く拠点の計算]]
 	{
 		//★角度計算
 		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
@@ -441,16 +459,16 @@ void  CEnemy::AIBasicAction(void)
 		if (pos.x <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x + 25.0f && pos.x >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.x - 25.0f &&
 			pos.z <= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z + 25.0f && pos.z >= m_AreaInfo[m_nAreaNow][m_nTargetNum].pos.z - 25.0f)
 		{
-			CGame * pGame = CManager::GetGame();
+
 			if (pGame != NULL)
 			{
 				CCharacter *pChara = pGame->GetChara(m_nEnemyNo);
 				if (pChara != NULL)
 				{
-					switch(pChara->GetCharcterType())
+					switch (pChara->GetCharcterType())
 					{
 					case CCharacter::CHARCTERTYPE_SPEED:
-						
+
 						if (m_state == STATE_ACTION) { LineConnect(((9 + m_nLevel) - (rand() % 4))); }	//アクション時
 						else { LineConnect(((7 + m_nLevel) - (rand() % 3))); } //通常時
 						break;
@@ -465,12 +483,12 @@ void  CEnemy::AIBasicAction(void)
 					}
 				}
 			}
-			
+
 			//[[フラグを立てる]]
 			m_AreaInfo[m_nAreaNow][m_nTargetNum].bFlag = true;
 			//[[通過記録カウントアップ]]
 			m_nPassCnt += 1;
-			
+
 
 			//イベント時
 			if (pGame->GetDivisionEventFlag() == true)//分断エリアのイベントが発生している場合...
@@ -478,6 +496,7 @@ void  CEnemy::AIBasicAction(void)
 				//発生ごとに更新一回のみ
 				if (m_EveCheckDivi == false)
 				{
+					//InitSort(GetPos());
 					Interruption();//引いているラインを一度リセット
 				}
 				m_EveCheckDivi = true;
@@ -515,19 +534,19 @@ void  CEnemy::AIBasicAction(void)
 						m_nAreaNow = 0;
 					}
 
-					//★角度計算
 					for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 					{
 						m_AreaInfo[m_nAreaNow][nCnt].fRadian = (float)atan2(m_AreaInfo[m_nAreaNow][nCnt].pos.z - pos.z, m_AreaInfo[m_nAreaNow][nCnt].pos.x - pos.x);
 					}
 				}
 			}
-			
+
 			DisSort(pos);	//距離の再計算
+
 		}
 
 		Program_Motion();	//モーションアクション(キャラ同士のぶつかり等)
-		Program_Move(pos,m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//移動処理
+		Program_Move(pos, m_AreaInfo[m_nAreaNow][m_nTargetNum]);	//移動処理
 	}
 }
 
@@ -546,6 +565,8 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 		{
 			if (m_state == STATE_WALK || m_state == STATE_ACTION)
 			{
+				//CDebugProc::Print("\nfSpeed : %.1f  fSpeed : %.1f\n", fSpeed, m_fSpeed);
+
 				pos.x += (float)cos(territory.fRadian) * (fSpeed * m_fSpeed);
 				pos.z += (float)sin(territory.fRadian) * (fSpeed * m_fSpeed);
 			}
@@ -567,12 +588,12 @@ void CEnemy::Program_Move(D3DXVECTOR3 pos,TERRITORY_INFO territory)
 		CCharacter::SetPos(pos);
 		CCharacter::SetRot(m_rot);
 		//CDebugProc::Print("\n角度 : %.1f", territory.fRadian);
-		CDebugProc::Print("\n角度A : %.1f", m_nTerrStart.fRadian);
+		/*CDebugProc::Print("\n角度A : %.1f", m_nTerrStart.fRadian);
 		for (int nCnt = 0; nCnt < m_nAreaTerrNum[m_nAreaNow]; nCnt++)
 		{
 			CDebugProc::Print("角度B : %.1f", m_AreaInfo[m_nAreaNow][nCnt].fRadian);
 
-		}
+		}*/
 
 	}
 #endif
@@ -823,6 +844,8 @@ void CEnemy::Event_Bonus(void)
 			}
 		}
 		m_EventCheck = true; //ここで初めてフラグを立てる(無駄にリセットさせないため)
+
+		
 	}
 	else
 	{

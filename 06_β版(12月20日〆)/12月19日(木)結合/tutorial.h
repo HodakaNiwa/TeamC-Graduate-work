@@ -15,7 +15,7 @@
 // É}ÉNÉçíËã`
 //=================================
 #define TEX_TUTORIAL_BG (10)
-#define TEX_TUTORIAL    (8)
+#define TEX_TUTORIAL    (3)
 #define MAX_OBJTYPE		(13)
 
 //=================================
@@ -86,6 +86,7 @@ private:
 
 	LPDIRECT3DTEXTURE9 m_pTextureBG[TEX_TUTORIAL_BG];
 	LPDIRECT3DTEXTURE9 m_pTextureText[TEX_TUTORIAL];
+	LPDIRECT3DTEXTURE9 m_pTextureLogo;
 
 	STATE m_state;
 	CMoveUI * m_pBG;

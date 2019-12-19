@@ -195,7 +195,10 @@ void CRobot::Update(void)
 
 	CCharacter::Update();		// キャラクターの更新
 	UpdateRobotUI();			// 出現テロップの更新
-
+	if (m_pShadow != NULL)
+	{
+		m_pShadow->SetPos(D3DXVECTOR3(m_pos.x, 0.3f, m_pos.z));
+	}
 	if (m_bDeth)
 	{
 		if (m_pShadow != NULL)

@@ -35,7 +35,7 @@
 #define TEX_YELLOW						(3)		//黄色
 
 // 地面シェーダー用
-#define FIELDRENDER_PRIORITY        	(3)
+#define FIELDRENDER_PRIORITY        	(1)
 #define FIELDRENDER_SHADER_FILENAME 	"data/field.hlsl"
 
 // 通常

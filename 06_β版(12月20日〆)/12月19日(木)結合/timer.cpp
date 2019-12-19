@@ -514,9 +514,9 @@ void CGameTimer::TimeGameUpdate(void)
 			if (m_nTime == 60)
 			{//残り1分になったらテクスチャを生成
 				pSound->PlaySound(CSound::SOUND_LABEL_SE012);	//タイムアナウンス
-				pSound->PlaySound(CSound::SOUND_LABEL_BGM037);
-				//pSound->SetVolume(CSound::SOUND_LABEL_BGM037, 5.0f);
-				pSound->StopSound(CSound::SOUND_LABEL_BGM001);
+				pSound->PlaySound(CSound::SOUND_LABEL_BGM037);	//ロボットBGMに切り替え
+				pSound->SetVolume(CSound::SOUND_LABEL_BGM037, 2.0f);	//音量を上げる
+				pSound->StopSound(CSound::SOUND_LABEL_BGM001);			//ゲームBGM止める
 				CTimerLogo::Create(m_pos, m_LogoSize, CTimerLogo::TIMERLOGO_1MIN);
 				CManager::GetGame()->GetFieldManger()->SetState(CFieldManager::STATE_TIME_1);
 			}

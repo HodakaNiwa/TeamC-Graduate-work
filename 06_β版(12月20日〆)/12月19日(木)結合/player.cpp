@@ -1294,7 +1294,7 @@ bool CPlayer::CollisionPlayerAttackSphereCollider(CPlayerAttackSphereCollider *p
 //=============================================================================
 bool CPlayer::CollisionRobotAttackSphereCollider(CPlayerAttackSphereCollider *pShere, D3DXVECTOR3 &pos, D3DXVECTOR3 &ColRange)
 {
-	if (pShere->Collision(&pos, 100.0f, this) == true && pShere->GetParent() != this)
+	if (pShere->Collision(&pos, 70.0f, this) == true && pShere->GetParent() != this)
 	{// Ž©•ªˆÈŠO‚ÌUŒ‚‹…‚ª“–‚½‚Á‚½‚ç
 		CScene *pParent = pShere->GetParent();
 		if (pParent->GetObjType() == OBJTYPE_ROBOT)

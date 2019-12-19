@@ -26,7 +26,7 @@
 #include "mine.h"
 #include "effectManager.h"
 #include "ring.h"
-#include "shadow.h" 
+#include "shadow.h" //安
 
 //*****************************************************************************
 // マクロ定義
@@ -36,7 +36,7 @@
 #define FIRST_POS			(D3DXVECTOR3(1800.0f, 360.0f, 0.0f))
 #define MIDDLE_POS			(D3DXVECTOR3(640.0f, 360.0f, 0.0f))
 #define SLIDEOUT_POS		(D3DXVECTOR3(-600.0f, 360.0f, 0.0f))
-#define MOVE				(150.0f)		//50
+#define MOVE				(50.0f)		//50
 
 #define LOGO_SIZE			(D3DXVECTOR3(400.0f, 60.0f, 0.0f))
 #define TEXT00_POS			(D3DXVECTOR3(640.0f, 180.0f, 0.0f))
@@ -57,6 +57,7 @@
 #define CHAR_TIME1			(60 * 11)		//11
 #define CHAR_TIME2			(60 * 18)		//18
 
+
 //背景テクスチャのパス
 #define TEX_BG_001	("data/TEXTURE/Tutorial/BG/0.png")
 #define TEX_BG_002	("data/TEXTURE/Tutorial/BG/1_mine.png")
@@ -70,14 +71,12 @@
 #define TEX_BG_010	("data/TEXTURE/Tutorial/BG/7.png")
 
 //テキストのテクスチャパス
-#define TEX_TURORIAL		("data/TEXTURE/Tutorial/Logo.png")
-#define TEX_WIN				("data/TEXTURE/Tutorial/勝利条件.png")
 #define TEX_WIN_TEXT1		("data/TEXTURE/Tutorial/テキスト.png")
 #define TEX_WIN_TEXT2		("data/TEXTURE/Tutorial/テキスト1.png")
-#define TEX_GETTERRITORIY	("data/TEXTURE/Tutorial/領地の取り方.png")
-#define TEX_CONTROL			("data/TEXTURE/Tutorial/操作方法.png")
-#define TEX_CHARACTER		("data/TEXTURE/Tutorial/選手紹介.png")
 #define TEX_END				("data/TEXTURE/Tutorial/終了.png")
+
+//ロゴテクスチャのパス
+#define TEX_LOGO			("data/TEXTURE/Tutorial/LogoTutorial.png")
 
 //読み込むテキストファイル名
 #define LOAD_TERRITORY			("data/TEXT/Territory.txt")
@@ -123,6 +122,7 @@ void CTutorial::Init(void)
 	m_pTerritoryRender = NULL;
 	m_pEffectManager = NULL;
 	m_pCharDamege = NULL;
+	m_pTextureLogo = NULL;
 	m_state = STATE_FIRST;
 	m_nCountTime = 0;
 	m_bMoveSlideTitle = false;
@@ -359,7 +359,8 @@ void CTutorial::UpdateFirst(void)
 
 	if (m_pTitle == NULL)
 	{//チュートリアルロゴの生成
-		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureText[0]);
+		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureLogo);
+		m_pTitle->SetTexUV(0.0f, 1.0f, 0.0f, 0.2f);
 	}
 	else
 	{//中心まで移動
@@ -377,7 +378,8 @@ void CTutorial::UpdateWin(void)
 
 	if (m_pTitle == NULL)
 	{//チュートリアルロゴの生成
-		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureText[1]);
+		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureLogo);
+		m_pTitle->SetTexUV(0.0f, 1.0f, 0.2f, 0.4f);
 	}
 	else
 	{
@@ -394,7 +396,7 @@ void CTutorial::UpdateWin(void)
 
 		if (m_pText00 == NULL)
 		{//テキストの生成
-			m_pText00 = CMoveUI::Create(TEXT00_POS, TEXT00_SIZE, m_pTextureText[3]);
+			m_pText00 = CMoveUI::Create(TEXT00_POS, TEXT00_SIZE, m_pTextureText[1]);
 			m_pText00->SetColoer(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 		}
 		else
@@ -406,7 +408,7 @@ void CTutorial::UpdateWin(void)
 		{//テキスト生成
 			if (m_pText01 == NULL)
 			{
-				m_pText01 = CMoveUI::Create(TEXT01_POS, TEXT01_SIZE, m_pTextureText[2]);
+				m_pText01 = CMoveUI::Create(TEXT01_POS, TEXT01_SIZE, m_pTextureText[0]);
 				m_pText01->SetColoer(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 			}
 			else
@@ -445,7 +447,8 @@ void CTutorial::UpdateGetTerritory(void)
 {
 	if (m_pTitle == NULL)
 	{
-		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureText[4]);
+		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureLogo);
+		m_pTitle->SetTexUV(0.0f, 1.0f, 0.4f, 0.6f);
 	}
 	else
 	{
@@ -571,7 +574,8 @@ void CTutorial::UpdateControler(void)
 {
 	if (m_pTitle == NULL)
 	{
-		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureText[5]);
+		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureLogo);
+		m_pTitle->SetTexUV(0.0f, 1.0f, 0.6f, 0.8f);
 	}
 	else
 	{
@@ -607,7 +611,8 @@ void CTutorial::UpdateCharacter(void)
 {
 	if (m_pTitle == NULL)
 	{
-		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureText[6]);
+		m_pTitle = CMoveUI::Create(FIRST_POS, LOGO_SIZE, m_pTextureLogo);
+		m_pTitle->SetTexUV(0.0f, 1.0f, 0.8f, 1.0f);
 	}
 	else
 	{
@@ -688,7 +693,7 @@ void CTutorial::UpdateEnd(void)
 
 	if (m_pTitle == NULL)
 	{
-		m_pTitle = CMoveUI::Create(MIDDLE_POS, TEXTEND_SIZE, m_pTextureText[7]);
+		m_pTitle = CMoveUI::Create(MIDDLE_POS, TEXTEND_SIZE, m_pTextureText[2]);
 		m_pTitle->SetColoer(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 	}
 	else
@@ -1055,14 +1060,12 @@ void CTutorial::LoadTex(void)
 	D3DXCreateTextureFromFile(pDevice, TEX_BG_010, &m_pTextureBG[9]);
 
 	//テキストテクスチャンの読み込み
-	D3DXCreateTextureFromFile(pDevice, TEX_TURORIAL, &m_pTextureText[0]);
-	D3DXCreateTextureFromFile(pDevice, TEX_WIN, &m_pTextureText[1]);
-	D3DXCreateTextureFromFile(pDevice, TEX_WIN_TEXT1, &m_pTextureText[2]);
-	D3DXCreateTextureFromFile(pDevice, TEX_WIN_TEXT2, &m_pTextureText[3]);
-	D3DXCreateTextureFromFile(pDevice, TEX_GETTERRITORIY, &m_pTextureText[4]);
-	D3DXCreateTextureFromFile(pDevice, TEX_CONTROL, &m_pTextureText[5]);
-	D3DXCreateTextureFromFile(pDevice, TEX_CHARACTER, &m_pTextureText[6]);
-	D3DXCreateTextureFromFile(pDevice, TEX_END, &m_pTextureText[7]);
+	D3DXCreateTextureFromFile(pDevice, TEX_WIN_TEXT1, &m_pTextureText[0]);
+	D3DXCreateTextureFromFile(pDevice, TEX_WIN_TEXT2, &m_pTextureText[1]);
+	D3DXCreateTextureFromFile(pDevice, TEX_END, &m_pTextureText[2]);
+
+	//ロゴの読込み
+	D3DXCreateTextureFromFile(pDevice, TEX_LOGO, &m_pTextureLogo);
 }
 
 //=============================================================================
@@ -1086,5 +1089,11 @@ void CTutorial::UnloadTex(void)
 			m_pTextureText[nCnt]->Release();
 			m_pTextureText[nCnt] = NULL;
 		}
+	}
+
+	if (m_pTextureLogo != NULL)
+	{//ロゴテクスチャの破棄
+		m_pTextureLogo->Release();
+		m_pTextureLogo = NULL;
 	}
 }
