@@ -293,14 +293,7 @@ void CLine::RequestVecA(void)
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&mtxLineWorld);
-
-	// 回転を反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, Rot.y, Rot.x, Rot.z);
-	D3DXMatrixMultiply(&mtxLineWorld, &mtxLineWorld, &mtxRot);
-
-	// 位置を反映
-	D3DXMatrixTranslation(&mtxTrans, Pos.x, Pos.y, Pos.z);
-	D3DXMatrixMultiply(&mtxLineWorld, &mtxLineWorld, &mtxTrans);
+	RequestWorldMatrix(Pos, Rot, &mtxLineWorld);
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtxLineWorld);
@@ -312,14 +305,7 @@ void CLine::RequestVecA(void)
 	{
 		// ワールドマトリックスの初期化
 		D3DXMatrixIdentity(&mtxPriWorld);
-
-		// 回転を反映
-		D3DXMatrixRotationYawPitchRoll(&mtxPriRot, 0.0f, 0.0f, 0.0f);
-		D3DXMatrixMultiply(&mtxPriWorld, &mtxPriWorld, &mtxPriRot);
-
-		// 位置を反映
-		D3DXMatrixTranslation(&mtxPriTrans, PrimitivPos[nCnt].x, PrimitivPos[nCnt].y, PrimitivPos[nCnt].z);
-		D3DXMatrixMultiply(&mtxPriWorld, &mtxPriWorld, &mtxPriTrans);
+		RequestWorldMatrix(PrimitivPos[nCnt], INITIALIZE_VECTOR3, &mtxPriWorld);
 
 		// ワールドマトリックスの設定
 		D3DXMatrixMultiply(&mtxPriWorld, &mtxPriWorld, &mtxLineWorld);
@@ -346,4 +332,48 @@ void CLine::RequestVecA(void)
 
 		m_VecA[nCntVec] = m_WorldPos[nCnt] - m_WorldPos[nCntVec];
 	}
+}
+
+//=============================================================================
+// ワールドマトリックスの計算処理
+//=============================================================================
+void CLine::RequestWorldMatrix(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXMATRIX * mtxWorld)
+{
+	D3DXMATRIX mtxRot, mtxParent; // 計算用マトリックス
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(mtxWorld);
+
+	// 回転行列を作成(D3DXMatrixRotationYawPitchRoll参照)
+	float fSinPitch = sinf(rot.x);
+	float fCosPitch = cosf(rot.x);
+	float fSinYaw = sinf(rot.y);
+	float fCosYaw = cosf(rot.y);
+	float fSinRoll = sinf(rot.z);
+	float fCosRoll = cosf(rot.z);
+	mtxRot._11 = fSinRoll * fSinPitch * fSinYaw + fCosRoll * fCosYaw;
+	mtxRot._12 = fSinRoll * fCosPitch;
+	mtxRot._13 = fSinRoll * fSinPitch * fCosYaw - fCosRoll * fSinYaw;
+	mtxRot._21 = fCosRoll * fSinPitch * fSinYaw - fSinRoll * fCosYaw;
+	mtxRot._22 = fCosRoll * fCosPitch;
+	mtxRot._23 = fCosRoll * fSinPitch * fCosYaw + fSinRoll * fSinYaw;
+	mtxRot._31 = fCosPitch * fSinYaw;
+	mtxRot._32 = -fSinPitch;
+	mtxRot._33 = fCosPitch * fCosYaw;
+
+	// 回転を反映する
+	mtxWorld->_11 = mtxRot._11;
+	mtxWorld->_12 = mtxRot._12;
+	mtxWorld->_13 = mtxRot._13;
+	mtxWorld->_21 = mtxRot._21;
+	mtxWorld->_22 = mtxRot._22;
+	mtxWorld->_23 = mtxRot._23;
+	mtxWorld->_31 = mtxRot._31;
+	mtxWorld->_32 = mtxRot._32;
+	mtxWorld->_33 = mtxRot._33;
+
+	// オフセット位置を反映
+	mtxWorld->_41 = pos.x;
+	mtxWorld->_42 = pos.y;
+	mtxWorld->_43 = pos.z;
 }

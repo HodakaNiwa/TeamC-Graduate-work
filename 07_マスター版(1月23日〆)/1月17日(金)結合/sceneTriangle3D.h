@@ -30,6 +30,8 @@ public:
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }	//バッファの取得
 
 private:
+	void SetWorldMatrix(void);
+
 	//メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;								//頂点バッファへのポインタ
 	D3DXMATRIX				m_mtxWorld;								//ワールドマトリックス

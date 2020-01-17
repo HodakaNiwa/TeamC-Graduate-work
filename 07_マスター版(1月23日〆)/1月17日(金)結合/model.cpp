@@ -227,17 +227,7 @@ void CModel::Draw(float fAlpha)
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	//拡大縮小行列の作成
-	D3DXMatrixScaling(&mtxScale, m_Scale.x, m_Scale.y, m_Scale.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxScale);
-
-	// 回転を反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_Rot.y, m_Rot.x, m_Rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	// 位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_Pos.x, m_Pos.y, m_Pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	SetWorldMatrix();
 
 	if (m_pParent != NULL)
 	{//親の場合
@@ -401,4 +391,45 @@ void CModel::CreateXFile(char FileName[40])
 		NULL,
 		&m_nNumMat,
 		&m_pMesh);
+}
+
+//=============================================================================
+// ワールドマトリックスの計算
+//=============================================================================
+void CModel::SetWorldMatrix(void)
+{
+	D3DXMATRIX mtxRot; // 計算用マトリックス
+
+	// 回転行列を作成(D3DXMatrixRotationYawPitchRoll参照)
+	float fSinPitch = sinf(m_Rot.x);
+	float fCosPitch = cosf(m_Rot.x);
+	float fSinYaw = sinf(m_Rot.y);
+	float fCosYaw = cosf(m_Rot.y);
+	float fSinRoll = sinf(m_Rot.z);
+	float fCosRoll = cosf(m_Rot.z);
+	mtxRot._11 = fSinRoll * fSinPitch * fSinYaw + fCosRoll * fCosYaw;
+	mtxRot._12 = fSinRoll * fCosPitch;
+	mtxRot._13 = fSinRoll * fSinPitch * fCosYaw - fCosRoll * fSinYaw;
+	mtxRot._21 = fCosRoll * fSinPitch * fSinYaw - fSinRoll * fCosYaw;
+	mtxRot._22 = fCosRoll * fCosPitch;
+	mtxRot._23 = fCosRoll * fSinPitch * fCosYaw + fSinRoll * fSinYaw;
+	mtxRot._31 = fCosPitch * fSinYaw;
+	mtxRot._32 = -fSinPitch;
+	mtxRot._33 = fCosPitch * fCosYaw;
+
+	// 大きさと回転を反映する
+	m_mtxWorld._11 = mtxRot._11 * m_Scale.x;
+	m_mtxWorld._12 = mtxRot._12 * m_Scale.x;
+	m_mtxWorld._13 = mtxRot._13 * m_Scale.x;
+	m_mtxWorld._21 = mtxRot._21 * m_Scale.y;
+	m_mtxWorld._22 = mtxRot._22 * m_Scale.y;
+	m_mtxWorld._23 = mtxRot._23 * m_Scale.y;
+	m_mtxWorld._31 = mtxRot._31 * m_Scale.z;
+	m_mtxWorld._32 = mtxRot._32 * m_Scale.z;
+	m_mtxWorld._33 = mtxRot._33 * m_Scale.z;
+
+	// オフセット位置を反映
+	m_mtxWorld._41 = m_Pos.x;
+	m_mtxWorld._42 = m_Pos.y;
+	m_mtxWorld._43 = m_Pos.z;
 }

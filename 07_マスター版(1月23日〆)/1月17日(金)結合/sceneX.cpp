@@ -355,7 +355,7 @@ void CSceneX::RequestMatrix(D3DXVECTOR3 rot, D3DXVECTOR3 pos)
 {
 	D3DXMATRIX mtxRot; // 計算用マトリックス
 
-					   // 回転行列を作成(D3DXMatrixRotationYawPitchRoll参照)
+	// 回転行列を作成(D3DXMatrixRotationYawPitchRoll参照)
 	float fSinPitch = sinf(rot.x);
 	float fCosPitch = cosf(rot.x);
 	float fSinYaw = sinf(rot.y);

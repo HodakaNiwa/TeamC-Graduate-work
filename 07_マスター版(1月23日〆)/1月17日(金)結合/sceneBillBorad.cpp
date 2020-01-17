@@ -186,13 +186,8 @@ void CSceneBillborad::Draw(void)
 	m_mtxWorld._32 = mtxView._23;
 	m_mtxWorld._33 = mtxView._33;
 
-	// 回転を反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	// 位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	//ワールドマトリックスの計算
+	SetWorldMatrix();
 
 	//ライティングを無効にする 安
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
@@ -340,4 +335,15 @@ void CSceneBillborad::SetUV(D3DXVECTOR2 uvMIn, D3DXVECTOR2 uvMax)
 
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
+}
+
+//=============================================================================
+// ワールドマトリックスの計算
+//=============================================================================
+void CSceneBillborad::SetWorldMatrix(void)
+{
+	// オフセット位置を反映
+	m_mtxWorld._41 = m_pos.x;
+	m_mtxWorld._42 = m_pos.y;
+	m_mtxWorld._43 = m_pos.z;
 }

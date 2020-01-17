@@ -42,7 +42,8 @@ protected:
 	D3DXVECTOR3		m_rot;										//向きの設定
 
 private:
-
+	void SetWorldMatrix(void);
+		
 	//メンバ変数
 	LPDIRECT3DTEXTURE9		m_pTexture;							// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;							//頂点バッファへのポインタ

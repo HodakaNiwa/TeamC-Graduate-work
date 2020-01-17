@@ -40,6 +40,8 @@ public:
 	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }								//ワールドマトリックスの取得
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }					//バッファの取得
 private:
+	void SetWorldMatrix(void);
+
 	//メンバ変数
 	LPDIRECT3DTEXTURE9		m_pTexture;												// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;												//頂点バッファへのポインタ

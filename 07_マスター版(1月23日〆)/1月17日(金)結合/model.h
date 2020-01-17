@@ -78,6 +78,7 @@ protected://派生クラスでも使える
 
 private://個人のみ使える
 	void SetScale(D3DXVECTOR3 Scale) { m_Scale = Scale; };
+	void SetWorldMatrix(void);
 
 	//	---<<小林が追加しました>>★	★	★	★	★	★	★	★	★	★
 	//	---<<デバック用変数>>---

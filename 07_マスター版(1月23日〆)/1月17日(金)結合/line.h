@@ -36,6 +36,7 @@ public:
 
 private:
 	void RequestVecA(void);
+	void RequestWorldMatrix(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXMATRIX * mtxWorld);
 	bool CollsionLine(D3DXVECTOR3 PlayerPos);
 
 	//ïœêî

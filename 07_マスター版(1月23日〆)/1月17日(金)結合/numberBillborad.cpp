@@ -156,9 +156,10 @@ void CNumberBillborad::Draw(void)
 	m_mtxWorld._32 = mtxView._23;
 	m_mtxWorld._33 = mtxView._33;
 
-	// 位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	// オフセット位置を反映
+	m_mtxWorld._41 = m_pos.x;
+	m_mtxWorld._42 = m_pos.y;
+	m_mtxWorld._43 = m_pos.z;
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

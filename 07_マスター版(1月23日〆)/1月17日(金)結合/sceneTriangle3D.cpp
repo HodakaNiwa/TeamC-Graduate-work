@@ -161,13 +161,8 @@ void CSceneTriangle3D::Draw(void)
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	// 回転を反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, 0.0f, 0.0f, 0.0f);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	// 位置を反映
-	D3DXMatrixTranslation(&mtxTrans, 0.0f, 5.0f, 0.0f);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	//ワールドマトリックスの計算
+	SetWorldMatrix();
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -243,3 +238,47 @@ void CSceneTriangle3D::SetPos(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, D3DXVECTOR3 Po
 // 設定処理
 //=============================================================================
 void CSceneTriangle3D::Set(const D3DXVECTOR3 pos, const D3DXVECTOR3 size){}
+
+//=============================================================================
+// ワールドマトリックスの計算
+//=============================================================================
+void CSceneTriangle3D::SetWorldMatrix(void)
+{
+	D3DXMATRIX mtxRot, mtxParent; // 計算用マトリックス
+
+								  // ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 回転行列を作成(D3DXMatrixRotationYawPitchRoll参照)
+	float fSinPitch = sinf(0.0f);
+	float fCosPitch = cosf(0.0f);
+	float fSinYaw = sinf(0.0f);
+	float fCosYaw = cosf(0.0f);
+	float fSinRoll = sinf(0.0f);
+	float fCosRoll = cosf(0.0f);
+	mtxRot._11 = fSinRoll * fSinPitch * fSinYaw + fCosRoll * fCosYaw;
+	mtxRot._12 = fSinRoll * fCosPitch;
+	mtxRot._13 = fSinRoll * fSinPitch * fCosYaw - fCosRoll * fSinYaw;
+	mtxRot._21 = fCosRoll * fSinPitch * fSinYaw - fSinRoll * fCosYaw;
+	mtxRot._22 = fCosRoll * fCosPitch;
+	mtxRot._23 = fCosRoll * fSinPitch * fCosYaw + fSinRoll * fSinYaw;
+	mtxRot._31 = fCosPitch * fSinYaw;
+	mtxRot._32 = -fSinPitch;
+	mtxRot._33 = fCosPitch * fCosYaw;
+
+	// 回転を反映する
+	m_mtxWorld._11 = mtxRot._11;
+	m_mtxWorld._12 = mtxRot._12;
+	m_mtxWorld._13 = mtxRot._13;
+	m_mtxWorld._21 = mtxRot._21;
+	m_mtxWorld._22 = mtxRot._22;
+	m_mtxWorld._23 = mtxRot._23;
+	m_mtxWorld._31 = mtxRot._31;
+	m_mtxWorld._32 = mtxRot._32;
+	m_mtxWorld._33 = mtxRot._33;
+
+	// オフセット位置を反映
+	m_mtxWorld._41 = 0.0f;
+	m_mtxWorld._42 = 5.0f;
+	m_mtxWorld._43 = 0.0f;
+}
