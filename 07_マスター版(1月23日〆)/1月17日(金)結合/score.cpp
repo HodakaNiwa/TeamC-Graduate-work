@@ -232,32 +232,34 @@ HRESULT CScoreGame::Init()
 
 	Set(m_pos, m_size);
 
-	int nPlayerNum = CManager::GetGame()->GetNumPlay();
-	float fPos = 0.0f;
-	float fSize = 0.0f;
+	if (CManager::MODE_GAME == CManager::GetMode())
+	{
+		int nPlayerNum = CManager::GetGame()->GetNumPlay();
+		float fPos = 0.0f;
+		float fSize = 0.0f;
 
-	if (nPlayerNum == 1)
-	{
-		fPos = 125.0f;
-		fSize = 1.0f;
-	}
-	else if (nPlayerNum >= 2)
-	{
-		fPos = 72.0f;
-		fSize = 0.55f;
-	}
-	
-	if (m_pScene2D == NULL)
-	{
-		m_pScene2D = CScene2D::Create(m_pos, m_size, CScene2D::TYPE_LOGO);
-
-		if (m_pScene2D != NULL)
+		if (nPlayerNum == 1)
 		{
-			m_pScene2D->BindTexture(m_pTexture);
-			m_pScene2D->Set(D3DXVECTOR3(m_pos.x - fPos,m_pos.y + 3.0f,m_pos.z), D3DXVECTOR3(100.0f * fSize,105.0f * fSize,0.0f));
+			fPos = 125.0f;
+			fSize = 1.0f;
+		}
+		else if (nPlayerNum >= 2)
+		{
+			fPos = 72.0f;
+			fSize = 0.55f;
+		}
+
+		if (m_pScene2D == NULL)
+		{
+			m_pScene2D = CScene2D::Create(m_pos, m_size, CScene2D::TYPE_LOGO);
+
+			if (m_pScene2D != NULL)
+			{
+				m_pScene2D->BindTexture(m_pTexture);
+				m_pScene2D->Set(D3DXVECTOR3(m_pos.x - fPos,m_pos.y + 3.0f,m_pos.z), D3DXVECTOR3(100.0f * fSize,105.0f * fSize,0.0f));
+			}
 		}
 	}
-	
 	return S_OK;
 }
 
@@ -287,9 +289,12 @@ void CScoreGame::Uninit(void)
 		m_nScoreData[nCntNum] = 0;
 	}
 
-	if (m_pScene2D != NULL)
+	if (CManager::MODE_GAME == CManager::GetMode())
 	{
-		m_pScene2D = NULL;
+		if (m_pScene2D != NULL)
+		{
+			m_pScene2D = NULL;
+		}
 	}
 
 	Release();
