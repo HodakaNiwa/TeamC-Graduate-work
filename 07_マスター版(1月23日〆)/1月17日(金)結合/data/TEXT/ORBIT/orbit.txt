@@ -1,0 +1,48 @@
+#--------------------------------------
+#
+# 軌跡スクリプト [orbit.txt]
+# Author : 佐藤安純 Sato_Asumi
+#
+#--------------------------------------
+SCRIPT
+
+#--------------------------------------
+# テクスチャの情報
+#--------------------------------------
+MAX_TEX = 4		#テクスチャの最大数
+
+FILE_NAME = data//TEXTURE//OrbitTex//Thunder.jpg		#[0] 稲妻
+FILE_NAME = data//TEXTURE//OrbitTex//FireOrbit.jpg	#[1] 炎
+FILE_NAME = data//TEXTURE//OrbitTex//orbit.jpg		#[2] 軌跡
+FILE_NAME = data//TEXTURE//OrbitTex//StarOrbit.jpg	#[3] 軌跡
+
+#--------------------------------------
+# 軌跡の情報
+#--------------------------------------
+MAX_ORBIT = 2	#軌跡の最大数
+
+ORBITSET
+	SET
+		INDEX = 0					#インデックス数
+		TEX = 2						#テクスチャ番号
+		POS[0] = 0.0 0.0 0.0		#オフセット[0]
+		POS[1] = 0.0 30.0 0.0		#オフセット[1]
+		PRIMITIV = 7500				#頂点数
+		COLOR = 0.3 0.3 1.0 0.7		#色
+		UV = 0.05					#XのUVの分割数
+		ANIM = 0.01					#アニメーション量
+	END_SET
+	
+	SET
+		INDEX = 1					#インデックス数
+		TEX = 3						#テクスチャ番号
+		POS[0] = 0.0 0.0 0.0        #オフセット[0]
+		POS[1] = 0.0 20.0 0.0       #オフセット[1]
+		PRIMITIV = 80               #頂点数
+		COLOR = 1.0 1.0 1.0 0.9     #色
+		UV = 0.01                   #XのUVの分割数
+		ANIM = 0.0                #アニメーション量
+	END_SET
+END_ORBITSET
+END_SCRIPT
+
