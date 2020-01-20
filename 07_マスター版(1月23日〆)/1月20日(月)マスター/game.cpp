@@ -1889,7 +1889,7 @@ void CGame::StartDivisionEvent(void)
 	m_nDivisionUICounter = 0;
 
 	// 分断する方向をランダムで設定
-	m_nDivisionDirection = 0;//rand() % 2;
+	m_nDivisionDirection = rand() % 2;
 
 	// イベント用カメラを生成
 	CreateEventCamera_DivisionStart();

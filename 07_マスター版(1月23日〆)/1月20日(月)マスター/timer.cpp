@@ -568,7 +568,7 @@ void CGameTimer::StartUpEvent(void)
 	if (pGame->GetDivisionEventFlag() == true || pGame->GetAreaBonusEventFlag() == true) { return; }
 
 	// 起動させるイベントをランダムで設定
-	int nRandom = 1;//rand() % CGame::GAMEEVENT_MAX;
+	int nRandom = rand() % CGame::GAMEEVENT_MAX;
 
 	switch (nRandom)
 	{// ランダムの値によって処理わけ
