@@ -389,6 +389,7 @@ void CResult::Update(void)
 			pSound->PlaySoundA(CSound::SOUND_LABEL_BGM002);
 		}
 	}
+
 #ifdef _DEBUG
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{

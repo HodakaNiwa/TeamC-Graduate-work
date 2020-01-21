@@ -285,7 +285,7 @@ void CTutorialPlayer::SetAimPos(void)
 	m_AimPosList[1].List[3] = D3DXVECTOR3(150.0f, 0.0f, 300.0f);
 	m_AimPosList[1].List[4] = D3DXVECTOR3(160.0f, 0.0f, 150.0f);
 	m_AimPosList[1].List[5] = D3DXVECTOR3(140.0f, 0.0f, -10.0f);
-	m_AimPosList[1].List[6] = D3DXVECTOR3(-60.0f, 0.0f, -20.0f);
+	m_AimPosList[1].List[6] = D3DXVECTOR3(-100.0f, 0.0f, -20.0f);
 
 	//3‚Â–Ú‚ÌƒŠƒXƒg‚ğì¬
 	m_AimPosList[2].nMaxList = AIMPOS_LIST02;

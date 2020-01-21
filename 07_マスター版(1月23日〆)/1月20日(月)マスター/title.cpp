@@ -244,6 +244,7 @@ void CTitle::Update(void)
 		}
 	}
 
+
 	if (m_pFieldManager != NULL) { m_pFieldManager->Update(); }
 	CDebugProc::Print("\nループ回数　 :　%d\n", g_nCnt);
 }

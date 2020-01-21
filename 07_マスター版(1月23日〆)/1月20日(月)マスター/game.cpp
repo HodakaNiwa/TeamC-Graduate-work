@@ -75,7 +75,7 @@
 #define PLAYER_MAX					(1)
 
 // デバッグ
-#define DEBUG_NUMPLAYER				 (1)
+#define DEBUG_NUMPLAYER				 (4)
 #define DEBUG_CAMERA				 (D3DXVECTOR3(1260.0f,2500.0f,180.0f))
 
 // 回転カメラ用(3人プレイ時のみ適用する)
@@ -436,7 +436,7 @@ void CGame::CreateInitPlayer(void)
 	CSelect *pSelect = CManager::GetSelect();
 	m_nNumPlay = CSelect::GetEntryPlayer();
 	if (m_nNumPlay == 0)
-	{
+	{//デバッグ用
 		m_nNumPlay = DEBUG_NUMPLAYER;
 	}
 	
@@ -1114,16 +1114,6 @@ void CGame::Update(void)
 			m_pRoboCharacter->ReleaseRobotUI();
 		}
 	}
-
-	//m_nCounter++;
-	//if (m_nCounter >= 3)
-	//{
-	//	if (CFade::GetFadeMode() == CFade::FADE_NONE)
-	//	{
-	//		CFade::SetFade(CManager::MODE_GAME);
-	//		m_nCounter = 0;
-	//	}
-	//}
 }
 
 //=============================================================================
@@ -1801,8 +1791,6 @@ void CGame::UpdateAreaBonusUI(void)
 			m_pAreaBonusLogo[nCnt]->SetVtxBuffCol();
 		}
 	}
-
-
 }
 
 //=============================================================================

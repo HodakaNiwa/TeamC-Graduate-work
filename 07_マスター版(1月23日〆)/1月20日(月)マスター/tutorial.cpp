@@ -1036,7 +1036,7 @@ void CTutorial::SetObjTypeList(void)
 	m_ObjTypeList[9] = CScene::OBJTYPE_RINGRENDER;
 	m_ObjTypeList[10] = CScene::OBJTYPE_MINE;
 	m_ObjTypeList[11] = CScene::OBJTYPE_RINGEMITTER;
-	m_ObjTypeList[11] = CScene::OBJTYPE_RINGEFFECT;
+	m_ObjTypeList[12] = CScene::OBJTYPE_RINGEFFECT;
 }
 
 //=============================================================================
